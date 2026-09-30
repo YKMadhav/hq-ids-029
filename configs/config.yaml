@@ -1,0 +1,99 @@
+# Project HQ-IDS-029 Configuration File
+#
+# All experiment scripts read this file; no hyperparameters are hard-coded downstream.
+
+experiment:
+  project_name: "hq-ids-029"
+  random_seed: 42
+  eval_metric: "f1_macro"
+  device: "cpu"
+
+dataset:
+  name: "UNSW-NB15"
+  path: "./data/real_flows.csv"
+  source: "UNSW-NB15 normalized, deterministic 5,000-flow sample"
+  n_flows: 5000
+  # Metadata columns stripped before preprocessing to prevent shortcut learning:
+  #   id (unique flow record id), proto/service/state (nominal protocol metadata),
+  #   attack_cat (ground-truth attack family).
+  strip_metadata_columns: ["id", "proto", "service", "state", "attack_cat"]
+  # 44 raw feature columns - 5 metadata columns = 39 numeric model inputs.
+  # Resolved from the data at run time; kept here for documentation only.
+  feature_dim: 39
+  test_size: 0.2   # 20% held-out test
+  val_size: 0.1    # 10% validation; remaining 70% train
+  log_transform_skewed: true
+  skew_threshold: 1.0
+  scaler_range: [-3.141592653589793, 3.141592653589793] # [-pi, pi] for quantum angle encoding
+
+classical_encoder:
+  type: "bottleneck_mlp" # "autoencoder" or "bottleneck_mlp"
+  input_dim: 39
+  hidden_dim: 16
+  latent_dim: 4 # Strict hardware budget: 4 latent variables for 4 qubits
+  activation: "tanh" # Scaled by pi -> z in [-pi, pi]
+
+quantum_circuit:
+  num_qubits: 4 # Strict NISQ budget: N <= 4
+  ansatz: "RealAmplitudes" # Ry rotation layers + linear CNOT rings
+  reps: 2 # Variational layer repetitions
+  # PennyLaneVQCModule also supports "ZZFeatureMap". AngleEmbedding is used because it
+  # is measurably more trainable: its data encoding is a direct Ry(z) map, whereas
+  # ZZFeatureMap's 2*(pi - z_i)*(pi - z_j) phase saturates the oscillatory
+  # 4-dimensional latent bottleneck (72% vs 94% test accuracy, see EXECUTION_LOG.md).
+  # QiskitVQCBuilder transcribes the SAME circuit (verified to <2e-7 in <Z_i>), so the
+  # shot-based Aer NISQ replay in Step 3 still matches the trained model exactly.
+  feature_map: "AngleEmbedding"
+  feature_map_reps: 1
+  entanglement: "linear"
+  # Circuit profiles measured by QiskitVQCBuilder (asserted at run time):
+  trained_circuit:            # AngleEmbedding + RealAmplitudes(4, reps=2)
+    depth: 9
+    cnot_count: 6
+    num_parameters: 16
+  hardware_reference_circuit: # ZZFeatureMap(4, reps=1) + RealAmplitudes(4, reps=2)
+    depth: 18
+    cnot_count: 12
+    num_parameters: 16
+
+hybrid_classifier:
+  head_type: "linear"
+  output_classes: 2 # Binary: Benign (0) vs Attack (1)
+  learning_rate: 0.01
+  optimizer: "adam"
+  epochs: 20
+  batch_size: 64
+
+error_mitigation:
+  m3_readout_mitigation: true
+  dynamical_decoupling: false
+  noise:
+    p_single_qubit: 0.001  # single-qubit depolarizing
+    p_cnot: 0.01            # two-qubit CNOT depolarizing
+    p_readout: 0.03         # symmetric readout bit-flip
+  shots: 1024
+  # Aer shot-based replay budget (test-set flows executed per seed).
+  nisq_eval_samples: 1000
+
+baselines:
+  seeds: [42, 43, 44, 45, 46]
+  latency_runs: 1000
+  latency_warmup_runs: 50
+  random_forest:
+    n_estimators: 100
+    max_depth: 12
+  xgboost:
+    n_estimators: 100
+    max_depth: 6
+    learning_rate: 0.1
+    eval_metric: "logloss"
+  mlp:
+    input_dim: 39
+    hidden_dim: 16
+    bottleneck_dim: 4
+    output_dim: 2
+    learning_rate: 0.005
+    batch_size: 64
+    epochs: 40
+    weight_decay: 0.0001
+    patience: 8
