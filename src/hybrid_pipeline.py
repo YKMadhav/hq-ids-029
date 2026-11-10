@@ -57,10 +57,12 @@ class _HybridQNNModule(nn.Module):
         ansatz_type: str = "RealAmplitudes",
         feature_map: str = "AngleEmbedding",
         feature_map_reps: int = 1,
-        quantum_layer: str = "vqc"
+        quantum_layer: str = "vqc",
+        output_mode: str = "expectations",
     ):
         super().__init__()
         self.quantum_layer = quantum_layer
+        self.output_mode = output_mode
         self.encoder = BottleneckMLPEncoder(
             input_dim=input_dim,
             hidden_dim=hidden_dim,
@@ -73,7 +75,8 @@ class _HybridQNNModule(nn.Module):
                 num_layers=num_layers,
                 ansatz_type=ansatz_type,
                 feature_map=feature_map,
-                feature_map_reps=feature_map_reps
+                feature_map_reps=feature_map_reps,
+                output_mode=output_mode,
             )
         elif quantum_layer == "identity":
             self.vqc = nn.Identity()
@@ -83,22 +86,24 @@ class _HybridQNNModule(nn.Module):
                 num_layers=num_layers,
                 ansatz_type=ansatz_type,
                 feature_map=feature_map,
-                feature_map_reps=feature_map_reps
+                feature_map_reps=feature_map_reps,
+                output_mode=output_mode,
             )
             for parameter in self.vqc.parameters():
                 parameter.requires_grad = False
         else:
             raise ValueError(f"Unsupported quantum_layer: {quantum_layer}")
 
-        self.head = nn.Linear(num_qubits, output_dim)
+        head_dim = 2**num_qubits if (quantum_layer != "identity" and output_mode == "bitstrings") else num_qubits
+        self.head = nn.Linear(head_dim, output_dim)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         # 1. Classical feature compression: input -> 4 latent angles in [-pi, pi]
         z = self.encoder(x)
-        # 2. Parameterized Quantum Circuit: 4 -> 4 Pauli-Z expectation values in [-1, 1]
-        q_expvals = self.vqc(z)
-        # 3. Classical readout head: 4 -> 2 class logits
-        logits = self.head(q_expvals)
+        # 2. Parameterized Quantum Circuit: 4 -> 4 expectations or 16 probabilities
+        q_out = self.vqc(z)
+        # 3. Classical readout head -> class logits
+        logits = self.head(q_out)
         return logits
 
     def encode(self, x: torch.Tensor) -> torch.Tensor:
@@ -132,6 +137,8 @@ class HybridQNNClassifier:
         feature_map: str = "AngleEmbedding",
         feature_map_reps: int = 1,
         quantum_layer: str = "vqc",
+        output_mode: str = "expectations",
+        loss_fn: Optional[nn.Module] = None,
         learning_rate: float = 0.01,
         batch_size: int = 64,
         epochs: int = 20,
@@ -147,6 +154,8 @@ class HybridQNNClassifier:
         self.feature_map = feature_map
         self.feature_map_reps = feature_map_reps
         self.quantum_layer = quantum_layer
+        self.output_mode = output_mode
+        self.loss_fn = loss_fn
         self.learning_rate = learning_rate
         self.batch_size = batch_size
         self.epochs = epochs
@@ -166,10 +175,11 @@ class HybridQNNClassifier:
             ansatz_type=ansatz_type,
             feature_map=feature_map,
             feature_map_reps=feature_map_reps,
-            quantum_layer=quantum_layer
+            quantum_layer=quantum_layer,
+            output_mode=output_mode,
         ).to(self.device)
 
-        self.criterion = nn.CrossEntropyLoss()
+        self.criterion = loss_fn if loss_fn is not None else nn.CrossEntropyLoss()
 
     def fit(
         self,

@@ -89,6 +89,33 @@ METADATA_COLUMNS = SYNTHETIC_METADATA_COLUMNS + UNSW_METADATA_COLUMNS
 # Ground-truth / supervision columns that must never enter the feature matrix.
 LABEL_COLUMNS = ["label", "attack_category", "attack_cat"]
 
+# Canonical 10-class UNSW-NB15 attack category taxonomy
+ATTACK_CAT_MAPPING = {
+    "Normal": 0,
+    "Fuzzers": 1,
+    "Analysis": 2,
+    "Backdoors": 3,
+    "Backdoor": 3,  # Normalize singular/plural
+    "DoS": 4,
+    "Exploits": 5,
+    "Generic": 6,
+    "Reconnaissance": 7,
+    "Shellcode": 8,
+    "Worms": 9,
+}
+ATTACK_CAT_NAMES = [
+    "Normal",
+    "Fuzzers",
+    "Analysis",
+    "Backdoors",
+    "DoS",
+    "Exploits",
+    "Generic",
+    "Reconnaissance",
+    "Shellcode",
+    "Worms",
+]
+
 
 class SyntheticFlowGenerator:
     """
@@ -432,10 +459,12 @@ class FlowPreprocessor:
         feature_range: Tuple[float, float] = (-math.pi, math.pi),
         log_transform_skewed: bool = True,
         skew_threshold: float = 1.0,
+        multi_class: bool = False,
     ):
         self.feature_range = feature_range
         self.log_transform_skewed = log_transform_skewed
         self.skew_threshold = skew_threshold
+        self.multi_class = multi_class
         self.scaler = MinMaxScaler(feature_range=feature_range)
         self.skewed_features_: List[str] = []
         self.feature_names_: List[str] = []
@@ -472,9 +501,20 @@ class FlowPreprocessor:
         """
         Transforms features into scaled numpy array bounded in [-pi, pi],
         and returns (X, y).
+        If self.multi_class is True, y is 10-class ordinal index from ATTACK_CAT_MAPPING.
         """
         features_df = self._extract_features(df)
-        labels = df["label"].values.astype(np.int64) if "label" in df.columns else np.zeros(len(df), dtype=np.int64)
+        if self.multi_class:
+            if "attack_cat" in df.columns:
+                labels = df["attack_cat"].map(lambda c: ATTACK_CAT_MAPPING.get(str(c).strip(), 0)).values.astype(np.int64)
+            elif "attack_category" in df.columns:
+                labels = df["attack_category"].map(lambda c: ATTACK_CAT_MAPPING.get(str(c).strip(), 0)).values.astype(np.int64)
+            elif "label" in df.columns:
+                labels = df["label"].values.astype(np.int64)
+            else:
+                labels = np.zeros(len(df), dtype=np.int64)
+        else:
+            labels = df["label"].values.astype(np.int64) if "label" in df.columns else np.zeros(len(df), dtype=np.int64)
 
         transformed_df = features_df.copy()
         if self.log_transform_skewed:

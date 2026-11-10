@@ -1,0 +1,85 @@
+{
+  "metadata": {
+    "protocol": "tcp_setup_header_proxy_v1",
+    "seed": 42,
+    "n_samples": 82332,
+    "unique_source_flows": 82332,
+    "source_flow_id_sha256": "02935e7c6be3e73dd142911436bc7e99314127b0a5b2da38f1f3a020f4bf3c98",
+    "testing_source": "/Users/yippilikhatwangmadhav/Desktop/hq-ids-029/data/UNSW_NB15_testing-set.csv",
+    "threat_count": 45332,
+    "benign_count": 37000,
+    "threat_ratio": 0.5506000097167566,
+    "horizons": [
+      2
+    ],
+    "checkpoint_manifest": "/Users/yippilikhatwangmadhav/Desktop/hq-ids-029/models/checkpoints/phase4_setup_manifest.json",
+    "scaler_metadata": {
+      "protocol": "tcp_setup_header_proxy_v1",
+      "feature_names": [
+        "packet_1_proto",
+        "packet_1_sttl",
+        "packet_1_swin",
+        "packet_2_proto",
+        "packet_2_dttl",
+        "packet_2_dwin"
+      ],
+      "input_flat_dim": 6,
+      "training_source": "/Users/yippilikhatwangmadhav/Desktop/hq-ids-029/data/UNSW_NB15_training-set.csv",
+      "n_training_flows": 175341,
+      "training_id_sha256": "8210456fc824f04bdaaf211c4bf5e97c00e9b9853bec5128276f40bf4147b597",
+      "testing_source": "/Users/yippilikhatwangmadhav/Desktop/hq-ids-029/data/UNSW_NB15_testing-set.csv",
+      "n_testing_flows": 82332,
+      "testing_id_sha256": "02935e7c6be3e73dd142911436bc7e99314127b0a5b2da38f1f3a020f4bf3c98"
+    }
+  },
+  "setup_header_proxy_k2": {
+    "ClassicalMLP": {
+      "accuracy": 0.7858305397658262,
+      "f1_macro": 0.7626155674437963,
+      "f1_binary": 0.8368508220838461,
+      "precision": 0.7207197156836184,
+      "recall": 0.997595517515221,
+      "fpr": 0.47362162162162164,
+      "specificity": 0.5263783783783784,
+      "total_inference_time_sec": 0.36397070800012443,
+      "latency_per_sample_ms": 0.0044207684496930045,
+      "throughput_flows_per_sec": 226205.01647613867
+    },
+    "CNN1D": {
+      "accuracy": 0.7858548316571928,
+      "f1_macro": 0.7626464893584401,
+      "f1_binary": 0.8368663082802076,
+      "precision": 0.720742688660451,
+      "recall": 0.997595517515221,
+      "fpr": 0.47356756756756757,
+      "specificity": 0.5264324324324324,
+      "total_inference_time_sec": 0.6686602499994478,
+      "latency_per_sample_ms": 0.008121511077095757,
+      "throughput_flows_per_sec": 123129.79573717443
+    },
+    "LSTM": {
+      "accuracy": 0.7858183938201428,
+      "f1_macro": 0.7626001059794846,
+      "f1_binary": 0.8368430792005922,
+      "precision": 0.7207082297443743,
+      "recall": 0.997595517515221,
+      "fpr": 0.47364864864864864,
+      "specificity": 0.5263513513513514,
+      "total_inference_time_sec": 0.5295990419999725,
+      "latency_per_sample_ms": 0.006432481198075749,
+      "throughput_flows_per_sec": 155461.00629087668
+    },
+    "SequentialQNN": {
+      "accuracy": 0.7856726424719429,
+      "f1_macro": 0.7624225479737308,
+      "f1_binary": 0.8367441344090001,
+      "precision": 0.720584485945567,
+      "recall": 0.9975513985705462,
+      "fpr": 0.4739189189189189,
+      "specificity": 0.5260810810810811,
+      "total_inference_time_sec": 441.58078962499894,
+      "latency_per_sample_ms": 5.363416285587608,
+      "throughput_flows_per_sec": 186.44832822079584
+    }
+  }
+}

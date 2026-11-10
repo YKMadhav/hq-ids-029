@@ -26,6 +26,17 @@ dataset:
   skew_threshold: 1.0
   scaler_range: [-3.141592653589793, 3.141592653589793] # [-pi, pi] for quantum angle encoding
 
+# This separate configuration is mandatory for Phase 4. It must not be
+# replaced by the 5,000-flow sample used by the other project phases.
+phase4_setup_header_proxy:
+  protocol: "tcp_setup_header_proxy_v1"
+  official_training_path: "./data/UNSW_NB15_training-set.csv"
+  official_testing_path: "./data/UNSW_NB15_testing-set.csv"
+  k_packets: 2
+  feature_allow_list: ["proto", "sttl", "dttl", "swin", "dwin"]
+  forbidden_post_hoc_features: ["sbytes", "dbytes", "spkts", "dpkts", "sloss", "dloss"]
+  scaler_bundle: "./models/checkpoints/phase4_setup_scaler.joblib"
+
 classical_encoder:
   type: "bottleneck_mlp" # "autoencoder" or "bottleneck_mlp"
   input_dim: 39

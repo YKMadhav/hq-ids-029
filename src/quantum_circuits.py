@@ -105,6 +105,7 @@ class PennyLaneVQCModule(nn.Module):
         ansatz_type: str = "RealAmplitudes",
         feature_map: str = "AngleEmbedding",
         feature_map_reps: int = 1,
+        output_mode: str = "expectations",
         device_name: str = "default.qubit",
     ):
         super().__init__()
@@ -113,6 +114,7 @@ class PennyLaneVQCModule(nn.Module):
         self.ansatz_type = ansatz_type
         self.feature_map = feature_map
         self.feature_map_reps = feature_map_reps
+        self.output_mode = output_mode
 
         # Device initialization
         self.dev = qml.device(device_name, wires=num_qubits)
@@ -128,6 +130,12 @@ class PennyLaneVQCModule(nn.Module):
         else:
             raise ValueError(f"Unsupported feature_map: {feature_map}")
 
+        def _measurement():
+            if self.output_mode == "bitstrings":
+                return qml.probs(wires=list(range(num_qubits)))
+            else:
+                return [qml.expval(qml.PauliZ(i)) for i in range(num_qubits)]
+
         if ansatz_type == "RealAmplitudes":
             # RealAmplitudes: (num_layers + 1) Ry layers interleaved with linear CNOT rings
             self.weight_shapes = {"weights": (num_layers + 1, num_qubits)}
@@ -136,7 +144,7 @@ class PennyLaneVQCModule(nn.Module):
             def _circuit(inputs, weights):
                 encode(inputs)
                 _apply_real_amplitudes(weights, list(range(num_qubits)), reps=num_layers)
-                return [qml.expval(qml.PauliZ(i)) for i in range(num_qubits)]
+                return _measurement()
 
             self.circuit_fn = _circuit
 
@@ -148,7 +156,7 @@ class PennyLaneVQCModule(nn.Module):
             def _circuit(inputs, weights):
                 encode(inputs)
                 qml.StronglyEntanglingLayers(weights, wires=list(range(num_qubits)))
-                return [qml.expval(qml.PauliZ(i)) for i in range(num_qubits)]
+                return _measurement()
 
             self.circuit_fn = _circuit
 
@@ -160,7 +168,7 @@ class PennyLaneVQCModule(nn.Module):
             def _circuit(inputs, weights):
                 encode(inputs)
                 qml.BasicEntanglerLayers(weights, wires=list(range(num_qubits)))
-                return [qml.expval(qml.PauliZ(i)) for i in range(num_qubits)]
+                return _measurement()
 
             self.circuit_fn = _circuit
 
@@ -173,7 +181,9 @@ class PennyLaneVQCModule(nn.Module):
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
         Input: Batch of 4-dimensional continuous latent features x in [-pi, pi]^4.
-        Output: 4-dimensional vector of Pauli-Z expectation values <Z_i> in [-1, 1]^4.
+        Output:
+          - If output_mode == 'expectations': 4-dim Pauli-Z expectations in [-1, 1]^4.
+          - If output_mode == 'bitstrings': 16-dim computational basis probabilities in Delta^15.
         """
         return self.qnn(x)
 

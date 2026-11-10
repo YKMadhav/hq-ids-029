@@ -254,6 +254,7 @@ class ClassicalMLPBaseline:
         epochs: int = 40,
         weight_decay: float = 1e-4,
         patience: int = 8,
+        loss_fn: Optional[nn.Module] = None,
         random_state: int = 42,
         device: str = "cpu"
     ):
@@ -266,6 +267,7 @@ class ClassicalMLPBaseline:
         self.epochs = epochs
         self.weight_decay = weight_decay
         self.patience = patience
+        self.loss_fn = loss_fn
         self.random_state = random_state
         self.device = torch.device(device)
 
@@ -280,7 +282,7 @@ class ClassicalMLPBaseline:
             output_dim=output_dim
         ).to(self.device)
 
-        self.criterion = nn.CrossEntropyLoss()
+        self.criterion = loss_fn if loss_fn is not None else nn.CrossEntropyLoss()
 
     def fit(
         self,

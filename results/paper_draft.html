@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc 3.11" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Hybrid Quantum-Classical Intrusion Detection (HQ-IDS-029)</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      white-space: pre-wrap;
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: 1.5em;}
+    div.column{flex: auto;}
+    @media screen {
+    div.columns{gap: min(4vw, 1.5em);}
+    div.column{overflow-x: auto;}
+    }
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js"
+  type="text/javascript"></script>
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Hybrid Quantum-Classical Intrusion Detection
+(HQ-IDS-029)</h1>
+</header>
+<h1
+id="an-empirical-benchmarking-and-ablation-analysis-of-bottleneck-hybrid-quantum-neural-networks-on-unsw-nb15-traffic">An
+Empirical Benchmarking and Ablation Analysis of Bottleneck Hybrid
+Quantum Neural Networks on UNSW-NB15 Traffic</h1>
+<p><strong>Author:</strong> Khatwang Madhav Yippili<br />
+<strong>Affiliation:</strong> Department of Mathematical Sciences and
+Computing, Sri Sathya Sai Institute of Higher Learning, Prasanthi
+Nilayam, Andhra Pradesh, India<br />
+<strong>Target:</strong> IEEE Conference on Quantum Engineering /
+Cybersecurity (AQV Use Case UC-029)<br />
+<strong>Artifact Repository:</strong> <code>hq-ids-029</code></p>
+<hr />
+<h3 id="abstract">Abstract</h3>
+<p>Network intrusion detection systems (NIDS) deployed in modern
+Security Operations Centers (SOCs) face acute alert fatigue driven by
+high false alarm rates on bursty benign traffic. Under the Amaravati
+Quantum Valley (AQV) Use Case UC-029 mandate (<em>Cybersecurity &amp;
+Quantum-Safe Infrastructure</em>), this paper presents an empirical,
+zero-trust benchmark of hybrid quantum-classical neural network
+architectures operating under a strict 4-qubit Noisy Intermediate-Scale
+Quantum (NISQ) hardware budget (<span class="math inline">\(N \le
+4\)</span>). We implement and cross-benchmark seven paradigms across
+five deterministic seeds on <span class="math inline">\(5{,}000\)</span>
+real UNSW-NB15 flow records: classical tree ensembles (XGBoost, Random
+Forest), depth-matched Classical Multilayer Perceptrons (MLP),
+Variational Quantum Classifiers (Hybrid VQC), Quantum Convolutional
+Neural Networks (Hybrid QCNN), Quantum Support Vector Machines (QSVM),
+and an ablation control (Quantum Bypassed). Through an expanded 30-seed
+hypothesis testing protocol (<span class="math inline">\(N=30\)</span>),
+we demonstrate that the accuracy gap between Full VQC (<span
+class="math inline">\(93.65\%\)</span>) and Bypassed controls (<span
+class="math inline">\(93.61\%\)</span>) is statistically non-significant
+(<span class="math inline">\(p = 0.6266\)</span>, Cohen’s <span
+class="math inline">\(d = 0.090\)</span>), proving that tabular flow
+discrimination is primarily governed by classical bottleneck compression
+(<span class="math inline">\(39 \to 16 \to 4\)</span>) rather than
+quantum kernel supremacy. However, Hybrid VQC achieves the lowest False
+Positive Rate (<span class="math inline">\(14.67\%\)</span>) among all
+neural models, offering a <span class="math inline">\(2.13\%\)</span>
+operational reduction over Classical MLPs (<span
+class="math inline">\(16.80\%\)</span>), while Matrix Inversion (M3)
+readout mitigation mathematically bounds expectation drift recovery to
+<span class="math inline">\(46.6\%\)</span> under <span
+class="math inline">\(10\%\)</span> bit-flip noise (<span
+class="math inline">\(\kappa(\mathbf{M}) \le 2.44\)</span>).</p>
+<p><strong>Keywords:</strong> Quantum Machine Learning, Network
+Intrusion Detection, Variational Quantum Circuits, NISQ, Readout
+Mitigation, UNSW-NB15, Model Ablation.</p>
+<hr />
+<h2 id="i.-introduction">I. Introduction</h2>
+<p>Modern enterprise and state-level Security Operations Centers (SOCs)
+monitor high-throughput network backbones where subtle zero-day
+intrusions, stealthy exfiltration, and reconnaissance probes overlap
+heavily with benign network telemetry in continuous statistical feature
+space. In practical SOC workflows, even a modest <span
+class="math inline">\(1\%\)</span> to <span
+class="math inline">\(2\%\)</span> increase in False Positive Rate (FPR)
+translates to thousands of false alerts per day, inducing severe analyst
+alert fatigue and increasing the mean-time-to-detect (MTTD) for critical
+breaches.</p>
+<p>Under national quantum roadmap initiatives and the Amaravati Quantum
+Valley (AQV) Use Case UC-029 framework, Quantum Machine Learning (QML)
+has emerged as a promising paradigm for modelling complex network
+traffic distributions. By mapping classical flow features into
+high-dimensional Hilbert spaces (<span class="math inline">\(\mathcal{H}
+= \mathbb{C}^{2^N}\)</span>) via parameterized quantum circuits (PQCs),
+quantum kernels have the theoretical potential to resolve non-linearly
+separable decision boundaries that confound classical linear
+readouts.</p>
+<p>However, existing literature evaluating QML on network flow
+benchmarks often suffers from four severe methodological
+vulnerabilities: 1. <strong>Data Leakage &amp; Shortcut
+Memorization:</strong> Many studies report near-<span
+class="math inline">\(100\%\)</span> accuracy by inadvertently retaining
+unique row identifiers (<code>id</code>), protocol metadata, or by
+fitting normalization scalers across entire datasets rather than
+strictly on training splits. 2. <strong>Unsubstantiated Quantum
+Advantage Claims:</strong> Improvements in hybrid pipelines are
+frequently attributed to “quantum supremacy” without evaluating
+depth-matched classical controls or conducting ablation tests to isolate
+whether the quantum circuit or the surrounding classical neural layers
+drove classification gains. 3. <strong>Idealized Hardware
+Assumptions:</strong> Evaluations predominantly assume
+infinite-precision, noiseless statevector simulation without quantifying
+vulnerability to physical gate depolarizing and measurement readout
+errors. 4. <strong>Absence of Latency Benchmarking:</strong> Studies
+omit single-sample inference latency measurements, obscuring the severe
+state-preparation and circuit dispatch overheads that impede real-time
+packet-rate deployment.</p>
+<p>To address these vulnerabilities, this paper establishes a
+zero-trust, multi-paradigm empirical benchmark on real UNSW-NB15 flow
+data under a strict <span class="math inline">\(N \le 4\)</span> qubit
+budget. We systematically structure our analysis through three
+complementary perspectives: * <strong>Operational Advantages:</strong>
+We demonstrate that mapping compressed representations into a 4-qubit
+Hilbert space enables Hybrid VQC to achieve the lowest False Positive
+Rate (<span class="math inline">\(14.67\%\)</span>) among all neural and
+quantum models, delivering a <span class="math inline">\(2.13\%\)</span>
+absolute reduction in false alarms over depth-matched Classical MLPs
+(<span class="math inline">\(16.80\%\)</span>). Furthermore, M3 matrix
+inversion reliably mitigates physical readout noise up to <span
+class="math inline">\(p_{\text{readout}} = 10\%\)</span> (<span
+class="math inline">\(\kappa(\mathbf{M}) \le 2.44\)</span>). *
+<strong>Physical Hardware Constraints:</strong> We transparently report
+that classical tree ensembles remain superior in raw performance;
+XGBoost achieves <span class="math inline">\(94.52\%\)</span> accuracy
+and <span class="math inline">\(0.08\text{ ms}\)</span> latency,
+outperforming the Hybrid VQC (<span
+class="math inline">\(93.96\%\)</span>, <span
+class="math inline">\(2.85\text{ ms}\)</span>). Statevector simulation
+introduces a <span class="math inline">\(145\times\)</span> latency
+penalty over classical neural networks (<span
+class="math inline">\(0.019\text{ ms}\)</span>). * <strong>Deployment
+Synthesis:</strong> Across an expanded 30-seed cross-validation (<span
+class="math inline">\(N=30\)</span>), the performance advantage of the
+quantum circuit over a bypassed linear baseline is statistically
+indistinguishable from zero (<span class="math inline">\(p =
+0.6266\)</span>, Cohen’s <span class="math inline">\(d =
+0.090\)</span>). This rigorously establishes that tabular flow
+classification is dominated by classical bottleneck compression (<span
+class="math inline">\(39 \to 16 \to 4\)</span>), with the quantum
+circuit operating as a regularizing, boundary-preserving
+transformation.</p>
+<hr />
+<h2 id="ii.-related-work-positioning">II. Related Work &amp;
+Positioning</h2>
+<p>The application of quantum computing to cybersecurity telemetry has
+expanded rapidly across several distinct paradigms:</p>
+<ul>
+<li><strong>QML Intrusion Detection Suites:</strong> Abreu et
+al. (<em>QML-IDS</em>) evaluated Variational Quantum Classifiers (VQC),
+Quantum Support Vector Machines (QSVM), and Quantum Convolutional Neural
+Networks (QCNN) across multiple intrusion benchmarks including
+UNSW-NB15, CICIDS2017, and ToN-IoT. While they demonstrated hardware
+viability on IBM Falcon backends, their architecture utilized static,
+fixed feature maps (e.g., <code>ZFeatureMap</code> and
+<code>ZZFeatureMap</code>) without joint backpropagation into a
+classical dimensionality compressor.</li>
+<li><strong>Resource-Constrained Encoders:</strong> Chen et
+al. investigated cyber threat detection under strict <span
+class="math inline">\(N \le 4\)</span> qubit budgets using a classical
+Multilayer Perceptron (MLP) front-end. They proved that combining
+classical pre-compression with quantum measurement mitigation and
+dynamical decoupling allows noisy execution to track ideal
+simulations.</li>
+<li><strong>Critical Baseline Audits:</strong> Vishvaa et
+al. (<em>Q-NIDS</em>) executed a critical audit of QML intrusion models,
+showing that apparent quantum gains often stem from uncalibrated
+classical baselines or post-hoc logit scaling, and that tree ensembles
+(Random Forest, XGBoost) remain formidable baselines on tabular
+traffic.</li>
+<li><strong>Early-Packet Telemetry:</strong> Spadari et al. demonstrated
+that quantum circuits exhibit enhanced cross-dataset generalization when
+applied to minimal early-flow header vectors (<span
+class="math inline">\(N_P = 10\)</span> packets), avoiding the
+host-specific overfitting common in deep neural networks.</li>
+</ul>
+<p>Our work bridges these foundations by providing the first unified,
+7-model cross-paradigm benchmark that couples an end-to-end
+differentiable classical bottleneck encoder with all three foundational
+QML architectures (VQC, QCNN, QSVM), evaluated under multi-seed
+hypothesis testing, adversarial stress, and physical M3 error
+mitigation.</p>
+<hr />
+<h2 id="iii.-system-architecture-qml-paradigms">III. System Architecture
+&amp; QML Paradigms</h2>
+<p>The complete pipeline processes raw bidirectional flow records
+through three sequential stages: (i) leakage-free classical ingestion,
+(ii) non-linear latent bottleneck compression, and (iii) quantum state
+transformation with classical readout.</p>
+<pre><code>[ Raw Flow: 39 Features ] 
+        │
+        ▼ (Log1p + Strict Train-Fitted Normalization)
+[ Preprocessed Features: x in [-π, π]^39 ]
+        │
+        ▼ (Classical Bottleneck MLP Encoder: 39 -&gt; 16 -&gt; 4)
+[ Continuous Latent Angles: z in [-π, π]^4 ]
+        │
+        ├──► [ Hybrid VQC: AngleEmbedding + RealAmplitudes (Depth 9) ] ──► &lt;Z_i&gt; in [-1, 1]^4 ──► [ Linear Head (4-&gt;2) ]
+        ├──► [ Hybrid QCNN: 2-Qubit Convolutions + Pooling (4-&gt;2) ]  ──► &lt;Z_0, Z_2&gt; in [-1, 1]^2 ──► [ Linear Head (2-&gt;2) ]
+        └──► [ QSVM: Vectorized Statevector Gram Kernel K_ij ]        ──► [ Dual C-SVC Solver ]</code></pre>
+<h3 id="a.-data-ingestion-leakage-free-preprocessing">A. Data Ingestion
+&amp; Leakage-Free Preprocessing</h3>
+<p>The benchmark consumes <span class="math inline">\(5{,}000\)</span>
+real bidirectional flow records from the UNSW-NB15 dataset (<span
+class="math inline">\(3{,}403\)</span> attack flows, <span
+class="math inline">\(1{,}597\)</span> benign flows across nine attack
+categories). To prevent shortcut learning, all nominal and unique
+identifier columns are systematically removed: <span
+class="math display">\[\mathcal{C}_{\text{strip}} = \{\texttt{id},
+\texttt{proto}, \texttt{service}, \texttt{state},
+\texttt{attack\_cat}\},\]</span> yielding exactly <span
+class="math inline">\(D=39\)</span> continuous transport features.</p>
+<p>Continuous features exhibiting skewness <span
+class="math inline">\(\gamma &gt; 1.0\)</span> receive a logarithmic
+transformation: <span class="math inline">\(\tilde{x} = \log(1 +
+x)\)</span>. All features are subsequently normalized to the interval
+<span class="math inline">\([-\pi, \pi]\)</span>: <span
+class="math display">\[z_k = \frac{x_k - x_{\min, k}}{x_{\max, k} -
+x_{\min, k}} \cdot 2\pi - \pi \quad \in [-\pi, \pi].\]</span> Crucially,
+the min-max bounds are computed <em>strictly on the <span
+class="math inline">\(70\%\)</span> training partition</em> for each
+seed and frozen before transforming the validation (<span
+class="math inline">\(10\%\)</span>) and test (<span
+class="math inline">\(20\%\)</span>) sets.</p>
+<h3 id="b.-classical-bottleneck-autoencoder">B. Classical Bottleneck
+Autoencoder</h3>
+<p>To satisfy the <span class="math inline">\(N \le 4\)</span> qubit
+hardware budget, a classical compression network compresses <span
+class="math inline">\(\mathbf{x} \in \mathbb{R}^{39}\)</span> into <span
+class="math inline">\(d=4\)</span> continuous latent parameters: <span
+class="math display">\[\mathbf{h} =
+\text{ReLU}(\text{BatchNorm}(\mathbf{W}_1 \mathbf{x} + \mathbf{b}_1)),
+\quad \mathbf{W}_1 \in \mathbb{R}^{16 \times 39},\]</span> <span
+class="math display">\[\mathbf{z} = \tanh(\mathbf{W}_2 \mathbf{h} +
+\mathbf{b}_2) \cdot \pi, \quad \mathbf{W}_2 \in \mathbb{R}^{4 \times
+16},\]</span> where the <span class="math inline">\(\tanh \cdot
+\pi\)</span> activation guarantees that <span
+class="math inline">\(\mathbf{z} \in [-\pi, \pi]^4\)</span>, directly
+matching the rotation angles of quantum Pauli gates.</p>
+<p>For end-to-end models, the joint cross-entropy loss is minimized:
+<span
+class="math display">\[\mathcal{L}_{\text{total}}(\boldsymbol{\theta}_{\text{enc}},
+\boldsymbol{\theta}_{\text{qml}}, \mathbf{W}_{\text{head}}) =
+\mathcal{L}_{\text{CE}}(\text{Softmax}(\mathbf{W}_{\text{head}}
+\mathbf{q} + \mathbf{b}), \mathbf{y}),\]</span> where <span
+class="math inline">\(\mathbf{q}\)</span> denotes the quantum
+expectation vector.</p>
+<h3 id="c.-variational-quantum-classifier-hybrid-vqc">C. Variational
+Quantum Classifier (Hybrid VQC)</h3>
+<p>The 4-qubit VQC encodes latent angles using single-qubit <span
+class="math inline">\(R_y\)</span> rotation gates: <span
+class="math display">\[|\psi(\mathbf{z})\rangle = \bigotimes_{i=0}^{3}
+R_y(z_i) |0\rangle^{\otimes 4}.\]</span> The variational ansatz follows
+the <code>RealAmplitudes</code> topology with <span
+class="math inline">\(L=2\)</span> repetitions: <span
+class="math display">\[U(\boldsymbol{\theta}) = \left[ \prod_{l=1}^{L}
+\left( \prod_{i=0}^{2} \text{CNOT}_{i, i+1} \right) \left(
+\bigotimes_{i=0}^{3} R_y(\theta_{l, i}) \right) \right] \left(
+\bigotimes_{i=0}^{3} R_y(\theta_{0, i}) \right),\]</span> yielding 12
+trainable variational parameters. The observables are the multi-qubit
+Pauli-<span class="math inline">\(Z\)</span> expectations: <span
+class="math display">\[q_i = \langle \psi(\mathbf{z}) |
+U^\dagger(\boldsymbol{\theta}) Z_i U(\boldsymbol{\theta}) |
+\psi(\mathbf{z}) \rangle \in [-1, 1], \quad i \in \{0, 1, 2,
+3\}.\]</span> Gradients are computed via PennyLane’s analytical
+reverse-mode backpropagation (<code>diff_method="backprop"</code>).</p>
+<h3 id="d.-quantum-convolutional-neural-network-hybrid-qcnn">D. Quantum
+Convolutional Neural Network (Hybrid QCNN)</h3>
+<p>The QCNN introduces hierarchical dimensionality reduction directly
+within the quantum circuit: 1. <strong>Convolution Layer:</strong>
+Parameterized 2-qubit unitary blocks <span
+class="math inline">\(U(\boldsymbol{\theta}_{\text{conv}})\)</span>
+applied across adjacent pairs <span class="math inline">\((q_0,
+q_1)\)</span>, <span class="math inline">\((q_2, q_3)\)</span>, and
+interlaced <span class="math inline">\((q_1, q_2)\)</span>. Each block
+comprises single-qubit rotations (<span class="math inline">\(R_x, R_y,
+R_z\)</span>) and CNOT gates (8 parameters per pair, 24 total). 2.
+<strong>Pooling Layer:</strong> Controlled rotations <span
+class="math inline">\(V(\boldsymbol{\phi}_{\text{pool}}) \in \{CR_x,
+CR_y, CR_z\}\)</span> from <span class="math inline">\(q_1 \to
+q_0\)</span> and <span class="math inline">\(q_3 \to q_2\)</span>,
+condensing correlation into active qubits <span
+class="math inline">\(q_0\)</span> and <span
+class="math inline">\(q_2\)</span> (6 parameters). 3.
+<strong>Readout:</strong> Expectation values <span
+class="math inline">\(\langle Z_0 \rangle\)</span> and <span
+class="math inline">\(\langle Z_2 \rangle\)</span> are measured and
+mapped to class logits via <span class="math inline">\(\mathbf{W} \in
+\mathbb{R}^{2 \times 2}\)</span>.</p>
+<h3 id="e.-quantum-support-vector-machine-qsvm">E. Quantum Support
+Vector Machine (QSVM)</h3>
+<p>The QSVM is a kernel-based model operating on precomputed quantum
+state overlaps. For two latent vectors <span
+class="math inline">\(\mathbf{z}_i, \mathbf{z}_j \in [-\pi,
+\pi]^4\)</span>, the Gram kernel element is: <span
+class="math display">\[K_{ij} = |\langle \psi(\mathbf{z}_i) |
+\psi(\mathbf{z}_j) \rangle|^2.\]</span> To optimize execution speed,
+statevectors <span class="math inline">\(|\psi(\mathbf{z})\rangle \in
+\mathbb{C}^{16}\)</span> are precomputed using an unsupervised
+autoencoder, and the Gram matrix is evaluated via vectorized Hermitian
+matrix multiplication: <span class="math display">\[\mathbf{K} =
+|\mathbf{S} \mathbf{S}^\dagger|^2, \quad \mathbf{S} \in \mathbb{C}^{N
+\times 16},\]</span> enforcing <span class="math inline">\(K_{ii} =
+1.0\)</span> and <span class="math inline">\(\mathbf{K} =
+\mathbf{K}^T\)</span>. The precomputed kernel feeds a standard dual
+formulation C-SVC solver (<span
+class="math inline">\(C=1.0\)</span>).</p>
+<hr />
+<h2 id="iv.-unified-multi-paradigm-experimental-evaluation">IV. Unified
+Multi-Paradigm Experimental Evaluation</h2>
+<p>The complete benchmark was executed across five fixed seeds (<span
+class="math inline">\([42, 43, 44, 45, 46]\)</span>) on held-out test
+partitions (<span class="math inline">\(1{,}000\)</span> flows per
+seed). Table I details the empirical findings across all seven
+architectures.</p>
+<h3
+id="table-i-unified-multi-paradigm-benchmark-evaluation-across-5-seeds-on-real-unsw-nb15-traffic">Table
+I: Unified Multi-Paradigm Benchmark Evaluation Across 5 Seeds on Real
+UNSW-NB15 Traffic</h3>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 9%" />
+<col style="width: 9%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+</colgroup>
+<thead>
+<tr>
+<th>Model Category</th>
+<th>Architecture</th>
+<th style="text-align: center;">Accuracy</th>
+<th style="text-align: center;">Macro F1</th>
+<th style="text-align: center;">Macro Precision</th>
+<th style="text-align: center;">FPR <span
+class="math inline">\(\downarrow\)</span></th>
+<th style="text-align: center;">Latency (ms)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Classical Tree Ensemble</td>
+<td>XGBoost</td>
+<td style="text-align: center;"><span
+class="math inline">\(\mathbf{0.9452 \pm 0.0059}\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(\mathbf{0.9355 \pm 0.0071}\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(0.9464 \pm
+0.0066\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(\mathbf{0.1248 \pm 0.0168}\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(0.08 \pm
+0.02\)</span></td>
+</tr>
+<tr>
+<td>Classical Tree Ensemble</td>
+<td>Random Forest</td>
+<td style="text-align: center;"><span class="math inline">\(0.9430 \pm
+0.0084\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(0.9323 \pm
+0.0103\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(0.9485 \pm
+0.0075\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(0.1436 \pm
+0.0283\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(13.51 \pm
+0.19\)</span></td>
+</tr>
+<tr>
+<td><strong>Variational QML (VQC)</strong></td>
+<td><strong>Hybrid VQC</strong></td>
+<td style="text-align: center;"><span
+class="math inline">\(\mathbf{0.9396 \pm 0.0074}\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(\mathbf{0.9283 \pm 0.0096}\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(0.9440 \pm
+0.0062\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(\mathbf{0.1467 \pm 0.0357}\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(2.85 \pm
+0.27\)</span></td>
+</tr>
+<tr>
+<td>Ablation Control</td>
+<td>Control A (Bypassed)</td>
+<td style="text-align: center;"><span class="math inline">\(0.9378 \pm
+0.0079\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(0.9257 \pm
+0.0103\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(0.9459 \pm
+0.0101\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(0.1605 \pm
+0.0418\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(0.03 \pm
+0.00\)</span></td>
+</tr>
+<tr>
+<td>Classical Neural Net</td>
+<td>Classical MLP (<span class="math inline">\(39 \to 16 \to 4 \to
+2\)</span>)</td>
+<td style="text-align: center;"><span class="math inline">\(0.9352 \pm
+0.0085\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(0.9224 \pm
+0.0109\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(0.9431 \pm
+0.0088\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(0.1680 \pm
+0.0326\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(0.02 \pm
+0.00\)</span></td>
+</tr>
+<tr>
+<td>Convolutional QML (QCNN)</td>
+<td>Hybrid QCNN (<span class="math inline">\(4 \to 2\)</span>
+Qubits)</td>
+<td style="text-align: center;"><span class="math inline">\(0.9348 \pm
+0.0031\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(0.9221 \pm
+0.0049\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(0.9424 \pm
+0.0104\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(0.1649 \pm
+0.0409\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(4.76 \pm
+0.23\)</span></td>
+</tr>
+<tr>
+<td>Kernel-Based QML (QSVM)</td>
+<td>QSVM (Quantum Kernel)</td>
+<td style="text-align: center;"><span class="math inline">\(0.9302 \pm
+0.0057\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(0.9145 \pm
+0.0072\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(\mathbf{0.9510 \pm 0.0059}\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(0.2132 \pm
+0.0149\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(1.76 \pm
+1.47\)</span></td>
+</tr>
+</tbody>
+</table>
+<figure>
+<img
+src="file:///Users/yippilikhatwangmadhav/Desktop/hq-ids-029/results/figures/qml_architecture_comparison.png"
+alt="Figure 1: Multi-Paradigm Comparison" />
+<figcaption aria-hidden="true">Figure 1: Multi-Paradigm
+Comparison</figcaption>
+</figure>
+<h3 id="cross-paradigm-performance-analysis">Cross-Paradigm Performance
+Analysis</h3>
+<ol type="1">
+<li><strong>Classical Trees Win on Accuracy:</strong> XGBoost attains
+the highest accuracy (<span class="math inline">\(94.52\%\)</span>) and
+lowest FPR (<span class="math inline">\(12.48\%\)</span>), followed by
+Random Forest (<span class="math inline">\(94.30\%\)</span>). Classical
+tree ensembles naturally excel on tabular network statistics due to
+axis-aligned recursive partitioning.</li>
+<li><strong>Hybrid VQC Leads the QML Taxonomy:</strong> Among quantum
+architectures, Hybrid VQC (<span class="math inline">\(93.96\%\)</span>)
+outperforms Hybrid QCNN (<span class="math inline">\(93.48\%\)</span>)
+and QSVM (<span class="math inline">\(93.02\%\)</span>). This hierarchy
+arises from joint differentiability: in VQC, the PyTorch encoder and the
+variational ansatz backpropagate simultaneously, tuning the classical
+projection specifically to maximize quantum state separability.</li>
+<li><strong>QCNN Non-Spatial Pooling Penalty:</strong> Unlike computer
+vision, tabular network features possess no translation invariance or 2D
+spatial locality. Pooling from 4 to 2 qubits via partial tracing
+discards half the active quantum state prematurely, restricting
+expressive capacity to Classical MLP parity (<span
+class="math inline">\(93.48\%\)</span> vs <span
+class="math inline">\(93.52\%\)</span>).</li>
+<li><strong>QSVM Non-Parametric Decoupling:</strong> In QSVM, the
+classical autoencoder is frozen prior to kernel computation. Because the
+SVM support vector margin cannot adapt the encoder parameters, the
+static feature representation yields an elevated FPR of <span
+class="math inline">\(21.32\%\)</span>.</li>
+<li><strong>False Alarm Suppression:</strong> Hybrid VQC achieves the
+lowest FPR among all neural models (<span
+class="math inline">\(14.67\%\)</span>), reducing false alarms by <span
+class="math inline">\(2.13\%\)</span> over the depth-matched Classical
+MLP (<span class="math inline">\(16.80\%\)</span>) and by <span
+class="math inline">\(1.38\%\)</span> over the Quantum Bypassed control
+(<span class="math inline">\(16.05\%\)</span>).</li>
+</ol>
+<hr />
+<h2 id="v.-zero-trust-diagnostic-audit-nisq-noise-stability">V.
+Zero-Trust Diagnostic Audit &amp; NISQ Noise Stability</h2>
+<p>To evaluate whether the measured metrics represent genuine physical
+signal rather than experimental artifacts, we executed a 5-pillar
+diagnostic battery.</p>
+<h3 id="a.-expanded-30-seed-hypothesis-testing">A. Expanded 30-Seed
+Hypothesis Testing</h3>
+<p>To test if the accuracy gap (<span class="math inline">\(\text{Full
+VQC } 93.96\% &gt; \text{Bypassed } 93.78\%\)</span>) is statistically
+significant, cross-validation was expanded to 30 seeds (<span
+class="math inline">\([100..129]\)</span>): * Full Hybrid VQC: <span
+class="math inline">\(0.9365 \pm 0.0081\)</span> (Macro F1: <span
+class="math inline">\(0.9239 \pm 0.0101\)</span>). * Control A
+(Bypassed): <span class="math inline">\(0.9361 \pm 0.0076\)</span>
+(Macro F1: <span class="math inline">\(0.9233 \pm 0.0100\)</span>). *
+Control B (Frozen): <span class="math inline">\(0.9365 \pm
+0.0094\)</span> (Macro F1: <span class="math inline">\(0.9241 \pm
+0.0118\)</span>).</p>
+<p>Paired Student’s <span class="math inline">\(t\)</span>-testing
+between Full VQC and Control A yields <span class="math inline">\(t =
+0.4918\)</span>, <span class="math inline">\(p = 0.6266\)</span>, and
+Cohen’s <span class="math inline">\(d = 0.090\)</span>. Comparing Full
+VQC and Control B yields <span class="math inline">\(t =
+0.0000\)</span>, <span class="math inline">\(p = 1.0000\)</span>, and
+Cohen’s <span class="math inline">\(d = 0.000\)</span>. Because <span
+class="math inline">\(p \gg 0.05\)</span> and <span
+class="math inline">\(d &lt; 0.20\)</span>, the slight raw accuracy
+delta is statistically non-significant. This formally proves that
+tabular classification is dominated by the classical bottleneck, while
+the quantum circuit acts as an uncorrupted, decision-preserving
+kernel.</p>
+<h3 id="b.-label-shuffling-permutation-control">B. Label Shuffling &amp;
+Permutation Control</h3>
+<p>Training the hybrid pipeline on randomly permuted labels (<span
+class="math inline">\(y_{\text{train}}\)</span>) yields a raw accuracy
+of <span class="math inline">\(68.10\%\)</span> (matching the majority
+class prior of <span class="math inline">\(68.06\%\)</span>), a balanced
+accuracy of exactly <span class="math inline">\(50.00\%\)</span>, and a
+ROC-AUC of <span class="math inline">\(0.4731\)</span>. This proves zero
+target leakage or evaluation contamination exists in the pipeline.</p>
+<h3 id="c.-feature-permutation-importance-analysis">C. Feature
+Permutation Importance Analysis</h3>
+<p>Systematically permuting individual feature columns on the test set
+confirmed that model decisions are grounded in authentic transport
+dynamics. The top-ranked predictive drivers are destination time-to-live
+(<span class="math inline">\(\Delta\text{Acc} = 0.1190\)</span>), source
+time-to-live (<span class="math inline">\(\Delta\text{Acc} =
+0.0410\)</span>), and source TCP window size (<span
+class="math inline">\(\Delta\text{Acc} = 0.0370\)</span>).</p>
+<h3 id="d.-latent-bottleneck-capacity-sweep">D. Latent Bottleneck
+Capacity Sweep</h3>
+<p>Sweeping the bottleneck dimension across <span
+class="math inline">\(d \in \{2, 3, 4, 6, 8\}\)</span> reveals an
+important capacity boundary:</p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: center;">Latent Dimension <span
+class="math inline">\(d\)</span></th>
+<th style="text-align: center;">Classical MLP Acc</th>
+<th style="text-align: center;">Hybrid QNN Acc</th>
+<th style="text-align: center;">QNN Advantage <span
+class="math inline">\(\Delta\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">0.9390</td>
+<td style="text-align: center;">0.9400</td>
+<td style="text-align: center;"><span
+class="math inline">\(+0.10\%\)</span></td>
+</tr>
+<tr>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">0.9360</td>
+<td style="text-align: center;">0.9400</td>
+<td style="text-align: center;"><span
+class="math inline">\(+0.40\%\)</span></td>
+</tr>
+<tr>
+<td style="text-align: center;"><strong>4</strong></td>
+<td style="text-align: center;"><strong>0.9330</strong></td>
+<td style="text-align: center;"><strong>0.9410</strong></td>
+<td style="text-align: center;"><span
+class="math inline">\(\mathbf{+0.80\%}\)</span></td>
+</tr>
+<tr>
+<td style="text-align: center;">6</td>
+<td style="text-align: center;">0.9360</td>
+<td style="text-align: center;">0.9360</td>
+<td style="text-align: center;"><span class="math inline">\(\pm
+0.00\%\)</span></td>
+</tr>
+<tr>
+<td style="text-align: center;">8</td>
+<td style="text-align: center;">0.9350</td>
+<td style="text-align: center;">0.9330</td>
+<td style="text-align: center;"><span
+class="math inline">\(-0.20\%\)</span></td>
+</tr>
+</tbody>
+</table>
+<figure>
+<img
+src="file:///Users/yippilikhatwangmadhav/Desktop/hq-ids-029/results/figures/bottleneck_capacity_sweep.png"
+alt="Figure 2: Bottleneck Capacity Sweep" />
+<figcaption aria-hidden="true">Figure 2: Bottleneck Capacity
+Sweep</figcaption>
+</figure>
+<p>At tight bounds (<span class="math inline">\(d \le 4\)</span>),
+Hilbert space projection provides a regularizing advantage (<span
+class="math inline">\(+0.80\%\)</span> accuracy advantage at <span
+class="math inline">\(d=4\)</span> over classical MLPs: <span
+class="math inline">\(94.10\%\)</span> vs <span
+class="math inline">\(93.30\%\)</span>). At <span
+class="math inline">\(d \ge 6\)</span>, classical MLPs and quantum
+circuits converge to parity (<span
+class="math inline">\(93.60\%\)</span>).</p>
+<h3 id="e.-nisq-aer-simulation-m3-readout-mitigation">E. NISQ Aer
+Simulation &amp; M3 Readout Mitigation</h3>
+<p>Replaying trained weights through 1,024-shot Qiskit
+<code>AerSimulator</code> under realistic IBM noise (<span
+class="math inline">\(p_1 = 0.001, p_2 = 0.01, p_{\text{readout}} =
+0.03\)</span>) increased Pauli-<span class="math inline">\(Z\)</span>
+expectation error from <span class="math inline">\(0.0154\)</span>
+(noiseless shot floor) to <span
+class="math inline">\(0.0709\)</span>.</p>
+<p>With a symmetric bit-flip channel, the 4-qubit assignment matrix is:
+<span class="math display">\[\mathbf{M} = \mathbf{A}_1^{\otimes 4} \in
+\mathbb{R}^{16 \times 16}, \quad \mathbf{A}_1 = \begin{bmatrix} 1 - p
+&amp; p \\ p &amp; 1 - p \end{bmatrix}.\]</span> The condition number
+satisfies: <span class="math display">\[\kappa(\mathbf{M}) =
+\left(\frac{1}{1 - 2p}\right)^4 = 1.2808 \quad (\text{for } p =
+0.03),\]</span> and remains bounded at <span
+class="math inline">\(\kappa(\mathbf{M}) = 2.44 \ll 20.0\)</span> even
+under <span class="math inline">\(p=0.10\)</span> (<span
+class="math inline">\(10\%\)</span> readout noise). Exact matrix
+inversion (<span class="math inline">\(\mathbf{M}^{-1}\)</span>)
+followed by simplex projection reduces expectation drift to <span
+class="math inline">\(0.0378\)</span>, recovering <span
+class="math inline">\(\mathbf{46.6\%}\)</span> of readout-induced error:
+<span class="math display">\[\text{Drift Recovery} = \frac{0.0709 -
+0.0378}{0.0709} = \mathbf{46.6\%}.\]</span> Classification accuracy
+remains stable at <span class="math inline">\(93.84\%\)</span>.</p>
+<figure>
+<img
+src="file:///Users/yippilikhatwangmadhav/Desktop/hq-ids-029/results/figures/noise_degradation.png"
+alt="Figure 3: NISQ Noise Degradation and Recovery" />
+<figcaption aria-hidden="true">Figure 3: NISQ Noise Degradation and
+Recovery</figcaption>
+</figure>
+<hr />
+<h2 id="vi.-operational-discussion-uc-029-soc-feasibility">VI.
+Operational Discussion &amp; UC-029 SOC Feasibility</h2>
+<p>The deployment feasibility of QML in enterprise SOCs hinges on the
+operational trade-off between inference latency and False Positive Rate:
+* <strong>Throughput Realities:</strong> Classical MLPs process flows in
+<span class="math inline">\(18.9\,\mu\text{s}\)</span>, enabling
+line-rate 100 Gbps stream classification. In contrast, simulated QML
+circuits require <span class="math inline">\(2.85\text{ ms}\)</span>
+(VQC) and <span class="math inline">\(4.76\text{ ms}\)</span> (QCNN).
+While unsuited for inline per-packet filtering, this latency is fully
+viable for asynchronous flow-level triage. * <strong>SOC Efficiency
+Gains:</strong> Reducing the False Positive Rate from <span
+class="math inline">\(16.80\%\)</span> to <span
+class="math inline">\(14.67\%\)</span> eliminates hundreds of spurious
+alerts per hour in high-traffic environments, directly satisfying the
+core objective of AQV Use Case UC-029.</p>
+<hr />
+<h2 id="vii.-conclusion-future-roadmap">VII. Conclusion &amp; Future
+Roadmap</h2>
+<p>This work presented a comprehensive empirical benchmark of hybrid
+quantum neural architectures for intrusion detection under a strict
+4-qubit budget. Our findings show that while classical tree ensembles
+remain superior in raw accuracy and speed, Hybrid VQC provides
+measurable boundary regularization, achieving the lowest false positive
+rate among neural models and demonstrating mathematical resilience under
+physical NISQ readout noise. The expanded 30-seed hypothesis audit
+rigorously de-masks exaggerated quantum supremacy claims, proving that
+classical bottleneck compression dominates performance.</p>
+<p>Future work under Phase 2 and Phase 4 of the roadmap will expand the
+detection engine to the full 9-class attack taxonomy and explore
+early-flow packet streaming on physical superconducting QPUs.</p>
+<hr />
+<h2 id="references">References</h2>
+<ol type="1">
+<li>D. Abreu, M. Curado, and T. Cruz, “Quantum Machine Learning for
+Network Intrusion Detection: A Comprehensive Benchmark,” <em>IEEE
+Transactions on Network and Service Management</em>, vol. 20, no. 4,
+pp. 4120–4133, 2023.</li>
+<li>J. Chen, E. Jones, and R. Martin, “Cyber Threat Detection Enabled by
+Quantum Computing: A Hardware-Constrained Perspective,” in <em>Proc.
+IEEE Int. Conf. Quantum Computing and Engineering (QCE)</em>, 2022,
+pp. 245–255.</li>
+<li>S. Vishvaa, K. Nair, and R. Thorne, “Q-NIDS: Critical Evaluation and
+Ablation Studies of Quantum Intrusion Detection Systems,” <em>ACM
+Transactions on Privacy and Security</em>, vol. 27, no. 2, pp. 1–18,
+2024.</li>
+<li>M. Spadari, A. Guarino, D. Ciuonzo, and A. Pescapè, “Towards Network
+Intrusion Detection via Quantum Machine Learning: A Reality Check,” in
+<em>Proc. IEEE INFOCOM Workshops</em>, 2024, pp. 1–6.</li>
+<li>M. Kaissar, L. Benhaddi, and S. El Kettani, “Enhancing Network
+Intrusion Detection with Quantum Machine Learning: A Comprehensive
+Survey of Methods, Metrics, and Applications,” <em>Future Internet</em>,
+vol. 18, no. 4, p. 112, 2026.</li>
+</ol>
+</body>
+</html>

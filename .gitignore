@@ -55,3 +55,14 @@ venv.bak/
 
 # PyPI / pip cache
 .cache/
+
+# LaTeX auxiliary files
+*.aux
+*.log
+*.out
+missfont.log
+
+# Large Raw Datasets (preserve aligned subsets)
+data/UNSW_NB15_*.csv
+data/cicids2017_raw.csv
+

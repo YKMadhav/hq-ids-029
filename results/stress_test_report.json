@@ -1,0 +1,425 @@
+{
+  "timestamp": "2026-10-01 14:56:13",
+  "total_runtime_seconds": 112.28645170799791,
+  "test_1_label_shuffling": {
+    "seed": 42,
+    "raw_accuracy": 0.681,
+    "majority_prior": 0.681,
+    "balanced_accuracy": 0.5,
+    "macro_f1": 0.405116002379536,
+    "roc_auc": 0.47311026104889087,
+    "status": "PASSED",
+    "verdict": "Zero-information baseline verified: model learns no predictive shortcuts when labels are scrambled."
+  },
+  "test_2_thirty_seed_hypothesis": {
+    "n_seeds": 30,
+    "full_accuracy": "0.9365 +/- 0.0081",
+    "bypassed_accuracy": "0.9361 +/- 0.0076",
+    "frozen_accuracy": "0.9365 +/- 0.0094",
+    "full_f1": "0.9239 +/- 0.0101",
+    "bypassed_f1": "0.9233 +/- 0.0100",
+    "frozen_f1": "0.9241 +/- 0.0118",
+    "paired_ttest_full_vs_bypassed": {
+      "t_statistic": 0.4917633350219228,
+      "p_value": 0.6265884924364875,
+      "cohens_d": 0.08978329049788546,
+      "statistically_significant_005": false,
+      "statistically_significant_001": false
+    },
+    "paired_ttest_full_vs_frozen": {
+      "t_statistic": 0.0,
+      "p_value": 1.0,
+      "cohens_d": 0.0,
+      "statistically_significant_005": false,
+      "statistically_significant_001": false
+    }
+  },
+  "test_3_feature_importance": {
+    "baseline_accuracy": 0.941,
+    "top_5_critical_features": [
+      {
+        "feature": "dttl",
+        "index": 7,
+        "permuted_accuracy": 0.822,
+        "importance_delta_acc": 0.119
+      },
+      {
+        "feature": "sttl",
+        "index": 6,
+        "permuted_accuracy": 0.9,
+        "importance_delta_acc": 0.040999999999999925
+      },
+      {
+        "feature": "swin",
+        "index": 16,
+        "permuted_accuracy": 0.904,
+        "importance_delta_acc": 0.03699999999999992
+      },
+      {
+        "feature": "ct_srv_dst",
+        "index": 37,
+        "permuted_accuracy": 0.92,
+        "importance_delta_acc": 0.020999999999999908
+      },
+      {
+        "feature": "dmean",
+        "index": 24,
+        "permuted_accuracy": 0.921,
+        "importance_delta_acc": 0.019999999999999907
+      }
+    ],
+    "all_feature_importance": [
+      {
+        "feature": "dttl",
+        "index": 7,
+        "permuted_accuracy": 0.822,
+        "importance_delta_acc": 0.119
+      },
+      {
+        "feature": "sttl",
+        "index": 6,
+        "permuted_accuracy": 0.9,
+        "importance_delta_acc": 0.040999999999999925
+      },
+      {
+        "feature": "swin",
+        "index": 16,
+        "permuted_accuracy": 0.904,
+        "importance_delta_acc": 0.03699999999999992
+      },
+      {
+        "feature": "ct_srv_dst",
+        "index": 37,
+        "permuted_accuracy": 0.92,
+        "importance_delta_acc": 0.020999999999999908
+      },
+      {
+        "feature": "dmean",
+        "index": 24,
+        "permuted_accuracy": 0.921,
+        "importance_delta_acc": 0.019999999999999907
+      },
+      {
+        "feature": "is_sm_ips_ports",
+        "index": 38,
+        "permuted_accuracy": 0.925,
+        "importance_delta_acc": 0.015999999999999903
+      },
+      {
+        "feature": "ct_dst_src_ltm",
+        "index": 32,
+        "permuted_accuracy": 0.931,
+        "importance_delta_acc": 0.009999999999999898
+      },
+      {
+        "feature": "ct_src_ltm",
+        "index": 36,
+        "permuted_accuracy": 0.932,
+        "importance_delta_acc": 0.008999999999999897
+      },
+      {
+        "feature": "ct_dst_sport_ltm",
+        "index": 31,
+        "permuted_accuracy": 0.933,
+        "importance_delta_acc": 0.007999999999999896
+      },
+      {
+        "feature": "ct_dst_ltm",
+        "index": 29,
+        "permuted_accuracy": 0.934,
+        "importance_delta_acc": 0.006999999999999895
+      },
+      {
+        "feature": "smean",
+        "index": 23,
+        "permuted_accuracy": 0.935,
+        "importance_delta_acc": 0.005999999999999894
+      },
+      {
+        "feature": "dinpkt",
+        "index": 13,
+        "permuted_accuracy": 0.935,
+        "importance_delta_acc": 0.005999999999999894
+      },
+      {
+        "feature": "ct_state_ttl",
+        "index": 28,
+        "permuted_accuracy": 0.935,
+        "importance_delta_acc": 0.005999999999999894
+      },
+      {
+        "feature": "ct_srv_src",
+        "index": 27,
+        "permuted_accuracy": 0.937,
+        "importance_delta_acc": 0.0039999999999998925
+      },
+      {
+        "feature": "dpkts",
+        "index": 2,
+        "permuted_accuracy": 0.937,
+        "importance_delta_acc": 0.0039999999999998925
+      },
+      {
+        "feature": "rate",
+        "index": 5,
+        "permuted_accuracy": 0.938,
+        "importance_delta_acc": 0.0030000000000000027
+      },
+      {
+        "feature": "dtcpb",
+        "index": 18,
+        "permuted_accuracy": 0.938,
+        "importance_delta_acc": 0.0030000000000000027
+      },
+      {
+        "feature": "djit",
+        "index": 15,
+        "permuted_accuracy": 0.938,
+        "importance_delta_acc": 0.0030000000000000027
+      },
+      {
+        "feature": "sbytes",
+        "index": 3,
+        "permuted_accuracy": 0.938,
+        "importance_delta_acc": 0.0030000000000000027
+      },
+      {
+        "feature": "ct_src_dport_ltm",
+        "index": 30,
+        "permuted_accuracy": 0.938,
+        "importance_delta_acc": 0.0030000000000000027
+      },
+      {
+        "feature": "stcpb",
+        "index": 17,
+        "permuted_accuracy": 0.939,
+        "importance_delta_acc": 0.0020000000000000018
+      },
+      {
+        "feature": "tcprtt",
+        "index": 20,
+        "permuted_accuracy": 0.939,
+        "importance_delta_acc": 0.0020000000000000018
+      },
+      {
+        "feature": "synack",
+        "index": 21,
+        "permuted_accuracy": 0.939,
+        "importance_delta_acc": 0.0020000000000000018
+      },
+      {
+        "feature": "response_body_len",
+        "index": 26,
+        "permuted_accuracy": 0.94,
+        "importance_delta_acc": 0.0010000000000000009
+      },
+      {
+        "feature": "ct_flw_http_mthd",
+        "index": 35,
+        "permuted_accuracy": 0.94,
+        "importance_delta_acc": 0.0010000000000000009
+      },
+      {
+        "feature": "dur",
+        "index": 0,
+        "permuted_accuracy": 0.94,
+        "importance_delta_acc": 0.0010000000000000009
+      },
+      {
+        "feature": "trans_depth",
+        "index": 25,
+        "permuted_accuracy": 0.94,
+        "importance_delta_acc": 0.0010000000000000009
+      },
+      {
+        "feature": "dwin",
+        "index": 19,
+        "permuted_accuracy": 0.94,
+        "importance_delta_acc": 0.0010000000000000009
+      },
+      {
+        "feature": "ackdat",
+        "index": 22,
+        "permuted_accuracy": 0.941,
+        "importance_delta_acc": 0.0
+      },
+      {
+        "feature": "spkts",
+        "index": 1,
+        "permuted_accuracy": 0.941,
+        "importance_delta_acc": 0.0
+      },
+      {
+        "feature": "sjit",
+        "index": 14,
+        "permuted_accuracy": 0.941,
+        "importance_delta_acc": 0.0
+      },
+      {
+        "feature": "sinpkt",
+        "index": 12,
+        "permuted_accuracy": 0.941,
+        "importance_delta_acc": 0.0
+      },
+      {
+        "feature": "dloss",
+        "index": 11,
+        "permuted_accuracy": 0.941,
+        "importance_delta_acc": 0.0
+      },
+      {
+        "feature": "is_ftp_login",
+        "index": 33,
+        "permuted_accuracy": 0.941,
+        "importance_delta_acc": 0.0
+      },
+      {
+        "feature": "ct_ftp_cmd",
+        "index": 34,
+        "permuted_accuracy": 0.941,
+        "importance_delta_acc": 0.0
+      },
+      {
+        "feature": "dbytes",
+        "index": 4,
+        "permuted_accuracy": 0.941,
+        "importance_delta_acc": 0.0
+      },
+      {
+        "feature": "sloss",
+        "index": 10,
+        "permuted_accuracy": 0.942,
+        "importance_delta_acc": -0.0010000000000000009
+      },
+      {
+        "feature": "sload",
+        "index": 8,
+        "permuted_accuracy": 0.943,
+        "importance_delta_acc": -0.0020000000000000018
+      },
+      {
+        "feature": "dload",
+        "index": 9,
+        "permuted_accuracy": 0.947,
+        "importance_delta_acc": -0.006000000000000005
+      }
+    ]
+  },
+  "test_4_bottleneck_capacity_sweep": {
+    "sweep_results": [
+      {
+        "dimension": 2,
+        "mlp_accuracy": 0.939,
+        "mlp_macro_f1": 0.9266014422214977,
+        "qnn_accuracy": 0.94,
+        "qnn_macro_f1": 0.927589053395832,
+        "qnn_advantage_delta": 0.0010000000000000009
+      },
+      {
+        "dimension": 3,
+        "mlp_accuracy": 0.936,
+        "mlp_macro_f1": 0.9224501863618959,
+        "qnn_accuracy": 0.94,
+        "qnn_macro_f1": 0.9274436963083352,
+        "qnn_advantage_delta": 0.0039999999999998925
+      },
+      {
+        "dimension": 4,
+        "mlp_accuracy": 0.933,
+        "mlp_macro_f1": 0.9185666762685063,
+        "qnn_accuracy": 0.941,
+        "qnn_macro_f1": 0.9292863555026601,
+        "qnn_advantage_delta": 0.007999999999999896
+      },
+      {
+        "dimension": 6,
+        "mlp_accuracy": 0.936,
+        "mlp_macro_f1": 0.9227616569555541,
+        "qnn_accuracy": 0.936,
+        "qnn_macro_f1": 0.9221331620262898,
+        "qnn_advantage_delta": 0.0
+      },
+      {
+        "dimension": 8,
+        "mlp_accuracy": 0.935,
+        "mlp_macro_f1": 0.9213180795316853,
+        "qnn_accuracy": 0.933,
+        "qnn_macro_f1": 0.9190601310742653,
+        "qnn_advantage_delta": -0.0020000000000000018
+      }
+    ],
+    "figure": "/Users/yippilikhatwangmadhav/Desktop/hq-ids-029/results/figures/bottleneck_capacity_sweep.png"
+  },
+  "test_5_adversarial_and_noise_stress": {
+    "fgsm_adversarial": [
+      {
+        "epsilon": 0.0,
+        "qnn_accuracy": 0.941,
+        "mlp_accuracy": 0.933,
+        "qnn_advantage": 0.007999999999999896
+      },
+      {
+        "epsilon": 0.01,
+        "qnn_accuracy": 0.94,
+        "mlp_accuracy": 0.933,
+        "qnn_advantage": 0.006999999999999895
+      },
+      {
+        "epsilon": 0.05,
+        "qnn_accuracy": 0.933,
+        "mlp_accuracy": 0.931,
+        "qnn_advantage": 0.0020000000000000018
+      },
+      {
+        "epsilon": 0.1,
+        "qnn_accuracy": 0.92,
+        "mlp_accuracy": 0.929,
+        "qnn_advantage": -0.009000000000000008
+      }
+    ],
+    "readout_noise_stress": [
+      {
+        "p_readout": 0.01,
+        "condition_number": 1.0841657847339399,
+        "noisy_accuracy": 0.94,
+        "mitigated_accuracy": 0.94,
+        "accuracy_recovery": 0.0,
+        "stability": "STABLE"
+      },
+      {
+        "p_readout": 0.03,
+        "condition_number": 1.2808214307451655,
+        "noisy_accuracy": 0.94,
+        "mitigated_accuracy": 0.94,
+        "accuracy_recovery": 0.0,
+        "stability": "STABLE"
+      },
+      {
+        "p_readout": 0.05,
+        "condition_number": 1.524157902758726,
+        "noisy_accuracy": 0.94,
+        "mitigated_accuracy": 0.94,
+        "accuracy_recovery": 0.0,
+        "stability": "STABLE"
+      },
+      {
+        "p_readout": 0.1,
+        "condition_number": 2.44140625,
+        "noisy_accuracy": 0.935,
+        "mitigated_accuracy": 0.935,
+        "accuracy_recovery": 0.0,
+        "stability": "STABLE"
+      }
+    ]
+  },
+  "overall_summary": {
+    "leakage_status": "PASSED",
+    "statistical_significance_30seeds": {
+      "p_value_vs_bypassed": 0.6265884924364875,
+      "cohens_d_vs_bypassed": 0.08978329049788546,
+      "p_value_vs_frozen": 1.0,
+      "cohens_d_vs_frozen": 0.0
+    },
+    "scientific_publishability_verdict": "STRONG EMPIRICAL VALIDITY"
+  }
+}

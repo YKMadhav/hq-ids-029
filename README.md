@@ -15,7 +15,7 @@ This codebase operationalizes key insights from foundational literature in QML n
 3. **Vishvaa et al. (Q-NIDS)**: Critical benchmarking demonstrating that classical tree ensembles (Random Forest, XGBoost) remain formidable baselines, mandating strict ablation controls to prevent attribution of classical post-processing power to "quantum advantage."
 4. **Al Malwi et al. & Chinthalagattu (IIT Madras)**: Generative QCBMs/QGANs and Quantum Autoencoders for zero-day threat detection.
 5. **Al Mazroa et al. (RHQ-CNN)**: Residual classical connections to avoid barren plateaus in variational circuits.
-6. **Spadari et al. (University of Napoli Federico II / Verona)**: Early traffic classification using transport-level header sequences (Payload Length, Direction, TCP Window Size) across the first 10 packets of bi-directional flows (biflows).
+6. **Spadari et al. (University of Napoli Federico II / Verona)**: Quantum and classical traffic classification studies at the mobile-network edge. This repository's separate Phase 4 experiment is only a $k=2$ connection-setup header proxy using proto, sttl, dttl, swin, and dwin; it is not a raw-PCAP or literal packet-prefix study.
 
 ## 3. Repository Architecture
 ```text
