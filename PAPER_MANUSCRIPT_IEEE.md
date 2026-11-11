@@ -221,7 +221,7 @@ The deployment feasibility of QML in enterprise SOCs hinges on the operational t
 
 This work presented a comprehensive empirical benchmark of hybrid quantum neural architectures for intrusion detection under a strict 4-qubit budget. Our findings show that while classical tree ensembles remain superior in raw accuracy and speed, Hybrid VQC provides competitive representation, tracking classical neural models while demonstrating mathematical resilience under physical NISQ readout noise. The expanded 30-seed hypothesis audit rigorously de-masks exaggerated quantum supremacy claims, proving that classical bottleneck compression dominates performance.
 
-Future work will expand the detection engine to the full 9-class attack taxonomy, evaluate cross-dataset domain shifts, and, separately, validate a raw-PCAP packet-streaming study. The present Phase 4 evidence remains limited to the $k=2$ connection-setup header proxy defined above.
+Future work will expand the detection engine to the full 9-class attack taxonomy and, separately, validate a raw-PCAP packet-streaming study under realistic packet-prefix conditions. The present Phase 4 evidence remains limited to the $k=2$ connection-setup header proxy defined above.
 
 ---
 

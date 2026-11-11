@@ -23,8 +23,7 @@
 \IEEEauthorblockN{Khatwang Madhav Yippili}
 \IEEEauthorblockA{\textit{Department of Mathematical Sciences and Computing} \\
 \textit{Sri Sathya Sai Institute of Higher Learning}\\
-Prasanthi Nilayam, Andhra Pradesh, India \\
-Email: khatwangmadhav@ssihl.edu.in}
+Prasanthi Nilayam, Andhra Pradesh, India}
 }
 
 \maketitle
@@ -38,7 +37,7 @@ Quantum Machine Learning, Network Intrusion Detection, Variational Quantum Circu
 \end{IEEEkeywords}
 
 \section{Introduction}
-\IEEEPARstart{M}{odern} enterprise and state-level Security Operations Centers (SOCs) monitor high-throughput network backbones where subtle zero-day intrusions, stealthy exfiltration, and reconnaissance probes overlap heavily with benign network telemetry in continuous statistical feature space. In practical SOC workflows, even a modest $1\%$ to $2\%$ increase in False Positive Rate (FPR) translates to thousands of false alerts per day, inducing severe analyst alert fatigue and increasing the mean-time-to-detect (MTTD) for critical breaches.
+Modern enterprise and state-level Security Operations Centers (SOCs) monitor high-throughput network backbones where subtle zero-day intrusions, stealthy exfiltration, and reconnaissance probes overlap heavily with benign network telemetry in continuous statistical feature space. In practical SOC workflows, even a modest $1\%$ to $2\%$ increase in False Positive Rate (FPR) translates to thousands of false alerts per day, inducing severe analyst alert fatigue and increasing the mean-time-to-detect (MTTD) for critical breaches.
 
 Under national quantum roadmap initiatives and the Amaravati Quantum Valley (AQV) Use Case UC-029 framework, Quantum Machine Learning (QML) has emerged as a promising paradigm for modelling complex network traffic distributions. By mapping classical flow features into high-dimensional Hilbert spaces ($\mathcal{H} = \mathbb{C}^{2^N}$) via parameterized quantum circuits (PQCs), quantum kernels have the theoretical potential to resolve non-linearly separable decision boundaries that confound classical linear readouts.
 
@@ -86,7 +85,7 @@ z_k = \frac{x_k - x_{\min, k}}{x_{\max, k} - x_{\min, k}} \cdot 2\pi - \pi \quad
 \end{equation}
 Crucially, the min-max bounds are computed \textit{strictly on the $70\%$ training partition} for each seed and frozen before transforming the validation ($10\%$) and test ($20\%$) sets.
 
-\subsection{Phase 4 $k=2$ Connection-Setup Header Proxy}
+\subsection{Phase 4 \texorpdfstring{$k=2$}{k=2} Connection-Setup Header Proxy}
 The Phase 4 experiment is a separate, CSV-backed $k=2$ connection-setup header proxy, not a raw-PCAP extraction or a literal packet-prefix result. It uses the official UNSW-NB15 partitions (175,341 training records and 82,332 testing records). Each record is represented by two directional setup-header observations,
 \begin{equation}
 \mathbf{x}_{\mathrm{setup}} =
@@ -101,16 +100,19 @@ The official training partition is split deterministically into 157,806 fitting 
 \caption{Official 82,332-flow test results for the $k=2$ connection-setup header proxy (seed 42).}
 \label{tab:phase4_proxy}
 \centering
+\small
+\resizebox{\columnwidth}{!}{%
 \begin{tabular}{lrrrr}
-\hline
-Model & Accuracy & Recall & FPR & Latency (ms) \\
-\hline
+\toprule
+\textbf{Model} & \textbf{Accuracy} & \textbf{Recall} & \textbf{FPR} & \textbf{Latency (ms)} \\
+\midrule
 Classical MLP & 78.58\% & 99.76\% & 47.36\% & 0.0044 \\
 1D-CNN & 78.59\% & 99.76\% & 47.36\% & 0.0081 \\
 LSTM & 78.58\% & 99.76\% & 47.36\% & 0.0064 \\
 5-Qubit Sequential QNN & 78.57\% & 99.76\% & 47.39\% & 5.3634 \\
-\hline
-\end{tabular}
+\bottomrule
+\end{tabular}%
+}
 \end{table}
 
 \subsection{Classical Bottleneck Autoencoder}
@@ -135,9 +137,10 @@ The 4-qubit VQC encodes latent angles using single-qubit $R_y$ rotation gates:
 |\psi(\mathbf{z})\rangle = \bigotimes_{i=0}^{3} R_y(z_i) |0\rangle^{\otimes 4}.
 \end{equation}
 The variational ansatz follows the \texttt{RealAmplitudes} topology with $L=2$ repetitions:
-\begin{equation}
-U(\boldsymbol{\theta}) = \left[ \prod_{l=1}^{L} \left( \prod_{i=0}^{2} \text{CNOT}_{i, i+1} \right) \left( \bigotimes_{i=0}^{3} R_y(\theta_{l, i}) \right) \right] \left( \bigotimes_{i=0}^{3} R_y(\theta_{0, i}) \right),
-\end{equation}
+\begin{align}
+U(\boldsymbol{\theta}) = &\left[ \prod_{l=1}^{L} \left( \prod_{i=0}^{2} \text{CNOT}_{i, i+1} \right) \left( \bigotimes_{i=0}^{3} R_y(\theta_{l, i}) \right) \right] \nonumber \\
+&\times \left( \bigotimes_{i=0}^{3} R_y(\theta_{0, i}) \right),
+\end{align}
 yielding 12 trainable variational parameters. The observables are the multi-qubit Pauli-$Z$ expectations:
 \begin{equation}
 q_i = \langle \psi(\mathbf{z}) | U^\dagger(\boldsymbol{\theta}) Z_i U(\boldsymbol{\theta}) | \psi(\mathbf{z}) \rangle \in [-1, 1], \quad i \in \{0, 1, 2, 3\}.
@@ -165,13 +168,13 @@ enforcing $K_{ii} = 1.0$ and $\mathbf{K} = \mathbf{K}^T$. The precomputed kernel
 
 \begin{figure}[t]
 \centering
-% \includegraphics[width=\columnwidth]{results/figures/qml_architecture_comparison.png}
+\includegraphics[width=\columnwidth]{results/figures/qml_architecture_comparison.png}
 \caption{Comprehensive performance comparison across seven model architectures on UNSW-NB15 traffic over 5 seeds: (a) Test Accuracy, (b) Macro F1-score, (c) False Positive Rate (FPR), and (d) Single-sample inference latency (log scale).}
 \label{fig:qml_comparison}
 \end{figure}
 
 \begin{table*}[t]
-\caption{Unified Multi-Paradigm Benchmark Evaluation Across 5 Seeds on Real UNSW-NB15 Traffic (Source: \texttt{results/qml\_comparison\_summary.json})}
+\caption{Unified Multi-Paradigm Benchmark Evaluation Across 5 Seeds on Real UNSW-NB15 Traffic}
 \label{tab:benchmark_results}
 \centering
 \small
@@ -308,7 +311,7 @@ The deployment feasibility of QML in enterprise SOCs hinges on the operational t
 \section{Conclusion \& Future Roadmap}
 This work presented a comprehensive empirical benchmark of hybrid quantum neural architectures for intrusion detection under a strict 4-qubit budget. Our findings show that while classical tree ensembles remain superior in raw accuracy and speed, Hybrid VQC provides competitive representation, tracking classical neural models while demonstrating mathematical resilience under physical NISQ readout noise. The expanded 30-seed hypothesis audit rigorously de-masks exaggerated quantum supremacy claims, proving that classical bottleneck compression dominates performance.
 
-Future work will expand the detection engine to the full 9-class attack taxonomy, evaluate cross-dataset domain shifts, and, separately, validate a raw-PCAP packet-streaming study. The present Phase 4 evidence remains limited to the $k=2$ connection-setup header proxy defined above.
+Future work will expand the detection engine to the full 9-class attack taxonomy and, separately, validate a raw-PCAP packet-streaming study under realistic packet-prefix conditions. The present Phase 4 evidence remains limited to the $k=2$ connection-setup header proxy defined above.
 
 \bibliographystyle{IEEEtran}
 \begin{thebibliography}{00}
