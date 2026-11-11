@@ -1,0 +1,30 @@
+{
+  "protocol": "tcp_setup_header_proxy_v1",
+  "k_packets": 2,
+  "seed": 42,
+  "scaler_bundle": "/Users/yippilikhatwangmadhav/Desktop/hq-ids-029/models/checkpoints/phase4_setup_scaler.joblib",
+  "checkpoints": {
+    "ClassicalMLP": "phase4_setup_classical_mlp_k2.pt",
+    "CNN1D": "phase4_setup_cnn1d_k2.pt",
+    "LSTM": "phase4_setup_lstm_k2.pt",
+    "SequentialQNN": "phase4_setup_sequential_qnn_k2.pt"
+  },
+  "scaler_metadata": {
+    "protocol": "tcp_setup_header_proxy_v1",
+    "feature_names": [
+      "packet_1_proto",
+      "packet_1_sttl",
+      "packet_1_swin",
+      "packet_2_proto",
+      "packet_2_dttl",
+      "packet_2_dwin"
+    ],
+    "input_flat_dim": 6,
+    "training_source": "/Users/yippilikhatwangmadhav/Desktop/hq-ids-029/data/UNSW_NB15_training-set.csv",
+    "n_training_flows": 175341,
+    "training_id_sha256": "8210456fc824f04bdaaf211c4bf5e97c00e9b9853bec5128276f40bf4147b597",
+    "testing_source": "/Users/yippilikhatwangmadhav/Desktop/hq-ids-029/data/UNSW_NB15_testing-set.csv",
+    "n_testing_flows": 82332,
+    "testing_id_sha256": "02935e7c6be3e73dd142911436bc7e99314127b0a5b2da38f1f3a020f4bf3c98"
+  }
+}

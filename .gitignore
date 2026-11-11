@@ -53,8 +53,9 @@ venv.bak/
 *.sublime-project
 *.sublime-workspace
 
-# PyPI / pip cache
+# PyPI / pip cache & pytest
 .cache/
+.pytest_cache/
 
 # LaTeX auxiliary files
 *.aux
@@ -62,7 +63,16 @@ venv.bak/
 *.out
 missfont.log
 
-# Large Raw Datasets (preserve aligned subsets)
+# Large Raw Datasets & PCAPs (>50MB)
 data/UNSW_NB15_*.csv
 data/cicids2017_raw.csv
+*.pcap
+*.pcapng
+
+# Heavy model checkpoints
+*.pt
+*.pth
+*.h5
+*.ckpt
+
 
