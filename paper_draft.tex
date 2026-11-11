@@ -29,7 +29,7 @@ Prasanthi Nilayam, Andhra Pradesh, India}
 \maketitle
 
 \begin{abstract}
-Network intrusion detection systems (NIDS) deployed in modern Security Operations Centers (SOCs) face acute alert fatigue driven by high false alarm rates on bursty benign traffic. Under the Amaravati Quantum Valley (AQV) Use Case UC-029 mandate (\textit{Cybersecurity \& Quantum-Safe Infrastructure}), this paper presents an empirical, zero-trust benchmark of hybrid quantum-classical neural network architectures operating under a strict 4-qubit Noisy Intermediate-Scale Quantum (NISQ) hardware budget ($N \le 4$). Across seven paradigms on real UNSW-NB15 flow records, we conduct an expanded 30-seed hypothesis testing protocol ($N=30$) and demonstrate that the performance gap between Full VQC ($93.65\%$ accuracy) and Bypassed controls ($93.61\%$ accuracy) is statistically non-significant ($p = 0.6266$, Cohen's $d = 0.090$), proving that tabular flow discrimination is primarily governed by classical bottleneck compression ($39 \to 16 \to 4$) rather than quantum kernel supremacy. Crucially, we introduce parameter-matched Classical Random Fourier Feature (RFF) and Trainable Fourier surrogates to test if quantum expressivity transcends classical harmonic representations. In-domain, classical Fourier surrogates match Hybrid VQC exactly ($88.08\%$ vs $88.69\%$ F1, $p = 0.6128$), while in cross-dataset domain transfer to CIC-IDS2017, the Classical RFF surrogate significantly outperforms Hybrid VQC ($53.36\%$ vs $42.38\%$ F1, $p = 0.0419$) with a $96\times$ latency advantage ($0.054\text{ ms}$ vs $5.193\text{ ms}$). Furthermore, Matrix Inversion (M3) readout mitigation mathematically recovers $46.6\%$ of Pauli-$Z$ expectation drift under $10\%$ bit-flip noise ($\kappa(\mathbf{M}) \le 2.44$). These findings establish that 4-qubit variational circuits act functionally as classical Fourier feature transforms without unique quantum representational supremacy on classical network flows.
+Network intrusion detection systems (NIDS) deployed in modern Security Operations Centers (SOCs) face acute alert fatigue driven by high false alarm rates on bursty benign traffic. Under the Amaravati Quantum Valley (AQV) Use Case UC-029 mandate (\textit{Cybersecurity \& Quantum-Safe Infrastructure}), this paper presents an empirical, zero-trust benchmark of hybrid quantum-classical neural network architectures operating under a strict 4-qubit Noisy Intermediate-Scale Quantum (NISQ) hardware budget ($N \le 4$). Across seven paradigms on real UNSW-NB15 flow records, we conduct an expanded 30-seed hypothesis testing protocol ($N=30$) and demonstrate that the performance gap between Full VQC ($93.65\%$ accuracy) and Bypassed controls ($93.61\%$ accuracy) is statistically non-significant ($p = 0.6266$, Cohen's $d = 0.090$), proving that tabular flow discrimination is primarily governed by classical bottleneck compression ($39 \to 16 \to 4$) rather than quantum kernel supremacy. Crucially, we introduce parameter-matched Classical Random Fourier Feature (RFF) and Trainable Fourier surrogates to test if quantum expressivity transcends classical harmonic representations. In cross-dataset domain transfer from UNSW-NB15 to CIC-IDS2017 with strict per-model RNG isolation, Hybrid VQC ($48.22\% \pm 4.31\%$ F1, $54.85\%$ retention) is statistically indistinguishable from classical Fourier surrogates (RFF: $49.06\% \pm 13.71\%$ F1, $p = 0.9087$; Trainable Fourier: $49.20\% \pm 3.59\%$ F1, $p = 0.7910$), while classical Fourier models maintain a $77\times$ latency advantage ($0.066\text{ ms}$ vs $5.088\text{ ms}$). Furthermore, Matrix Inversion (M3) readout mitigation mathematically recovers $46.6\%$ of Pauli-$Z$ expectation drift under $3\%$ bit-flip noise ($p = 0.03$), with condition numbers remaining bounded ($\kappa(\mathbf{M}) \le 2.44$) even under $10\%$ noise. These findings establish that 4-qubit variational circuits act functionally as classical Fourier feature transforms without unique quantum representational supremacy on classical network flows.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -254,7 +254,7 @@ The condition number satisfies:
 \begin{equation}
 \kappa(\mathbf{M}) = \left(\frac{1}{1 - 2p}\right)^4 = 1.2808 \quad (\text{for } p = 0.03),
 \end{equation}
-and remains bounded at $\kappa(\mathbf{M}) = 2.44 \ll 20.0$ even under $p=0.10$ ($10\%$ readout noise). For the 5-qubit assignment matrix used in Phase 4, the condition number evaluates to $\kappa(\mathbf{M}) \approx 33.4$, still well within the numerical stability threshold ($\kappa \ll 100$). Exact matrix inversion ($\mathbf{M}^{-1}$) followed by simplex projection reduces expectation drift to $0.0378$, recovering $\mathbf{46.6\%}$ of readout-induced error (Fig.~\ref{fig:noise_degradation}). Classification accuracy remains stable at $93.84\%$.
+and remains bounded at $\kappa(\mathbf{M}) = 2.44 \ll 20.0$ even under $p=0.10$ ($10\%$ readout noise). For the 5-qubit assignment matrix used in Phase 4, the condition number evaluates to $\kappa(\mathbf{M}) \approx 33.4$, still well within the numerical stability threshold ($\kappa \ll 100$). Exact matrix inversion ($\mathbf{M}^{-1}$) followed by simplex projection reduces expectation drift from $0.0709$ to $0.0378$, recovering $\mathbf{46.6\%}$ of readout-induced error under physical $p=0.03$ noise (Fig.~\ref{fig:noise_degradation}). Classification accuracy remains stable at $93.84\%$.
 
 \section{Cross-Dataset Transfer and Classical Fourier Surrogate Evaluation}
 \label{sec:rff_surrogates}
@@ -280,9 +280,9 @@ We extract 12 standardized physical transport features (`dur`, `spkts`, `dpkts`,
 
 The empirical findings (Table~\ref{tab:rff_summary} and Fig.~\ref{fig:rff_quantum}) settle the representational question:
 \begin{itemize}
-    \item \textit{In-Domain Statistical Equivalence:} In-domain on UNSW-NB15, Trainable Fourier ($88.88\% \pm 0.71\%$), Hybrid VQC ($88.69\% \pm 0.96\%$), Classical MLP ($88.22\% \pm 1.06\%$), and Classical RFF ($88.08\% \pm 1.84\%$) are statistically indistinguishable. Paired two-tailed $t$-tests yield $p = 0.6128$ (VQC vs RFF) and $p = 0.7942$ (VQC vs Trainable Fourier).
-    \item \textit{Cross-Domain Transfer Superiority of Classical RFF:} Under network transfer, Classical RFF achieves $53.36\% \pm 5.98\%$ F1 ($60.66\%$ retention), significantly outperforming Hybrid VQC at $42.38\% \pm 8.25\%$ F1 ($47.82\%$ retention, $t = -2.9511, p = 0.0419$).
-    \item \textit{Latency Reality:} Classical RFF executes in $0.054\text{ ms/sample}$, providing a $96\times$ operational speed advantage over statevector VQC simulation ($5.193\text{ ms/sample}$).
+    \item \textit{In-Domain Equivalence:} In-domain on UNSW-NB15, Trainable Fourier achieves $89.30\% \pm 0.67\%$ F1, Classical RFF reaches $88.57\% \pm 0.76\%$ F1, Classical MLP attains $88.22\% \pm 1.06\%$ F1, and Hybrid VQC achieves $87.90\% \pm 1.22\%$ F1. Paired two-tailed $t$-tests confirm that VQC is statistically equivalent to Classical RFF ($t = -0.9542, p = 0.3940$) and Classical MLP ($t = -0.3986, p = 0.7106$). Trainable Fourier moderately exceeds VQC ($t = -3.2692, p = 0.0308$) due to backpropagation through harmonic basis frequencies.
+    \item \textit{Cross-Domain Transfer Generalization:} Under zero-shot transfer onto CIC-IDS2017, Hybrid VQC achieves $48.22\% \pm 4.31\%$ F1 ($54.85\%$ retention), performing comparably to Classical RFF ($49.06\% \pm 13.71\%$ F1, $55.30\%$ retention, $t = -0.1222, p = 0.9087$) and Trainable Fourier ($49.20\% \pm 3.59\%$ F1, $55.10\%$ retention, $t = -0.2833, p = 0.7910$), while Classical MLP achieves $44.97\% \pm 6.29\%$ F1 ($50.96\%$ retention).
+    \item \textit{Latency Reality:} Classical Fourier surrogates execute in $0.065$--$0.066\text{ ms/sample}$, providing a $77\times$ operational speed advantage over statevector VQC simulation ($5.088\text{ ms/sample}$).
 \end{itemize}
 
 \begin{table*}[t]
@@ -293,10 +293,10 @@ The empirical findings (Table~\ref{tab:rff_summary} and Fig.~\ref{fig:rff_quantu
 \toprule
 \textbf{Model Architecture} & \textbf{In-Domain Macro F1} & \textbf{Cross-Domain Macro F1} & \textbf{F1 Retention Ratio} & \textbf{Single-Sample Latency} \\
 \midrule
-Classical MLP (12 $\to$ 16 $\to$ 4 $\to$ 2) & $88.22\% \pm 1.06\%$ & $44.97\% \pm 6.29\%$ & $50.96\% \pm 7.00\%$ & $\mathbf{0.049\text{ ms}}$ \\
-Classical RFF Surrogate (Random Fourier) & $88.08\% \pm 1.84\%$ & $\mathbf{53.36\% \pm 5.98\%}$ & $\mathbf{60.66\% \pm 7.38\%}$ & $0.054\text{ ms}$ \\
-Trainable Fourier Network & $\mathbf{88.88\% \pm 0.71\%}$ & $53.24\% \pm 5.86\%$ & $59.87\% \pm 6.20\%$ & $0.055\text{ ms}$ \\
-Hybrid VQC ($4$-Qubit Variational Circuit) & $88.69\% \pm 0.96\%$ & $42.38\% \pm 8.25\%$ & $47.82\% \pm 9.54\%$ & $5.193\text{ ms}$ \\
+Classical MLP (12 $\to$ 16 $\to$ 4 $\to$ 2) & $88.22\% \pm 1.06\%$ & $44.97\% \pm 6.29\%$ & $50.96\% \pm 7.00\%$ & $\mathbf{0.054\text{ ms}}$ \\
+Classical RFF Surrogate (Random Fourier) & $88.57\% \pm 0.76\%$ & $49.06\% \pm 13.71\%$ & $\mathbf{55.30\% \pm 15.21\%}$ & $0.066\text{ ms}$ \\
+Trainable Fourier Network & $\mathbf{89.30\% \pm 0.67\%}$ & $\mathbf{49.20\% \pm 3.59\%}$ & $55.10\% \pm 4.07\%$ & $0.065\text{ ms}$ \\
+Hybrid VQC ($4$-Qubit Variational Circuit) & $87.90\% \pm 1.22\%$ & $48.22\% \pm 4.31\%$ & $54.85\% \pm 4.72\%$ & $5.088\text{ ms}$ \\
 \bottomrule
 \end{tabular}
 \end{table*}
@@ -317,11 +317,8 @@ Future work will expand the detection engine to the full 9-class attack taxonomy
 \begin{thebibliography}{00}
 \bibitem{abreu2024qml} D. Abreu, C. E. Rothenberg, and A. Abel\'em, ``QML-IDS: Quantum Machine Learning Intrusion Detection System,'' arXiv:2410.16308, 2024. DOI: 10.48550/arXiv.2410.16308.
 \bibitem{abreu2025quantumnetsec} D. Abreu, D. Moura, C. E. Rothenberg, and A. Abel\'em, ``QuantumNetSec: Quantum Machine Learning for Network Security,'' Preprints, 2024. DOI: 10.22541/au.172540693.31989215.
-\bibitem{chen2022cyber} J. Chen, E. Jones, and R. Martin, ``Cyber Threat Detection Enabled by Quantum Computing: A Hardware-Constrained Perspective,'' arXiv preprint arXiv:2501.00000 [quant-ph], 2025.
-\bibitem{vishvaa2024qnids} S. Vishvaa, K. Nair, and R. Thorne, ``Q-NIDS: Critical Evaluation and Ablation Studies of Quantum Intrusion Detection Systems,'' \textit{ACM Transactions on Privacy and Security}, vol. 27, no. 2, pp. 1--18, 2024.
 \bibitem{spadari2024edge} V. Spadari, I. Guarino, D. Ciuonzo, and A. Pescap\`e, ``A Comparison Between Classical and Quantum Machine Learning for Mobile App Traffic Classification,'' in \textit{Proc. 2024 IEEE/ACM Symposium on Edge Computing (SEC)}, 2024, pp. 461--467. DOI: 10.1109/SEC62691.2024.00053.
 \bibitem{spadari2025reality} V. Spadari, I. Guarino, D. Ciuonzo, and A. Pescap\`e, ``Towards Network Intrusion Detection via Quantum Machine Learning: A Reality Check,'' in \textit{Proc. IEEE Conference on Computer Communications Workshops (INFOCOM WKSHPS)}, 2025, pp. 1--6. DOI: 10.1109/infocomwkshps65812.2025.11152772.
-\bibitem{kaissar2026survey} M. Kaissar, L. Benhaddi, and S. El Kettani, ``Enhancing Network Intrusion Detection with Quantum Machine Learning: A Comprehensive Survey of Methods, Metrics, and Applications,'' \textit{Future Internet}, vol. 18, no. 4, p. 112, 2026.
 \bibitem{schuld2021effect} M. Schuld, R. Sweke, and J. J. Meyer, ``Effect of data encoding on the expressive power of variational quantum-machine-learning models,'' \textit{Physical Review A}, vol. 103, no. 3, p. 032430, 2021.
 \end{thebibliography}
 

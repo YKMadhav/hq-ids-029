@@ -14,97 +14,97 @@
     "cross_fpr_std": 0.09959180083296802,
     "f1_retention_mean": 50.9594818768508,
     "f1_retention_std": 6.998925748014364,
-    "latency_ms_mean": 0.048543499999505,
-    "latency_ms_std": 0.014325664974018357
+    "latency_ms_mean": 0.054099466401385146,
+    "latency_ms_std": 0.006460356044638041
   },
   "Classical RFF": {
-    "in_accuracy_mean": 0.9014,
-    "in_accuracy_std": 0.014690132742763096,
-    "in_f1_mean": 0.8807540869643089,
-    "in_f1_std": 0.018379832311251395,
-    "in_fpr_mean": 0.26713831789404213,
-    "in_fpr_std": 0.04664218479002829,
-    "cross_accuracy_mean": 0.5894,
-    "cross_accuracy_std": 0.09029473960314631,
-    "cross_f1_mean": 0.533634056053853,
-    "cross_f1_std": 0.05977826457193171,
-    "cross_fpr_mean": 0.5951158422041327,
-    "cross_fpr_std": 0.10122893652660817,
-    "f1_retention_mean": 60.658547904736395,
-    "f1_retention_std": 7.384899700083964,
-    "latency_ms_mean": 0.05403261640312849,
-    "latency_ms_std": 0.00851418950330635
+    "in_accuracy_mean": 0.9036000000000002,
+    "in_accuracy_std": 0.007368853370776223,
+    "in_f1_mean": 0.8857033937586516,
+    "in_f1_std": 0.007640134339365565,
+    "in_fpr_mean": 0.23530027286622862,
+    "in_fpr_std": 0.018291365002459557,
+    "cross_accuracy_mean": 0.53756,
+    "cross_accuracy_std": 0.16179242256669502,
+    "cross_f1_mean": 0.4905625958197547,
+    "cross_f1_std": 0.13708497981876352,
+    "cross_fpr_mean": 0.5902316844082656,
+    "cross_fpr_std": 0.09034565780293648,
+    "f1_retention_mean": 55.29638649964795,
+    "f1_retention_std": 15.21024785289527,
+    "latency_ms_mean": 0.06622986680013128,
+    "latency_ms_std": 0.014346626002237916
   },
   "Trainable Fourier": {
-    "in_accuracy_mean": 0.9067999999999999,
-    "in_accuracy_std": 0.008167006795638174,
-    "in_f1_mean": 0.888818949864375,
-    "in_f1_std": 0.0071242336234194304,
-    "in_fpr_mean": 0.2405483319869687,
-    "in_fpr_std": 0.024880468943985504,
-    "cross_accuracy_mean": 0.5606,
-    "cross_accuracy_std": 0.060483551483027205,
-    "cross_f1_mean": 0.5324016967681094,
-    "cross_f1_std": 0.0586447325702562,
-    "cross_fpr_mean": 0.5018159048215404,
-    "cross_fpr_std": 0.08408774143938615,
-    "f1_retention_mean": 59.868696530007995,
-    "f1_retention_std": 6.195493029107713,
-    "latency_ms_mean": 0.054832033599086574,
-    "latency_ms_std": 0.010349841510981181
+    "in_accuracy_mean": 0.9094000000000001,
+    "in_accuracy_std": 0.00669328021227261,
+    "in_f1_mean": 0.89301574409022,
+    "in_f1_std": 0.006565134080708685,
+    "in_fpr_mean": 0.21973259010052032,
+    "in_fpr_std": 0.03321696601149596,
+    "cross_accuracy_mean": 0.51364,
+    "cross_accuracy_std": 0.05561427874206409,
+    "cross_f1_mean": 0.49199658282178393,
+    "cross_f1_std": 0.035868450421562614,
+    "cross_fpr_mean": 0.46675015654351915,
+    "cross_fpr_std": 0.1351771914785948,
+    "f1_retention_mean": 55.098716592932966,
+    "f1_retention_std": 4.073303900487836,
+    "latency_ms_mean": 0.06547996639856138,
+    "latency_ms_std": 0.012847225306825921
   },
   "Hybrid VQC": {
-    "in_accuracy_mean": 0.9054,
-    "in_accuracy_std": 0.004827007354458872,
-    "in_f1_mean": 0.8868608839798698,
-    "in_f1_std": 0.009617253001441806,
-    "in_fpr_mean": 0.2421840461500878,
-    "in_fpr_std": 0.02608267530731931,
-    "cross_accuracy_mean": 0.43723999999999996,
-    "cross_accuracy_std": 0.08778785793035389,
-    "cross_f1_mean": 0.4238428275018456,
-    "cross_f1_std": 0.08254632338746493,
-    "cross_fpr_mean": 0.4641202254226675,
-    "cross_fpr_std": 0.10618442792430785,
-    "f1_retention_mean": 47.823841531170196,
-    "f1_retention_std": 9.537251097668216,
-    "latency_ms_mean": 5.192732000010437,
-    "latency_ms_std": 1.5663460465161185
+    "in_accuracy_mean": 0.8986000000000001,
+    "in_accuracy_std": 0.011545561917897294,
+    "in_f1_mean": 0.8790190000481714,
+    "in_f1_std": 0.012213741252081474,
+    "in_fpr_mean": 0.25240706100568117,
+    "in_fpr_std": 0.046636521908028646,
+    "cross_accuracy_mean": 0.5296000000000001,
+    "cross_accuracy_std": 0.06134557848777694,
+    "cross_f1_mean": 0.48220502560333695,
+    "cross_f1_std": 0.043140843688186686,
+    "cross_fpr_mean": 0.6256731371321227,
+    "cross_fpr_std": 0.10427293184879283,
+    "f1_retention_mean": 54.85017705281932,
+    "f1_retention_std": 4.721493319783272,
+    "latency_ms_mean": 5.087938995988225,
+    "latency_ms_std": 0.47438733673196354
   },
   "hypothesis_tests": {
     "VQC_vs_Classical MLP": {
       "in_domain": {
-        "t_statistic": 0.5849625447596198,
-        "p_value": 0.5899802347375052,
+        "t_statistic": -0.39855043135282986,
+        "p_value": 0.7105832409037138,
         "significant_p05": false
       },
       "cross_domain": {
-        "t_statistic": -0.4286745819733375,
-        "p_value": 0.6902366364522444,
+        "t_statistic": 0.978814253477895,
+        "p_value": 0.38309315228376745,
         "significant_p05": false
       }
     },
     "VQC_vs_Classical RFF": {
       "in_domain": {
-        "t_statistic": 0.5480566229318042,
-        "p_value": 0.612802027038837,
+        "t_statistic": -0.9542374058395692,
+        "p_value": 0.3940001512165511,
         "significant_p05": false
       },
       "cross_domain": {
-        "t_statistic": -2.951138284655466,
-        "p_value": 0.04192188716974954,
-        "significant_p05": true
+        "t_statistic": -0.12215815531048078,
+        "p_value": 0.9086651033334885,
+        "significant_p05": false
       }
     },
     "VQC_vs_Trainable Fourier": {
       "in_domain": {
-        "t_statistic": -0.27882269854516517,
-        "p_value": 0.7942021840997361,
-        "significant_p05": false
+        "t_statistic": -3.2691883723138573,
+        "p_value": 0.030812716073034496,
+        "significant_p05": true
       },
       "cross_domain": {
-        "t_statistic": -2.4917525670420564,
-        "p_value": 0.06735797945996182,
+        "t_statistic": -0.2832741266602488,
+        "p_value": 0.7910229017346184,
         "significant_p05": false
       }
     }

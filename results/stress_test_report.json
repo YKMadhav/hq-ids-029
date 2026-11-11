@@ -348,7 +348,7 @@
         "qnn_advantage_delta": -0.0020000000000000018
       }
     ],
-    "figure": "/Users/yippilikhatwangmadhav/Desktop/hq-ids-029/results/figures/bottleneck_capacity_sweep.png"
+    "figure": "results/figures/bottleneck_capacity_sweep.png"
   },
   "test_5_adversarial_and_noise_stress": {
     "fgsm_adversarial": [
