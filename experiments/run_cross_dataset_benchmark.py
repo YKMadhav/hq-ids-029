@@ -186,6 +186,8 @@ def main():
         # 1. XGBoost
         # ---------------------------------------------------------------------
         print("  Evaluating XGBoost...")
+        torch.manual_seed(seed)
+        np.random.seed(seed)
         xgb_clf = xgb.XGBClassifier(n_estimators=100, max_depth=6, learning_rate=0.1, random_state=seed, eval_metric="logloss")
         xgb_clf.fit(X_train, y_train)
 
@@ -212,6 +214,8 @@ def main():
         # 2. Random Forest
         # ---------------------------------------------------------------------
         print("  Evaluating Random Forest...")
+        torch.manual_seed(seed)
+        np.random.seed(seed)
         rf_clf = RandomForestClassifier(n_estimators=100, max_depth=12, random_state=seed)
         rf_clf.fit(X_train, y_train)
 
@@ -236,6 +240,8 @@ def main():
         # 3. Classical MLP Baseline (12 -> 16 -> 4 -> 2)
         # ---------------------------------------------------------------------
         print("  Evaluating Classical MLP...")
+        torch.manual_seed(seed)
+        np.random.seed(seed)
         mlp_net = ClassicalMLPModel(INPUT_DIM, LATENT_DIM)
         opt_mlp = torch.optim.Adam(mlp_net.parameters(), lr=LR)
         crit = nn.CrossEntropyLoss()
@@ -274,6 +280,8 @@ def main():
         # 4. Hybrid VQC (12 -> 16 -> 4 -> 4-Qubit VQC -> 2)
         # ---------------------------------------------------------------------
         print("  Evaluating 4-Qubit Hybrid VQC...")
+        torch.manual_seed(seed)
+        np.random.seed(seed)
         vqc_net = HybridVQCModel(INPUT_DIM, LATENT_DIM, num_layers=2)
         opt_vqc = torch.optim.Adam(vqc_net.parameters(), lr=LR)
 

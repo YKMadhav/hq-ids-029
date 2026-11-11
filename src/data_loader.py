@@ -82,12 +82,12 @@ SYNTHETIC_METADATA_COLUMNS = [
 #     the classes and drives every metric to 1.0.
 #     `proto` / `service` / `state` are nominal protocol metadata.
 #     `attack_cat` is the ground-truth attack family, i.e. the label itself.
-UNSW_METADATA_COLUMNS = ["id", "proto", "service", "state", "attack_cat"]
+UNSW_METADATA_COLUMNS = ["id", "proto", "service", "state", "attack_cat", "clean_cat"]
 
 METADATA_COLUMNS = SYNTHETIC_METADATA_COLUMNS + UNSW_METADATA_COLUMNS
 
 # Ground-truth / supervision columns that must never enter the feature matrix.
-LABEL_COLUMNS = ["label", "attack_category", "attack_cat"]
+LABEL_COLUMNS = ["label", "attack_category", "attack_cat", "binary_label", "clean_cat"]
 
 # Canonical 10-class UNSW-NB15 attack category taxonomy
 ATTACK_CAT_MAPPING = {

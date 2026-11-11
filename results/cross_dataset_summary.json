@@ -52,19 +52,19 @@
   },
   "Hybrid VQC": {
     "paradigm": "Variational QML",
-    "in_accuracy_mean": 0.9136000000000001,
-    "in_accuracy_std": 0.012856904759700147,
-    "in_f1_mean": 0.8975771372742283,
-    "in_f1_std": 0.013712894913525168,
-    "in_fpr_mean": 0.22155019478679078,
-    "in_fpr_std": 0.028495837833519964,
-    "cross_accuracy_mean": 0.51068,
-    "cross_accuracy_std": 0.08529766702554062,
-    "cross_f1_mean": 0.48517151313263335,
-    "cross_f1_std": 0.06977817867603912,
-    "cross_fpr_mean": 0.5185973700688792,
-    "cross_fpr_std": 0.10666246349982622,
-    "f1_retention_mean": 54.095488840587244,
-    "f1_retention_std": 7.988130836324321
+    "in_accuracy_mean": 0.8986000000000001,
+    "in_accuracy_std": 0.011545561917897294,
+    "in_f1_mean": 0.8790190000481714,
+    "in_f1_std": 0.012213741252081474,
+    "in_fpr_mean": 0.25240706100568117,
+    "in_fpr_std": 0.046636521908028646,
+    "cross_accuracy_mean": 0.5296000000000001,
+    "cross_accuracy_std": 0.06134557848777694,
+    "cross_f1_mean": 0.48220502560333695,
+    "cross_f1_std": 0.043140843688186686,
+    "cross_fpr_mean": 0.6256731371321227,
+    "cross_fpr_std": 0.10427293184879283,
+    "f1_retention_mean": 54.85017705281932,
+    "f1_retention_std": 4.721493319783272
   }
 }

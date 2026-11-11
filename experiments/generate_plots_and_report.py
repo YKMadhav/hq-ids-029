@@ -440,9 +440,10 @@ held-out 1,000-flow test partition.
 - The hybrid QNN reaches **@ACC@** mean accuracy with ROC-AUC @AUCA@, statistically
   indistinguishable from the strongest classical baseline (@BCCN@, @BCC@; gap
   @GAP@ percentage points against a between-seed standard deviation of @ACSTD@).
-- The hybrid QNN attains the **lowest false positive rate** (@FPR@) of all four
-  models, which is the operationally decisive metric for intrusion detection: a
-  false alarm on benign traffic is what drives analyst fatigue.
+- The hybrid QNN reaches a competitive false positive rate (@FPR@) alongside
+  classical neural baselines, which is an operationally critical metric for intrusion detection: a
+  false alarm on benign traffic is what drives analyst fatigue. Tree ensembles achieve lower FPRs
+  but rely on broad axis-aligned partition ensembles.
 - It is also the only model that attains this accuracy while the discriminative
   computation itself runs on a 4-qubit, depth-@CD@ circuit - classical baselines
   operate on hundreds to thousands of effective bits.
@@ -575,11 +576,10 @@ operational costs of compressing @N@ features into a 4-qubit bottleneck.
 
 1. **A 4-qubit hybrid QNN is viable but not transformative.** On real UNSW-NB15
    traffic it reaches @ACC@ accuracy and @FPR@ FPR - within @GAP@ points of the best
-   classical baseline and with the lowest false positive rate of all four models.
-2. **The quantum layer earns its place, but narrowly.** The ablation ordering
-   $\text{Full} > \text{Frozen} > \text{Bypassed}$ holds across all five seeds. The
-   gain is small, and the depth-matched classical MLP control confirms that a
-   4-dimensional bottleneck, not quantumness, is the dominant constraint.
+   classical baseline and comparable to neural baselines.
+2. **The classical bottleneck dominates tabular representation.** In multi-seed hypothesis testing,
+   the performance gap between Full VQC and Bypassed controls is statistically non-significant,
+   confirming that classical bottleneck compression, rather than quantum kernel supremacy, is the dominant factor.
 3. **Readout mitigation is the correct lever under NISQ conditions.** M3 matrix
    inversion recovers @RECOV@% of the readout-induced drift in $\langle Z_i\rangle$
    at negligible cost, and is mathematically exact for product-form readout

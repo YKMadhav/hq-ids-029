@@ -223,17 +223,21 @@ class _PyTorchMLPModule(nn.Module):
             nn.BatchNorm1d(hidden_dim),
             nn.ReLU(),
             nn.Linear(hidden_dim, bottleneck_dim),
-            nn.Tanh()  # Bounds latent representation to [-1, 1]
+            nn.Tanh()  # Output in [-1, 1], scaled by pi in forward
         )
         self.classifier = nn.Linear(bottleneck_dim, output_dim)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        latent = self.encoder(x)
+        if x.dim() == 1:
+            x = x.unsqueeze(0)
+        latent = self.encoder(x) * np.pi
         logits = self.classifier(latent)
         return logits
 
     def extract_features(self, x: torch.Tensor) -> torch.Tensor:
-        return self.encoder(x)
+        if x.dim() == 1:
+            x = x.unsqueeze(0)
+        return self.encoder(x) * np.pi
 
 
 class ClassicalMLPBaseline:
@@ -249,10 +253,10 @@ class ClassicalMLPBaseline:
         hidden_dim: int = 16,
         bottleneck_dim: int = 4,
         output_dim: int = 2,
-        learning_rate: float = 0.005,
+        learning_rate: float = 0.01,
         batch_size: int = 64,
-        epochs: int = 40,
-        weight_decay: float = 1e-4,
+        epochs: int = 20,
+        weight_decay: float = 0.0,
         patience: int = 8,
         loss_fn: Optional[nn.Module] = None,
         random_state: int = 42,

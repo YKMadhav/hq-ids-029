@@ -259,6 +259,8 @@ def main():
 
         for name, factory in model_factories.items():
             print(f"  Training and evaluating: {name}...")
+            torch.manual_seed(seed)
+            np.random.seed(seed)
             model = factory()
             optimizer = torch.optim.Adam(model.parameters(), lr=LR)
             criterion = nn.CrossEntropyLoss()

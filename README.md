@@ -85,8 +85,8 @@ at the interpreter that has it.
 features; the scaler is fit on the train partition only.
 
 **Results at a glance** (5 seeds, mean accuracy): XGBoost 0.9452, Random Forest
-0.9430, Hybrid QNN 0.9396, Classical MLP 0.9352. The Hybrid QNN achieves the lowest
-false positive rate (0.1467) of all four. See `PROJECT_FINAL_REPORT.md` for the
+0.9430, Hybrid QNN 0.9396, Classical MLP 0.9352. The Hybrid QNN achieves a competitive
+false positive rate (0.1467) alongside classical neural baselines. See `PROJECT_FINAL_REPORT.md` for the
 full methodology, ablation, and NISQ/M3 analysis.
 
 **Key artifacts:**
