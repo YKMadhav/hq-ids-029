@@ -129,7 +129,7 @@ The complete benchmark was executed across five fixed seeds ($[42, 43, 44, 45, 4
 | Convolutional QML (QCNN) | Hybrid QCNN ($4 \to 2$ Qubits) | $0.9348 \pm 0.0031$ | $0.9221 \pm 0.0049$ | $0.9424 \pm 0.0104$ | $0.1649 \pm 0.0409$ | $4.76 \pm 0.23$ |
 | Kernel-Based QML (QSVM) | QSVM (Quantum Kernel) | $0.9302 \pm 0.0057$ | $0.9145 \pm 0.0072$ | $\mathbf{0.9510 \pm 0.0059}$ | $0.2132 \pm 0.0149$ | $1.76 \pm 1.47$ |
 
-![Figure 1: Multi-Paradigm Comparison](file:///Users/yippilikhatwangmadhav/Desktop/hq-ids-029/results/figures/qml_architecture_comparison.png)
+![Figure 1: Multi-Paradigm Comparison](results/figures/qml_architecture_comparison.png)
 
 ### Cross-Paradigm Performance Analysis
 1. **Classical Trees Win on Accuracy:** XGBoost attains the highest accuracy ($94.52\%$) and lowest FPR ($12.48\%$), followed by Random Forest ($94.30\%$). Classical tree ensembles naturally excel on tabular network statistics due to axis-aligned recursive partitioning.
@@ -171,7 +171,7 @@ Sweeping the bottleneck dimension across $d \in \{2, 3, 4, 6, 8\}$ reveals an im
 | 6 | 0.9360 | 0.9360 | $\pm 0.00\%$ |
 | 8 | 0.9350 | 0.9330 | $-0.20\%$ |
 
-![Figure 2: Bottleneck Capacity Sweep](file:///Users/yippilikhatwangmadhav/Desktop/hq-ids-029/results/figures/bottleneck_capacity_sweep.png)
+![Figure 2: Bottleneck Capacity Sweep](results/figures/bottleneck_capacity_sweep.png)
 
 At tight bounds ($d \le 4$), Hilbert space projection provides a regularizing advantage ($+0.80\%$ accuracy advantage at $d=4$ over classical MLPs: $94.10\%$ vs $93.30\%$). At $d \ge 6$, classical MLPs and quantum circuits converge to parity ($93.60\%$).
 
@@ -186,7 +186,7 @@ and remains bounded at $\kappa(\mathbf{M}) = 2.44 \ll 20.0$ even under $p=0.10$ 
 $$\text{Analytic Drift Recovery} = \frac{0.0686 - 0.0339}{0.0686} = \mathbf{50.6\%}.$$
 Downstream classification accuracy ($93.84\% \pm 0.62\%$) and Macro F1 ($92.70\% \pm 0.81\%$) under noise are statistically unchanged compared to unmitigated noisy inference ($93.88\% \pm 0.62\%$ accuracy, $92.74\% \pm 0.81\%$ F1, paired $p > 0.80$), as the shallow 4-qubit circuit does not accumulate sufficient expectation drift to cross the linear classification hyperplane.
 
-![Figure 3: NISQ Noise Degradation and Recovery](file:///Users/yippilikhatwangmadhav/Desktop/hq-ids-029/results/figures/noise_degradation.png)
+![Figure 3: NISQ Noise Degradation and Recovery](results/figures/noise_degradation.png)
 
 ---
 
@@ -209,7 +209,7 @@ We extract 12 standardized physical transport features (`dur`, `spkts`, `dpkts`,
 | **Trainable Fourier Network** | **89.30% ± 0.67%** | **49.20% ± 3.59%** | $55.10\% \pm 4.07\%$ | 0.065 ms |
 | **Hybrid VQC** ($4$-Qubit Variational Circuit) | $87.90\% \pm 1.22\%$ | $48.22\% \pm 4.31\%$ | $54.85\% \pm 4.72\%$ | 5.088 ms |
 
-![Figure 4: Classical Fourier Surrogates vs. Quantum VQC](file:///Users/yippilikhatwangmadhav/Desktop/hq-ids-029/results/figures/rff_quantum_comparison.png)
+![Figure 4: Classical Fourier Surrogates vs. Quantum VQC](results/figures/rff_quantum_comparison.png)
 
 The empirical findings settle the representational question:
 * **In-Domain Equivalence:** In-domain on UNSW-NB15, Trainable Fourier achieves $89.30\% \pm 0.67\%$ F1, Classical RFF reaches $88.57\% \pm 0.76\%$ F1, Classical MLP attains $88.22\% \pm 1.06\%$ F1, and Hybrid VQC achieves $87.90\% \pm 1.22\%$ F1. Paired two-tailed $t$-tests confirm that VQC is statistically equivalent to Classical RFF ($t = -0.9542, p = 0.3940$) and Classical MLP ($t = -0.3986, p = 0.7106$). Trainable Fourier moderately exceeds VQC ($t = -3.2692, p = 0.0308$) due to backpropagation through harmonic basis frequencies.
