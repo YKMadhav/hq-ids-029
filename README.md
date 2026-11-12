@@ -83,6 +83,21 @@ at the interpreter that has it.
 (`id`, `proto`, `service`, `state`, `attack_cat`) and retains **39** continuous
 features; the scaler is fit on the train partition only.
 
+**Dataset source.** The 5,000-flow sample `data/real_flows.csv` is committed to
+the repository and is sufficient to reproduce all Phase 1–3 experiments.
+The full UNSW-NB15 CSVs used by the Phase 4 proxy evaluation
+(`data/UNSW_NB15_training-set.csv`, `data/UNSW_NB15_testing-set.csv`) are
+also committed. The original dataset is publicly available from the UNSW Canberra
+Cyber research group at <https://research.unsw.edu.au/projects/unsw-nb15-dataset>.
+CIC-IDS2017 data used for cross-dataset evaluation is available from the
+Canadian Institute for Cybersecurity at
+<https://www.unb.ca/cic/datasets/ids-2017.html>; a 5-class 5,000-flow aligned
+sample is committed as `data/cic_aligned_5k.csv`.
+
+**Checkpoints.** Pre-trained model weights (`models/checkpoints/`) are committed
+to the repository. They are only needed by `scripts/run_scaled_inference.py` and
+the Phase 4 early-packet-proxy scripts. All other experiments retrain from scratch.
+
 **Results at a glance** (5 seeds, mean accuracy): XGBoost 0.9452, Random Forest
 0.9430, Hybrid QNN 0.9396, Classical MLP 0.9352. The Hybrid QNN achieves a competitive
 false positive rate (0.1467) alongside classical neural baselines.
