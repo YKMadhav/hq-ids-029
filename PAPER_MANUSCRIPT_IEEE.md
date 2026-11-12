@@ -70,7 +70,7 @@ yielding exactly $D=39$ continuous transport features.
 
 Continuous features exhibiting skewness $\gamma > 1.0$ receive a logarithmic transformation: $\tilde{x} = \log(1 + x)$. All features are subsequently normalized to the interval $[-\pi, \pi]$:
 $$z_k = \frac{x_k - x_{\min, k}}{x_{\max, k} - x_{\min, k}} \cdot 2\pi - \pi \quad \in [-\pi, \pi].$$
-Crucially, the min-max bounds are computed *strictly on the $70\%$ training partition* for each seed and frozen before transforming the validation ($10\%$) and test ($20\%$) sets.
+Crucially, the min-max bounds are computed *strictly on the $70\%$ training partition* for each seed and frozen before transforming the validation ($10\%$) and test ($20\%$) sets. We emphasize that while Phase 4 utilizes official partitions for its proxy, the tabular flow benchmarks in Sections IV--VI utilize 5,000 flows re-split deterministically from a single UNSW-NB15 sample across seeds ($70/10/20$).
 
 ### B. Classical Bottleneck Autoencoder
 To satisfy the $N \le 4$ qubit hardware budget, a classical compression network compresses $\mathbf{x} \in \mathbb{R}^{39}$ into $d=4$ continuous latent parameters:
@@ -105,8 +105,9 @@ The QCNN introduces hierarchical dimensionality reduction directly within the qu
 3. **Readout:** Expectation values $\langle Z_0 \rangle$ and $\langle Z_2 \rangle$ are measured and mapped to class logits via $\mathbf{W} \in \mathbb{R}^{2 \times 2}$.
 
 ### F. Quantum Support Vector Machine (QSVM)
-The QSVM is a kernel-based model operating on precomputed quantum state overlaps. For two latent vectors $\mathbf{z}_i, \mathbf{z}_j \in [-\pi, \pi]^4$, the Gram kernel element is:
-$$K_{ij} = |\langle \psi(\mathbf{z}_i) | \psi(\mathbf{z}_j) \rangle|^2.$$
+The QSVM is a kernel-based model operating on precomputed quantum state overlaps. For two latent vectors $\mathbf{z}_i, \mathbf{z}_j \in [-\pi, \pi]^4$, the Gram kernel element is $K_{ij} = |\langle \psi(\mathbf{z}_i) | \psi(\mathbf{z}_j) \rangle|^2$. Critically, for unentangled single-qubit $R_y$ angle embeddings, this evaluates analytically to a separable classical product kernel:
+$$K_{ij} = \prod_{k=0}^{3} \cos^2\left(\frac{z_{i,k} - z_{j,k}}{2}\right),$$
+which is exactly computable classically in $O(d)$ time without quantum state preparation, demonstrating that unentangled angle-encoded QSVM provides no quantum hardness.
 To optimize execution speed, statevectors $|\psi(\mathbf{z})\rangle \in \mathbb{C}^{16}$ are precomputed using an unsupervised autoencoder, and the Gram matrix is evaluated via vectorized Hermitian matrix multiplication:
 $$\mathbf{K} = |\mathbf{S} \mathbf{S}^\dagger|^2, \quad \mathbf{S} \in \mathbb{C}^{N \times 16},$$
 enforcing $K_{ii} = 1.0$ and $\mathbf{K} = \mathbf{K}^T$. The precomputed kernel feeds a standard dual formulation C-SVC solver ($C=1.0$).
@@ -212,7 +213,7 @@ We extract 12 standardized physical transport features (`dur`, `spkts`, `dpkts`,
 
 The empirical findings settle the representational question:
 * **In-Domain Equivalence:** In-domain on UNSW-NB15, Trainable Fourier achieves $89.30\% \pm 0.67\%$ F1, Classical RFF reaches $88.57\% \pm 0.76\%$ F1, Classical MLP attains $88.22\% \pm 1.06\%$ F1, and Hybrid VQC achieves $87.90\% \pm 1.22\%$ F1. Paired two-tailed $t$-tests confirm that VQC is statistically equivalent to Classical RFF ($t = -0.9542, p = 0.3940$) and Classical MLP ($t = -0.3986, p = 0.7106$). Trainable Fourier moderately exceeds VQC ($t = -3.2692, p = 0.0308$) due to backpropagation through harmonic basis frequencies.
-* **Cross-Domain Transfer Generalization:** Under zero-shot transfer onto CIC-IDS2017, Hybrid VQC achieves $48.22\% \pm 4.31\%$ F1 ($54.85\%$ retention), performing comparably to Classical RFF ($49.06\% \pm 13.71\%$ F1, $55.30\%$ retention, $t = -0.1222, p = 0.9087$) and Trainable Fourier ($49.20\% \pm 3.59\%$ F1, $55.10\%$ retention, $t = -0.2833, p = 0.7910$), while Classical MLP achieves $44.97\% \pm 6.29\%$ F1 ($50.96\%$ retention).
+* **Cross-Domain Equivalence:** Under zero-shot transfer onto CIC-IDS2017, all non-tree models are statistically indistinguishable: Hybrid VQC achieves $48.22\% \pm 4.31\%$ F1 ($54.85\%$ retention), performing comparably to Classical RFF ($49.06\% \pm 13.71\%$ F1, $55.30\%$ retention, paired $t = -0.1222, p = 0.9087$), Trainable Fourier ($49.20\% \pm 3.59\%$ F1, $55.10\%$ retention, paired $t = -0.2833, p = 0.7910$), and Classical MLP ($44.97\% \pm 6.29\%$ F1, paired $t = 0.9788, p = 0.3831$). This proves that neither quantum circuits nor harmonic expansions transcend the underlying tabular distribution shift.
 * **Latency Reality:** Classical Fourier surrogates execute in $0.065$--$0.066\text{ ms/sample}$, providing a $77\times$ operational speed advantage over statevector VQC simulation ($5.088\text{ ms/sample}$).
 
 ---

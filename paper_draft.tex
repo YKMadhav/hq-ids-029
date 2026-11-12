@@ -94,7 +94,7 @@ The Phase 4 experiment is a separate, CSV-backed $k=2$ connection-setup header p
 \end{equation}
 where \texttt{proto}, \texttt{sttl}, \texttt{dttl}, \texttt{swin}, and \texttt{dwin} are the sole allow-listed source fields. Byte totals, packet totals, and loss totals---including \texttt{sbytes}, \texttt{dbytes}, \texttt{spkts}, \texttt{dpkts}, \texttt{sloss}, and \texttt{dloss}---are excluded and never used to infer a sequence. Note that while the tabular flow baseline architectures operate under a strict 4‑qubit budget ($N=4$), the Phase 4 sequential early‑packet Sequential QNN benchmark utilizes a 5‑qubit quantum device ($N=5$) to accommodate two directional header observations.
 
-The official training partition is split deterministically into 157,806 fitting records and 17,535 validation records. A six-dimensional MinMaxScaler is fitted only on the fitting records, serialized with provenance metadata, and applied unchanged to the complete official testing partition. This proxy therefore supports claims only about the stated connection-setup header representation; it does not support claims about payload inspection, raw PCAP chronology, or post-hoc flow-volume features.
+The official training partition is split deterministically into 157,806 fitting records and 17,535 validation records. A six-dimensional MinMaxScaler is fitted only on the fitting records, serialized with provenance metadata, and applied unchanged to the complete official testing partition. This proxy representation was selected post-hoc as an empirical feature limitation to enforce temporal boundary constraints without packet reassembly; it does not support claims about payload inspection, raw PCAP chronology, or post-hoc flow-volume totals. Additionally, while Phase 4 uses official partitions, the tabular flow benchmarks in Sections IV--VI utilize 5,000 flows re-split deterministically from a single UNSW-NB15 sample across seeds ($70/10/20$).
 
 \begin{table}[t]
 \caption{Official 82,332-flow test results for the $k=2$ connection-setup header proxy (seed 42).}
@@ -159,10 +159,11 @@ The QCNN introduces hierarchical dimensionality reduction directly within the qu
 \end{enumerate}
 
 \subsection{Quantum Support Vector Machine (QSVM)}
-The QSVM is a kernel-based model operating on precomputed quantum state overlaps. For two latent vectors $\mathbf{z}_i, \mathbf{z}_j \in [-\pi, \pi]^4$, the Gram kernel element is:
+The QSVM is a kernel-based model operating on precomputed quantum state overlaps. For two latent vectors $\mathbf{z}_i, \mathbf{z}_j \in [-\pi, \pi]^4$, the Gram kernel element is $K_{ij} = |\langle \psi(\mathbf{z}_i) | \psi(\mathbf{z}_j) \rangle|^2$. Critically, for unentangled single-qubit $R_y$ angle embeddings, this evaluates analytically to a separable classical product kernel:
 \begin{equation}
-K_{ij} = |\langle \psi(\mathbf{z}_i) | \psi(\mathbf{z}_j) \rangle|^2.
+K_{ij} = \prod_{k=0}^{3} \cos^2\left(\frac{z_{i,k} - z_{j,k}}{2}\right),
 \end{equation}
+which is exactly computable classically in $O(d)$ time without quantum state preparation, demonstrating that unentangled angle-encoded QSVM provides no quantum hardness.
 To optimize execution speed, statevectors $|\psi(\mathbf{z})\rangle \in \mathbb{C}^{16}$ are precomputed using an unsupervised autoencoder, and the Gram matrix is evaluated via vectorized Hermitian matrix multiplication:
 \begin{equation}
 \mathbf{K} = |\mathbf{S} \mathbf{S}^\dagger|^2, \quad \mathbf{S} \in \mathbb{C}^{N \times 16},
@@ -280,7 +281,7 @@ We extract 12 standardized physical transport features (`dur`, `spkts`, `dpkts`,
 The empirical findings (Table~\ref{tab:rff_summary} and Fig.~\ref{fig:rff_quantum}) settle the representational question:
 \begin{itemize}
     \item \textit{In-Domain Equivalence:} In-domain on UNSW-NB15, Trainable Fourier achieves $89.30\% \pm 0.67\%$ F1, Classical RFF reaches $88.57\% \pm 0.76\%$ F1, Classical MLP attains $88.22\% \pm 1.06\%$ F1, and Hybrid VQC achieves $87.90\% \pm 1.22\%$ F1. Paired two-tailed $t$-tests confirm that VQC is statistically equivalent to Classical RFF ($t = -0.9542, p = 0.3940$) and Classical MLP ($t = -0.3986, p = 0.7106$). Trainable Fourier moderately exceeds VQC ($t = -3.2692, p = 0.0308$) due to backpropagation through harmonic basis frequencies.
-    \item \textit{Cross-Domain Transfer Generalization:} Under zero-shot transfer onto CIC-IDS2017, Hybrid VQC achieves $48.22\% \pm 4.31\%$ F1 ($54.85\%$ retention), performing comparably to Classical RFF ($49.06\% \pm 13.71\%$ F1, $55.30\%$ retention, $t = -0.1222, p = 0.9087$) and Trainable Fourier ($49.20\% \pm 3.59\%$ F1, $55.10\%$ retention, $t = -0.2833, p = 0.7910$), while Classical MLP achieves $44.97\% \pm 6.29\%$ F1 ($50.96\%$ retention).
+    \item \textit{Cross-Domain Equivalence:} Under zero-shot transfer onto CIC-IDS2017, all non-tree models are statistically indistinguishable: Hybrid VQC achieves $48.22\% \pm 4.31\%$ F1 ($54.85\%$ retention), performing comparably to Classical RFF ($49.06\% \pm 13.71\%$ F1, $55.30\%$ retention, paired $t = -0.1222, p = 0.9087$), Trainable Fourier ($49.20\% \pm 3.59\%$ F1, $55.10\%$ retention, paired $t = -0.2833, p = 0.7910$), and Classical MLP ($44.97\% \pm 6.29\%$ F1, paired $t = 0.9788, p = 0.3831$). This proves that neither quantum circuits nor harmonic expansions transcend the underlying tabular distribution shift.
     \item \textit{Latency Reality:} Classical Fourier surrogates execute in $0.065$--$0.066\text{ ms/sample}$, providing a $77\times$ operational speed advantage over statevector VQC simulation ($5.088\text{ ms/sample}$).
 \end{itemize}
 
