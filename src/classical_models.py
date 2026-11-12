@@ -68,7 +68,7 @@ from torch.utils.data import TensorDataset, DataLoader
 class RandomForestBaseline:
     """
     Random Forest classifier baseline.
-    Strong benchmark for tabular flow data as highlighted by Vishvaa et al. (Q-NIDS).
+    Strong benchmark for tabular flow data in intrusion detection.
     """
 
     def __init__(
@@ -230,14 +230,14 @@ class _PyTorchMLPModule(nn.Module):
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         if x.dim() == 1:
             x = x.unsqueeze(0)
-        latent = self.encoder(x) * np.pi
+        latent = self.encoder(x)
         logits = self.classifier(latent)
         return logits
 
     def extract_features(self, x: torch.Tensor) -> torch.Tensor:
         if x.dim() == 1:
             x = x.unsqueeze(0)
-        return self.encoder(x) * np.pi
+        return self.encoder(x)
 
 
 class ClassicalMLPBaseline:
@@ -253,10 +253,10 @@ class ClassicalMLPBaseline:
         hidden_dim: int = 16,
         bottleneck_dim: int = 4,
         output_dim: int = 2,
-        learning_rate: float = 0.01,
+        learning_rate: float = 0.005,
         batch_size: int = 64,
-        epochs: int = 20,
-        weight_decay: float = 0.0,
+        epochs: int = 40,
+        weight_decay: float = 1e-4,
         patience: int = 8,
         loss_fn: Optional[nn.Module] = None,
         random_state: int = 42,

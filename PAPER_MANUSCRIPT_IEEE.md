@@ -38,8 +38,7 @@ To address these vulnerabilities, this paper establishes a zero-trust, multi-par
 The application of quantum computing to cybersecurity telemetry has expanded rapidly across several distinct paradigms:
 
 * **QML Intrusion Detection Suites:** Abreu et al. (*QML-IDS*) evaluated Variational Quantum Classifiers (VQC), Quantum Support Vector Machines (QSVM), and Quantum Convolutional Neural Networks (QCNN) across multiple intrusion benchmarks including UNSW-NB15, CICIDS2017, and ToN-IoT. While they demonstrated hardware viability on IBM Falcon backends, their architecture utilized static, fixed feature maps (e.g., `ZFeatureMap` and `ZZFeatureMap`) without joint backpropagation into a classical dimensionality compressor.
-* **Chen et al.:** investigated cyber threat detection under strict $N \le 4$ qubit budgets using a classical Multilayer Perceptron (MLP) front-end \cite{chen2022cyber}. They proved that combining classical pre-compression with quantum measurement mitigation and dynamical decoupling allows noisy execution to track ideal simulations.
-* **Critical Baseline Audits:** Vishvaa et al. (*Q-NIDS*) executed a critical audit of QML intrusion models, showing that apparent quantum gains often stem from uncalibrated classical baselines or post-hoc logit scaling, and that tree ensembles (Random Forest, XGBoost) remain formidable baselines on tabular traffic.
+* **Resource-Constrained Encoders and Baseline Audits:** Studies on NISQ-constrained classification explore classical bottleneck compression prior to quantum processing. However, critical evaluations of QML intrusion models indicate that apparent quantum gains often stem from uncalibrated classical baselines or post-hoc logit scaling, whereas tree ensembles (Random Forest, XGBoost) remain formidable baselines on tabular traffic.
 * **Early-Packet Telemetry:** Spadari et al. demonstrated that quantum circuits exhibit enhanced cross-dataset generalization when applied to minimal early-flow header vectors ($N_P = 10$ packets), avoiding the host-specific overfitting common in deep neural networks.
 
 Our work bridges these foundations by providing the first unified, 7-model cross-paradigm benchmark that couples an end-to-end differentiable classical bottleneck encoder with all three foundational QML architectures (VQC, QCNN, QSVM), evaluated under multi-seed hypothesis testing, adversarial stress, and physical M3 error mitigation.
@@ -129,7 +128,7 @@ The complete benchmark was executed across five fixed seeds ($[42, 43, 44, 45, 4
 2. **Hybrid VQC Leads the QML Taxonomy:** Among quantum architectures, Hybrid VQC ($93.96\%$) outperforms Hybrid QCNN ($93.48\%$) and QSVM ($93.02\%$). This hierarchy arises from joint differentiability: in VQC, the PyTorch encoder and the variational ansatz backpropagate simultaneously, tuning the classical projection specifically to maximize quantum state separability.
 3. **QCNN Non-Spatial Pooling Penalty:** Unlike computer vision, tabular network features possess no translation invariance or 2D spatial locality. Pooling from 4 to 2 qubits via partial tracing discards half the active quantum state prematurely, restricting expressive capacity to Classical MLP parity ($93.48\%$ vs $93.52\%$).
 4. **QSVM Non-Parametric Decoupling:** In QSVM, the classical autoencoder is frozen prior to kernel computation. Because the SVM support vector margin cannot adapt the encoder parameters, the static feature representation yields an elevated FPR of $21.32\%$.
-5. **False Alarm Suppression:** Hybrid VQC achieves the lowest FPR among all neural models ($14.67\%$), reducing false alarms by $2.13\%$ over the depth-matched Classical MLP ($16.80\%$) and by $1.38\%$ over the Quantum Bypassed control ($16.05\%$).
+5. **False Alarm Profile:** In 5-seed point estimates, Hybrid VQC reports an FPR of $14.67\% \pm 3.57\%$, tracking closely alongside the Classical MLP ($16.80\% \pm 3.26\%$) and the Quantum Bypassed control ($16.05\% \pm 4.18\%$). As confirmed in Section V, this minor nominal difference sits well within statistical variance ($p = 0.6266$) across expanded seed runs.
 
 ---
 
@@ -173,8 +172,9 @@ With a symmetric bit-flip channel, the 4-qubit assignment matrix is:
 $$\mathbf{M} = \mathbf{A}_1^{\otimes 4} \in \mathbb{R}^{16 \times 16}, \quad \mathbf{A}_1 = \begin{bmatrix} 1 - p & p \\ p & 1 - p \end{bmatrix}.$$
 The condition number satisfies:
 $$\kappa(\mathbf{M}) = \left(\frac{1}{1 - 2p}\right)^4 = 1.2808 \quad (\text{for } p = 0.03),$$
-and remains bounded at $\kappa(\mathbf{M}) = 2.44 \ll 20.0$ even under $p=0.10$ ($10\%$ readout noise). Exact matrix inversion ($\mathbf{M}^{-1}$) followed by simplex projection reduces expectation drift from $0.0709$ to $0.0378$, recovering $\mathbf{46.6\%}$ of readout-induced error under physical $p=0.03$ noise:
-$$\text{Drift Recovery} = \frac{0.0709 - 0.0378}{0.0709} = \mathbf{46.6\%}.$$
+and remains bounded at $\kappa(\mathbf{M}) = 2.44 \ll 20.0$ even under $p=0.10$ ($10\%$ readout noise). Exact matrix inversion ($\mathbf{M}^{-1}$) followed by simplex projection reduces expectation drift relative to ideal analytic expectations from $0.0686$ to $0.0339$, recovering $\mathbf{50.6\%}$ of readout-induced error under physical $p=0.03$ noise:
+$$\text{Analytic Drift Recovery} = \frac{0.0686 - 0.0339}{0.0686} = \mathbf{50.6\%}.$$
+Relative to finite-shot noiseless simulations, the drift drops from $0.0709$ to $0.0378$ ($46.6\%$ recovery). Classification accuracy remains stable at $93.84\%$.
 Classification accuracy remains stable at $93.84\%$.
 
 ![Figure 3: NISQ Noise Degradation and Recovery](file:///Users/yippilikhatwangmadhav/Desktop/hq-ids-029/results/figures/noise_degradation.png)
@@ -228,9 +228,6 @@ Future work will expand the detection engine to the full 9-class attack taxonomy
 ## References
 1. D. Abreu, C. E. Rothenberg, and A. Abelém, "QML-IDS: Quantum Machine Learning Intrusion Detection System," arXiv:2410.16308, 2024. DOI: 10.48550/arXiv.2410.16308.
 2. D. Abreu, D. Moura, C. E. Rothenberg, and A. Abelém, "QuantumNetSec: Quantum Machine Learning for Network Security," Preprints, 2024. DOI: 10.22541/au.172540693.31989215.
-3. J. Chen, E. Jones, and R. Martin, "Cyber Threat Detection Enabled by Quantum Computing: A Hardware-Constrained Perspective," arXiv preprint arXiv:2501.00000 [quant-ph], 2025.
-4. S. Vishvaa, K. Nair, and R. Thorne, "Q-NIDS: Critical Evaluation and Ablation Studies of Quantum Intrusion Detection Systems," *ACM Transactions on Privacy and Security*, vol. 27, no. 2, pp. 1–18, 2024.
-5. V. Spadari, I. Guarino, D. Ciuonzo, and A. Pescapè, "A Comparison Between Classical and Quantum Machine Learning for Mobile App Traffic Classification," in *Proc. 2024 IEEE/ACM Symposium on Edge Computing (SEC)*, 2024, pp. 461–467. DOI: 10.1109/SEC62691.2024.00053.
-6. V. Spadari, I. Guarino, D. Ciuonzo, and A. Pescapè, "Towards Network Intrusion Detection via Quantum Machine Learning: A Reality Check," in *Proc. IEEE Conference on Computer Communications Workshops (INFOCOM WKSHPS)*, 2025, pp. 1–6. DOI: 10.1109/infocomwkshps65812.2025.11152772.
-7. M. Kaissar, L. Benhaddi, and S. El Kettani, "Enhancing Network Intrusion Detection with Quantum Machine Learning: A Comprehensive Survey of Methods, Metrics, and Applications," *Future Internet*, vol. 18, no. 4, p. 112, 2026.
-8. M. Schuld, R. Sweke, and J. J. Meyer, "Effect of data encoding on the expressive power of variational quantum-machine-learning models," *Physical Review A*, vol. 103, no. 3, p. 032430, 2021.
+3. V. Spadari, I. Guarino, D. Ciuonzo, and A. Pescapè, "A Comparison Between Classical and Quantum Machine Learning for Mobile App Traffic Classification," in *Proc. 2024 IEEE/ACM Symposium on Edge Computing (SEC)*, 2024, pp. 461–467. DOI: 10.1109/SEC62691.2024.00053.
+4. V. Spadari, I. Guarino, D. Ciuonzo, and A. Pescapè, "Towards Network Intrusion Detection via Quantum Machine Learning: A Reality Check," in *Proc. IEEE Conference on Computer Communications Workshops (INFOCOM WKSHPS)*, 2025, pp. 1–6. DOI: 10.1109/infocomwkshps65812.2025.11152772.
+5. M. Schuld, R. Sweke, and J. J. Meyer, "Effect of data encoding on the expressive power of variational quantum-machine-learning models," *Physical Review A*, vol. 103, no. 3, p. 032430, 2021.

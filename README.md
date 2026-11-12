@@ -11,11 +11,10 @@ Project **HQ-IDS-029** (`hq-ids-029`) investigates and implements a resource-con
 ## 2. Theoretical & Literature Backbone
 This codebase operationalizes key insights from foundational literature in QML network security:
 1. **Abreu et al. (QuantumNetSec / QML-IDS)**: Benchmarking VQC, QSVM, and QCNN against flow datasets (UNSW-NB15, CICIDS2017, CICIoT23).
-2. **Chen et al. (JHU)**: Compressed feature representations ($\le 4$ qubits) via classical MLP encoders + VQC with M3 readout mitigation and XY8 dynamical decoupling on noisy NISQ hardware.
-3. **Vishvaa et al. (Q-NIDS)**: Critical benchmarking demonstrating that classical tree ensembles (Random Forest, XGBoost) remain formidable baselines, mandating strict ablation controls to prevent attribution of classical post-processing power to "quantum advantage."
-4. **Al Malwi et al. & Chinthalagattu (IIT Madras)**: Generative QCBMs/QGANs and Quantum Autoencoders for zero-day threat detection.
-5. **Al Mazroa et al. (RHQ-CNN)**: Residual classical connections to avoid barren plateaus in variational circuits.
-6. **Spadari et al. (University of Napoli Federico II / Verona)**: Quantum and classical traffic classification studies at the mobile-network edge. This repository's separate Phase 4 experiment is only a $k=2$ connection-setup header proxy using proto, sttl, dttl, swin, and dwin; it is not a raw-PCAP or literal packet-prefix study.
+2. **Resource-Constrained Encoders**: Compressed feature representations ($\le 4$ qubits) via classical MLP encoders + VQC with M3 readout mitigation on noisy NISQ hardware.
+3. **Critical Baseline Auditing**: Rigorous benchmarking demonstrating that classical tree ensembles (Random Forest, XGBoost) remain formidable baselines, mandating strict ablation controls to prevent attribution of classical post-processing power to "quantum advantage."
+4. **Fourier Expansion in QML (Schuld et al.)**: Proving that single-qubit rotation encoding in variational circuits computes truncated Fourier series, motivating parameter-matched classical Fourier surrogates.
+5. **Spadari et al. (University of Napoli Federico II / Verona)**: Quantum and classical traffic classification studies at the mobile-network edge. This repository's separate Phase 4 experiment is only a $k=2$ connection-setup header proxy using proto, sttl, dttl, swin, and dwin; it is not a raw-PCAP or literal packet-prefix study.
 
 ## 3. Repository Architecture
 ```text

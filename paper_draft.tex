@@ -61,9 +61,7 @@ The application of quantum computing to cybersecurity telemetry has expanded rap
 
 \textit{QML Intrusion Detection Suites:} Abreu et al. introduced QML-IDS and QuantumNetSec, evaluating quantum and hybrid classifiers for network-security tasks across public datasets \cite{abreu2024qml,abreu2025quantumnetsec}. These studies motivate careful comparison against matched classical controls and clear separation of reported simulation and deployment evidence.
 
-\textit{Resource-Constrained Encoders:} Chen et al. investigated cyber threat detection under strict $N \le 4$ qubit budgets using a classical Multilayer Perceptron (MLP) front-end. They proved that combining classical pre-compression with quantum measurement mitigation and dynamical decoupling allows noisy execution to track ideal simulations.
-
-\textit{Critical Baseline Audits:} Vishvaa et al. (\textit{Q-NIDS}) executed a critical audit of QML intrusion models, showing that apparent quantum gains often stem from uncalibrated classical baselines or post-hoc logit scaling, and that tree ensembles (Random Forest, XGBoost) remain formidable baselines on tabular traffic.
+\textit{Resource-Constrained Encoders and Baseline Audits:} Studies on NISQ-constrained classification explore classical bottleneck compression prior to quantum processing. However, critical evaluations of QML intrusion models indicate that apparent quantum gains often stem from uncalibrated classical baselines or post-hoc logit scaling, whereas tree ensembles (Random Forest, XGBoost) remain formidable baselines on tabular traffic.
 
 \textit{Traffic Classification at the Edge:} Spadari et al. compare classical and quantum traffic classifiers in mobile and IoT settings \cite{spadari2024edge,spadari2025reality}. Their work motivates compact transport-layer representations, but does not make a packet-capture claim for the present CSV-based experiment.
 
@@ -254,7 +252,7 @@ The condition number satisfies:
 \begin{equation}
 \kappa(\mathbf{M}) = \left(\frac{1}{1 - 2p}\right)^4 = 1.2808 \quad (\text{for } p = 0.03),
 \end{equation}
-and remains bounded at $\kappa(\mathbf{M}) = 2.44 \ll 20.0$ even under $p=0.10$ ($10\%$ readout noise). For the 5-qubit assignment matrix used in Phase 4, the condition number evaluates to $\kappa(\mathbf{M}) \approx 33.4$, still well within the numerical stability threshold ($\kappa \ll 100$). Exact matrix inversion ($\mathbf{M}^{-1}$) followed by simplex projection reduces expectation drift from $0.0709$ to $0.0378$, recovering $\mathbf{46.6\%}$ of readout-induced error under physical $p=0.03$ noise (Fig.~\ref{fig:noise_degradation}). Classification accuracy remains stable at $93.84\%$.
+and remains bounded at $\kappa(\mathbf{M}) = 2.44 \ll 20.0$ even under $p=0.10$ ($10\%$ readout noise). Exact matrix inversion ($\mathbf{M}^{-1}$) followed by simplex projection reduces expectation drift relative to ideal analytic expectations from $0.0686$ to $0.0339$, recovering $\mathbf{50.6\%}$ of readout-induced error under physical $p=0.03$ noise (Fig.~\ref{fig:noise_degradation}). Relative to finite-shot noiseless simulations, the drift drops from $0.0709$ to $0.0378$ ($46.6\%$ recovery). Classification accuracy remains stable at $93.84\%$.
 
 \section{Cross-Dataset Transfer and Classical Fourier Surrogate Evaluation}
 \label{sec:rff_surrogates}

@@ -16,12 +16,11 @@ A systematic line-by-line inspection of the source code (`src/` and `scripts/`) 
 * **Partition Integrity:** `scaled_loader.py` enforces evaluation exactly once across the $82{,}332$ unique UNSW-NB15 testing records without synthetic copying, resampling, or stochastic jitter. 
 
 ## 4. LITERATURE POSITIONING & DOI AUDIT
-A live web-grounded audit confirms the authenticity of cited references:
+A citation audit confirms the authenticity of cited references:
 * **Abreu et al. (2024):** "QuantumNetSec: Quantum Machine Learning for Network Security" (Authorea preprint, DOI: 10.22541/au.172540693.31989215) is accurately cited.
 * **Spadari et al. (2024):** "A Comparison Between Classical and Quantum Machine Learning for Mobile App Traffic Classification" (IEEE/ACM SEC, DOI: 10.1109/SEC62691.2024.00053) is accurately cited.
 * **Spadari et al. (2025):** "Towards Network Intrusion Detection via Quantum Machine Learning: A Reality Check" (IEEE INFOCOM WKSHPS, DOI: 10.1109/infocomwkshps65812.2025.11152772) aligns with the conference track.
-* **Chen et al. (2025):** "Cyber Threat Detection Enabled by Quantum Computing: A Hardware-Constrained Perspective" (arXiv) focuses precisely on NISQ constraints and error mitigation, matching the narrative framing. Note: `paper_draft.tex` misattributes this to an IEEE QCE 2022 proceedings. This should be corrected in the manuscript.
-* **Vishvaa et al. (2024):** "Q-NIDS: Critical Evaluation and Ablation Studies of Quantum Intrusion Detection Systems" correctly supports the paper's ablation protocol and classical ensemble outperformance conclusions.
+* **Schuld et al. (2021):** "Effect of data encoding on the expressive power of variational quantum-machine-learning models" (*Physical Review A*, vol. 103, no. 3, p. 032430) supports the Fourier analysis of parameterized quantum circuits.
 
 ## 5. EXACT NUMERICAL RECONCILIATION TABLE
 
@@ -39,7 +38,6 @@ A live web-grounded audit confirms the authenticity of cited references:
 ## 6. CRITICAL LIMITATIONS & STRUCTURAL ADVANCEMENTS
 1. **Architectural Bottleneck Constraints:** The models reach parity at $\approx 78.58\%$ accuracy due to the fundamental information limits of the $k=2$ proxy. While this proves theoretical capability, practical SOC implementations will require recurrent or self-attentive quantum states extending beyond the handshake phase to separate obfuscated payloads.
 2. **QPU Queue Latency:** While statevector latency was established at $\sim 5.36\text{ ms}$, real physical NISQ hardware introduces queue and orchestration overheads. Future work must bridge the gap between simulation bounds and physical inline processing.
-3. **Bibliography Correction:** The manuscript must correct the publication year and venue for Chen et al. (it is a 2025 arXiv/preprint rather than a 2022 QCE paper).
 
 ## 7. FINAL FORMAL DECISION
 **Accept.** 

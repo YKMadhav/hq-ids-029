@@ -235,6 +235,8 @@ def run_ablation_and_noise_experiments(config: Dict[str, Any]) -> Tuple[pd.DataF
 
         # Degradation diagnostics against the ideal analytic expectations
         row["Noiseless_vs_Analytic_MAE"] = float(np.abs(noiseless_raw - analytic).mean())
+        row["Noisy_vs_Analytic_MAE"] = float(np.abs(noisy_raw - analytic).mean())
+        row["Mitigated_vs_Analytic_MAE"] = float(np.abs(mitigated_raw - analytic).mean())
         row["Noisy_vs_Noiseless_MAE"] = float(np.abs(noisy_raw - noiseless_raw).mean())
         row["Mitigated_vs_Noiseless_MAE"] = float(np.abs(mitigated_raw - noiseless_raw).mean())
         row["Noisy_MeanAbsExpval"] = float(np.abs(noisy_raw).mean())
@@ -244,7 +246,7 @@ def run_ablation_and_noise_experiments(config: Dict[str, Any]) -> Tuple[pd.DataF
         print(f"  [Aer] {len(latents)} flows x 3 conditions @ {shots} shots in {aer_time:.2f}s | "
               f"Acc nois {row['Noiseless_Accuracy']:.4f} -> noisy {row['Noisy_Accuracy']:.4f} "
               f"-> M3 {row['Mitigated_Accuracy']:.4f} | "
-              f"|d<Z>| noisy {row['Noisy_vs_Noiseless_MAE']:.4f} -> M3 {row['Mitigated_vs_Noiseless_MAE']:.4f}")
+              f"|d<Z>| noisy-analytic {row['Noisy_vs_Analytic_MAE']:.4f} -> M3-analytic {row['Mitigated_vs_Analytic_MAE']:.4f}")
 
     ablation_df = pd.DataFrame(ablation_records)
     noise_df = pd.DataFrame(noise_records)
