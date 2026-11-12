@@ -137,12 +137,14 @@ The complete benchmark was executed across five fixed seeds ($[42, 43, 44, 45, 4
 To evaluate whether the measured metrics represent genuine physical signal rather than experimental artifacts, we executed a 5-pillar diagnostic battery.
 
 ### A. Expanded 30-Seed Hypothesis Testing
-To test if the accuracy gap ($\text{Full VQC } 93.96\% > \text{Bypassed } 93.78\%$) is statistically significant, cross-validation was expanded to 30 seeds ($[100..129]$):
-* Full Hybrid VQC: $0.9365 \pm 0.0081$ (Macro F1: $0.9239 \pm 0.0101$).
-* Control A (Bypassed): $0.9361 \pm 0.0076$ (Macro F1: $0.9233 \pm 0.0100$).
-* Control B (Frozen): $0.9365 \pm 0.0094$ (Macro F1: $0.9241 \pm 0.0118$).
+On the 5-seed benchmark ($N=5$), Full Hybrid VQC attains an accuracy of $93.96\% \pm 0.74\%$, compared to $93.78\% \pm 0.79\%$ for Control A (Quantum Bypassed) and $93.82\% \pm 0.85\%$ for Control B (Quantum Frozen). Paired two-tailed $t$-testing on accuracy yields $t = 0.7579, p = 0.4907$ (Cohen's $d = 0.3390$) for Full vs Bypassed, and $t = 0.3998, p = 0.7097$ (Cohen's $d = 0.1788$) for Full vs Frozen. Across the family of comparisons across metrics, Holm-Bonferroni correction yields $p_{\text{adj}} = 1.0000$. Two One-Sided Tests (TOST) for statistical equivalence within a conservative $\pm 1.0\%$ margin ($\Delta = 0.01$) confirm equivalence ($p_{\text{TOST}} = 0.0130$ vs Bypassed; $p_{\text{TOST}} = 0.0350$ vs Frozen).
 
-Paired Student's $t$-testing between Full VQC and Control A yields $t = 0.4918$, $p = 0.6266$, and Cohen's $d = 0.090$. Comparing Full VQC and Control B yields $t = 0.0000$, $p = 1.0000$, and Cohen's $d = 0.000$. Because $p \gg 0.05$ and $d < 0.20$, the slight raw accuracy delta is statistically non-significant. This formally proves that tabular classification is dominated by the classical bottleneck, while the quantum circuit acts as an uncorrupted, decision-preserving kernel.
+To eliminate any concern that $N=5$ is underpowered, cross-validation was expanded to 30 seeds ($[100..129]$):
+* Full Hybrid VQC: $93.65\% \pm 0.81\%$ (Macro F1: $92.39\% \pm 1.01\%$).
+* Control A (Bypassed): $93.61\% \pm 0.76\%$ (Macro F1: $92.33\% \pm 1.00\%$).
+* Control B (Frozen): $93.65\% \pm 0.94\%$ (Macro F1: $92.41\% \pm 1.18\%$).
+
+Paired Student's $t$-testing on the 30-seed dataset yields $t = 0.4918$, $p = 0.6266$, and Cohen's $d = 0.090$ between Full VQC and Control A, and $t = 0.0000$, $p = 1.0000$, and Cohen's $d = 0.000$ between Full VQC and Control B. TOST equivalence tests within $\Delta = 0.01$ confirm statistical equivalence ($p_{\text{TOST}} = 2.97 \times 10^{-11}$). This formally proves that tabular classification is dominated by the classical bottleneck, while the quantum circuit acts as an uncorrupted, decision-preserving kernel without representational supremacy.
 
 ### B. Label Shuffling & Permutation Control
 Training the hybrid pipeline on randomly permuted labels ($y_{\text{train}}$) yields a raw accuracy of $68.10\%$ (matching the majority class prior of $68.06\%$), a balanced accuracy of exactly $50.00\%$, and a ROC-AUC of $0.4731$. This proves zero target leakage or evaluation contamination exists in the pipeline.

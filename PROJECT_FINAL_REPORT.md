@@ -159,22 +159,12 @@ size and initialisation seed; only the quantum layer differs
 
 **Findings.**
 
-- The full hybrid QNN is the best variant on **every** metric simultaneously:
-  accuracy 0.9396, macro F1 0.9283, ROC-AUC 0.9822, FPR 0.1467.
-- Removing the quantum layer (Control A) costs **+0.18 percentage points** of
-  accuracy and raises the false positive rate by **+1.38** points.
-- Freezing the circuit at random initialisation (Control B) recovers most but not
-  all of the gap, leaving an FPR excess of **+0.50** points versus the full model.
-  The ordering $\text{Full} > \text{Frozen} > \text{Bypassed}$ is consistent across
-  the five seeds.
-- The honest reading is that on this dataset the 4-qubit variational layer provides
-  a **small but consistent** benefit. The four-qubit bottleneck is a severe
-  constraint: the classical MLP control, which has the identical 4-dimensional
-  latent capacity, scores within a point of the full model, confirming that the
-  quantum layer is operating at the edge of what the representation can support
-  rather than transforming the problem. A meaningful claim of quantum advantage
-  would require either more qubits or a quantum kernel operating on many more
-  features than $N=4$ permits here.
+- Across the 5-seed benchmark, the full hybrid QNN achieves: accuracy $0.9396 \pm 0.0074$, macro F1 $0.9283 \pm 0.0096$, ROC-AUC $0.9822 \pm 0.0030$, FPR $0.1467 \pm 0.0357$.
+- Removing the quantum layer (Control A, Bypassed) yields: accuracy $0.9378 \pm 0.0079$, macro F1 $0.9257 \pm 0.0103$, FPR $0.1605 \pm 0.0418$. Paired $t$-testing confirms the accuracy difference is statistically non-significant ($t = 0.7579, p = 0.4907$, Cohen's $d = 0.3390$, Holm-adjusted $p = 1.0000$). Two One-Sided Tests (TOST) within a $\pm 1\%$ equivalence margin confirm statistical equivalence ($p_{\text{TOST}} = 0.0130$).
+- Freezing the circuit at random initialization (Control B) yields: accuracy $0.9382 \pm 0.0085$, macro F1 $0.9265 \pm 0.0105$, FPR $0.1517 \pm 0.0399$. Paired testing confirms equivalence ($t = 0.3998, p = 0.7097$, Cohen's $d = 0.1788$, TOST $p = 0.0350$).
+- Model rankings fluctuate across seeds (e.g. in Seed 43, Frozen > Bypassed > Full; in Seed 46, all three models achieve identical accuracy 0.9500).
+- In the expanded 30-seed test, Full VQC ($93.65\% \pm 0.81\%$) and Bypassed ($93.61\% \pm 0.76\%$) are statistically indistinguishable ($t = 0.4918, p = 0.6266$, Cohen's $d = 0.0898$, TOST $p = 2.97 \times 10^{-11}$).
+- The honest reading is that tabular network flow discrimination is primarily governed by the classical bottleneck compression ($39 \to 16 \to 4$), while the 4-qubit variational circuit operates as a boundary-preserving projection without unique representational supremacy.
 
 ---
 
