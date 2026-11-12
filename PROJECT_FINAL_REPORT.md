@@ -222,7 +222,32 @@ $$\mathbf{f}_{\text{true}} = M^{-1}\,\mathbf{f}_{\text{meas}},\qquad
 
 ---
 
-## 5. Confusion Matrix
+## 5. Phase 3: Unsupervised Zero-Day Anomaly Detection (Negative Result)
+
+### 5.1 Protocol and Experimental Design
+To assess whether quantum or classical autoencoders can flag novel zero-day attacks without signature supervision, Phase 3 evaluated unsupervised anomaly detection across five seeds [42..46]:
+- **Partitioning**: 100% Benign flows for training ($n=1{,}100$ Normal flows), Benign ($n=150$) + Known Attack ($n=150$ Exploits) for threshold calibration ($\tau_{95}$, 95th percentile benign validation reconstruction error), and Benign ($n=347$) + 7 unseen zero-day attack families ($n=1{,}304$ flows across DoS, Reconnaissance, Fuzzers, Analysis, Backdoor, Shellcode, and Worms) for held-out testing.
+- **Architectures**: Classical Autoencoder (CAE, $39 \to 16 \to 4 \to 16 \to 39$, MSE reconstruction loss) vs. Quantum Autoencoder (QAE, 4-qubit unitary compression into 2 latent qubits, trash subspace infidelity loss $\mathcal{L} = 1 - P(|00\rangle_{\text{trash}})$), and their standardized Hybrid Ensemble.
+
+### 5.2 Negative Result Findings
+Following the forensic audit that eliminated ground-truth target leakage (removal of the `binary_label` column), the un-leaked evaluation demonstrates that unsupervised zero-day detection on compressed tabular representations is a definitive **negative result**:
+
+| Model Architecture | ROC-AUC | PR-AUC (Prevalence $\approx 79\%$) | Recall at $\tau_{95}$ | FPR at $\tau_{95}$ | Macro F1 |
+|---|---:|---:|---:|---:|---:|
+| Classical Autoencoder (CAE) | 0.6939 ± 0.0232 | 0.8725 ± 0.0075 | 7.07\% ± 1.21\% | 3.98\% ± 1.56\% | 0.2413 ± 0.0098 |
+| Quantum Autoencoder (QAE) | 0.6912 ± 0.1042 | 0.8527 ± 0.0449 | 6.83\% ± 5.90\% | 5.30\% ± 1.66\% | 0.2344 ± 0.0569 |
+| Hybrid Ensemble | 0.7447 ± 0.0775 | 0.8938 ± 0.0307 | 12.58\% ± 4.92\% | 3.63\% ± 0.96\% | 0.2930 ± 0.0458 |
+
+**Critical Methodological and Scientific Disclosures:**
+1. **Near-Chance Detection at Operating Threshold:** At the operational threshold $\tau_{95}$ calibrated to benign traffic, recall on novel zero-day attacks is only $7.07\%$ for CAE and $6.83\%$ for QAE. Both models fail to reliably detect unseen intrusions.
+2. **Statistically Non-Significant Ensemble Gain:** While the Hybrid Ensemble achieves a nominal ROC-AUC of $0.7447 \pm 0.0775$ compared to CAE ($0.6939 \pm 0.0232$), a paired two-tailed $t$-test confirms this difference is non-significant ($t = 1.3679, p = 0.2432$), sitting comfortably within one standard deviation under $n=5$.
+3. **High Prevalence Baseline for PR-AUC:** The test partition contains 1,304 attack flows out of 1,651 total flows ($78.98\%$ attack prevalence). A random classifier trivially attains a baseline PR-AUC of $0.79$. The observed PR-AUCs ($0.85$--$0.89$) therefore represent marginal separation above chance.
+4. **Validation Normalization Disclosure:** The ensemble score standardization utilizes mean and standard deviation from the validation set (which includes known 'Exploits' attack flows). This represents a mild leakage of attack distribution statistics and must be explicitly disclosed.
+5. **Feature Saturation on Benign Data:** Features that are constant in the benign training set map to $-\pi$ or $\pi$ and saturate, limiting the discriminative capacity of both classical and quantum latent encodings.
+
+---
+
+## 6. Confusion Matrix
 
 ![Confusion matrix](results/figures/confusion_matrix.png)
 
@@ -240,7 +265,7 @@ operational costs of compressing 39 features into a 4-qubit bottleneck.
 
 ---
 
-## 6. Conclusions
+## 7. Conclusions
 
 1. **A 4-qubit hybrid QNN is viable but not transformative.** On real UNSW-NB15
    traffic it reaches 0.9396 accuracy and 0.1467 FPR - within 0.56 points of the best

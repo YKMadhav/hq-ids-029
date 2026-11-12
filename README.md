@@ -85,11 +85,15 @@ features; the scaler is fit on the train partition only.
 
 **Results at a glance** (5 seeds, mean accuracy): XGBoost 0.9452, Random Forest
 0.9430, Hybrid QNN 0.9396, Classical MLP 0.9352. The Hybrid QNN achieves a competitive
-false positive rate (0.1467) alongside classical neural baselines. See `PROJECT_FINAL_REPORT.md` for the
-full methodology, ablation, and NISQ/M3 analysis.
+false positive rate (0.1467) alongside classical neural baselines.
+- **Ablation & Equivalence:** 30-seed testing confirms Full VQC (0.9365) and Bypassed identity control (0.9361) are statistically equivalent ($p = 0.6266$, TOST $p = 2.97 \times 10^{-11}$).
+- **Surrogate Equivalence:** In zero-shot cross-dataset transfer onto CIC-IDS2017, Hybrid VQC (48.22% F1) is statistically indistinguishable from classical Random Fourier Features (49.06% F1, $p = 0.9087$) and Trainable Fourier networks (49.20% F1, $p = 0.7910$), with classical surrogates executing $77\times$ faster.
+- **Unsupervised Zero-Day Detection (Phase 3 Negative Result):** Unsupervised anomaly detection on benign-trained autoencoders yields near-chance detection on novel zero-day attack families (CAE ROC-AUC $0.6939 \pm 0.0232$, QAE $0.6912 \pm 0.1042$, Hybrid Ensemble $0.7447 \pm 0.0775$, recall at operational $\tau_{95}$ of only $7\%$--$13\%$; Hybrid vs CAE $p = 0.2432$, non-significant). See `PROJECT_FINAL_REPORT.md` for complete disclosures.
 
 **Key artifacts:**
 - `results/metrics.csv` — aggregated benchmark, one row per model
 - `results/ablation_results.csv` — 15 rows (3 variants x 5 seeds)
 - `results/noise_results.csv` — 5 rows of 1024-shot Aer NISQ metrics
-- `results/figures/` — latency, ablation, confusion matrix, and noise figures
+- `results/zeroday_summary.json` — Phase 3 unsupervised anomaly detection results
+- `results/rff_surrogate_summary.json` — Classical Fourier surrogate vs VQC results
+- `results/figures/` — latency, ablation, confusion matrix, noise, and zero-day figures
