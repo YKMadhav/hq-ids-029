@@ -28,11 +28,20 @@ echo "========================================================================"
 # ---------------------------------------------------------------------------
 # 1. Create / activate a virtual environment and install dependencies
 # ---------------------------------------------------------------------------
+BASE_PYTHON=""
+if [ -x "/Library/Frameworks/Python.framework/Versions/3.10/bin/python3" ]; then
+    BASE_PYTHON="/Library/Frameworks/Python.framework/Versions/3.10/bin/python3"
+elif [ -x "/usr/local/bin/python3" ]; then
+    BASE_PYTHON="/usr/local/bin/python3"
+else
+    BASE_PYTHON="python3"
+fi
+
 VENV_DIR="$REPO_ROOT/.venv"
 if [ ! -d "$VENV_DIR" ]; then
     echo ""
-    echo "[Setup] Creating virtual environment at .venv ..."
-    python3 -m venv "$VENV_DIR"
+    echo "[Setup] Creating virtual environment at .venv using $BASE_PYTHON ..."
+    "$BASE_PYTHON" -m venv --system-site-packages "$VENV_DIR"
 fi
 
 # shellcheck source=/dev/null
