@@ -154,6 +154,24 @@ To eliminate any concern that $N=5$ is underpowered, cross-validation was expand
 
 Paired Student's $t$-testing on the 30-seed dataset yields $t = 0.4918$, $p = 0.6266$, and Cohen's $d = 0.090$ between Full VQC and Control A, and $t = 0.0000$, $p = 1.0000$, and Cohen's $d = 0.000$ between Full VQC and Control B. TOST equivalence tests on accuracy within an assumed $\pm 1.0\%$ margin ($\Delta = 0.01$; this margin is a study assumption, not a pre-registered threshold) yield $p_{\text{TOST}} = 2.97 \times 10^{-11}$ for both comparisons. These results show that tabular classification is dominated by the classical bottleneck, while the quantum circuit acts as a decision-preserving transformation without evidence of representational supremacy under this dataset and architecture.
 
+Sensitivity analysis across margins $\Delta \in \{0.005, 0.010, 0.020\}$ with family-wise Holm correction ($m=36$ tests across metrics and cohorts) is detailed in Table IV. For 5 seeds at $\Delta = 0.010$, raw accuracy passes ($p = 0.0130$ and $0.0350$), but under Holm adjustment across the full 36-test family ($p_{\text{adj}} = 0.2339$ and $0.5599$), 5-seed equivalence requires $\Delta = 0.020$ for Bypassed ($p_{\text{adj}} = 0.0179$). For 30 seeds, accuracy and Macro F1 pass Holm-corrected equivalence even at $\Delta = 0.005$ ($p_{\text{adj}} \le 0.0031$).
+
+#### TABLE IV: TOST Equivalence Sensitivity Across Margins ($\Delta$)
+| Cohort | Metric | Comparison | $\Delta = 0.005$ | $\Delta = 0.010$ | $\Delta = 0.020$ |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| 5-seed | Accuracy | Full vs Bypassed | 0.1246 | 0.0130 | 0.0008 |
+| 5-seed | Accuracy | Full vs Frozen | 0.1810 | 0.0350 | 0.0030 |
+| 5-seed | Macro F1 | Full vs Bypassed | 0.2290 | 0.0311 | 0.0019 |
+| 5-seed | Macro F1 | Full vs Frozen | 0.2344 | 0.0556 | 0.0054 |
+| 5-seed | FPR | Full vs Bypassed | 0.8771 | 0.7054 | 0.1959 |
+| 5-seed | FPR | Full vs Frozen | 0.5009 | 0.2420 | 0.0408 |
+| 30-seed | Accuracy | Full vs Bypassed | $2.36\times 10^{-5}$ | $2.97\times 10^{-11}$ | $3.76\times 10^{-19}$ |
+| 30-seed | Accuracy | Full vs Frozen | $1.17\times 10^{-5}$ | $2.89\times 10^{-11}$ | $7.02\times 10^{-19}$ |
+| 30-seed | Macro F1 | Full vs Bypassed | $1.25\times 10^{-4}$ | $4.51\times 10^{-10}$ | $8.97\times 10^{-18}$ |
+| 30-seed | Macro F1 | Full vs Frozen | $6.77\times 10^{-5}$ | $3.28\times 10^{-10}$ | $5.02\times 10^{-18}$ |
+| 30-seed | FPR | Full vs Bypassed | 0.1906 | 0.0429 | $6.57\times 10^{-4}$ |
+| 30-seed | FPR | Full vs Frozen | 0.5645 | 0.2158 | $5.46\times 10^{-3}$ |
+
 ### B. Label Shuffling & Permutation Control
 Training the hybrid pipeline on randomly permuted labels ($y_{\text{train}}$) yields a raw accuracy of $68.10\%$ (matching the majority class prior of $68.06\%$), a balanced accuracy of exactly $50.00\%$, and a ROC-AUC of $0.4731$. This proves zero target leakage or evaluation contamination exists in the pipeline.
 

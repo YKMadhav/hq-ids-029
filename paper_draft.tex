@@ -8,7 +8,11 @@
 \usepackage{booktabs}
 \usepackage{microtype}
 \usepackage{hyperref}
-\setlength{\textfloatsep}{8pt plus 2pt minus 2pt}
+\setlength{\textfloatsep}{5pt plus 1pt minus 1pt}
+\setlength{\floatsep}{5pt plus 1pt minus 1pt}
+\setlength{\intextsep}{5pt plus 1pt minus 1pt}
+\setlength{\dbltextfloatsep}{5pt plus 1pt minus 1pt}
+\setlength{\dblfloatsep}{5pt plus 1pt minus 1pt}
 
 \hypersetup{
     colorlinks=true,
@@ -213,14 +217,14 @@ The complete benchmark was executed across five fixed seeds ($[42, 43, 44, 45, 4
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.82\columnwidth]{results/figures/bottleneck_capacity_sweep.png}
+\includegraphics[width=0.72\columnwidth]{results/figures/bottleneck_capacity_sweep.png}
 \caption{Latent Bottleneck Capacity Sweep ($d \in [2, 8]$): Test accuracy comparison between Classical MLP and Hybrid QNN across varying latent dimensions.}
 \label{fig:bottleneck_sweep}
 \end{figure}
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.82\columnwidth]{results/figures/noise_degradation.png}
+\includegraphics[width=0.72\columnwidth]{results/figures/noise_degradation.png}
 \caption{NISQ 1,024-shot Aer simulation under depolarizing and readout noise: (a) End-to-end accuracy resilience, and (b) Pauli-$Z$ expectation drift recovery under M3 matrix inversion mitigation.}
 \label{fig:noise_degradation}
 \end{figure}
@@ -233,6 +237,35 @@ To evaluate whether the measured metrics represent genuine physical signal rathe
 On the 5-seed benchmark ($N=5$), Full Hybrid VQC attains an accuracy of $93.96\% \pm 0.74\%$, compared to $93.78\% \pm 0.79\%$ for Control A (Quantum Bypassed) and $93.82\% \pm 0.85\%$ for Control B (Quantum Frozen). Paired two-tailed $t$-testing on accuracy yields $t = 0.7579, p = 0.4907$ (Cohen's $d = 0.3390$) for Full vs Bypassed, and $t = 0.3998, p = 0.7097$ (Cohen's $d = 0.1788$) for Full vs Frozen. Across the family of comparisons across metrics, Holm-Bonferroni correction yields $p_{\text{adj}} = 1.0000$. Two One-Sided Tests (TOST) for statistical equivalence within a $\pm 1.0\%$ accuracy margin ($\Delta = 0.01$; assumed as a clinically meaningful minimum difference) yield $p_{\text{TOST}} = 0.0130$ vs Bypassed and $p_{\text{TOST}} = 0.0350$ vs Frozen on accuracy (both pass $\alpha = 0.05$). On Macro F1, TOST yields $p_{\text{TOST}} = 0.0311$ vs Bypassed (passes) and $p_{\text{TOST}} = 0.0556$ vs Frozen (does not meet $\alpha = 0.05$). On FPR, TOST does not confirm equivalence for either comparison ($p_{\text{TOST}} = 0.7054$ vs Bypassed; $p_{\text{TOST}} = 0.2420$ vs Frozen). Equivalence is therefore supported on accuracy and Macro F1 for the Full vs Bypassed comparison and on accuracy for Full vs Frozen; it is not supported on FPR.
 
 To eliminate any concern that $N=5$ is underpowered, cross-validation was expanded to 30 seeds ($[100..129]$): Full Hybrid VQC achieves $93.65\% \pm 0.81\%$ (Macro F1: $92.39\% \pm 1.01\%$), Control A (Bypassed) achieves $93.61\% \pm 0.76\%$ (Macro F1: $92.33\% \pm 1.00\%$), and Control B (Frozen) achieves $93.65\% \pm 0.94\%$ (Macro F1: $92.41\% \pm 1.18\%$). Paired Student's $t$-testing on the 30-seed dataset yields $t = 0.4918, p = 0.6266$ (Cohen's $d = 0.0898$) between Full VQC and Control A, and $t = 0.0000, p = 1.0000$ (Cohen's $d = 0.0000$) between Full VQC and Control B. TOST equivalence tests on accuracy within an assumed $\pm 1.0\%$ margin ($\Delta = 0.01$; this margin is a study assumption, not a pre-registered threshold) yield $p_{\text{TOST}} = 2.97 \times 10^{-11}$ for both comparisons. These results show that tabular flow discrimination is primarily governed by the classical bottleneck compression ($39 \to 16 \to 4$), while the quantum layer acts as a decision-preserving transformation without evidence of representational supremacy under this dataset and architecture.
+
+Sensitivity analysis across margins $\Delta \in \{0.005, 0.010, 0.020\}$ with family-wise Holm correction ($m=36$ tests across metrics and cohorts) is detailed in Table~\ref{tab:tost_sensitivity}. For 5 seeds at $\Delta = 0.010$, raw accuracy passes ($p = 0.0130$ and $0.0350$), but under Holm adjustment across the full 36-test family ($p_{\text{adj}} = 0.2339$ and $0.5599$), 5-seed equivalence requires $\Delta = 0.020$ for Bypassed ($p_{\text{adj}} = 0.0179$). For 30 seeds, accuracy and Macro F1 pass Holm-corrected equivalence even at $\Delta = 0.005$ ($p_{\text{adj}} \le 0.0031$).
+
+\begin{table}[htbp]
+\centering
+\caption{TOST Equivalence Sensitivity Across Margins ($\Delta$)}
+\label{tab:tost_sensitivity}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{llcccc}
+\toprule
+\textbf{Cohort} & \textbf{Metric} & \textbf{Comparison} & $\Delta = 0.005$ & $\Delta = 0.010$ & $\Delta = 0.020$ \\
+\midrule
+5-seed & Accuracy & Full vs Bypassed & $0.1246$ & $0.0130$ & $0.0008$ \\
+5-seed & Accuracy & Full vs Frozen   & $0.1810$ & $0.0350$ & $0.0030$ \\
+5-seed & Macro F1 & Full vs Bypassed & $0.2290$ & $0.0311$ & $0.0019$ \\
+5-seed & Macro F1 & Full vs Frozen   & $0.2344$ & $0.0556$ & $0.0054$ \\
+5-seed & FPR      & Full vs Bypassed & $0.8771$ & $0.7054$ & $0.1959$ \\
+5-seed & FPR      & Full vs Frozen   & $0.5009$ & $0.2420$ & $0.0408$ \\
+\midrule
+30-seed & Accuracy & Full vs Bypassed & $2.36\times 10^{-5}$ & $2.97\times 10^{-11}$ & $3.76\times 10^{-19}$ \\
+30-seed & Accuracy & Full vs Frozen   & $1.17\times 10^{-5}$ & $2.89\times 10^{-11}$ & $7.02\times 10^{-19}$ \\
+30-seed & Macro F1 & Full vs Bypassed & $1.25\times 10^{-4}$ & $4.51\times 10^{-10}$ & $8.97\times 10^{-18}$ \\
+30-seed & Macro F1 & Full vs Frozen   & $6.77\times 10^{-5}$ & $3.28\times 10^{-10}$ & $5.02\times 10^{-18}$ \\
+30-seed & FPR      & Full vs Bypassed & $0.1906$ & $0.0429$ & $6.57\times 10^{-4}$ \\
+30-seed & FPR      & Full vs Frozen   & $0.5645$ & $0.2158$ & $5.46\times 10^{-3}$ \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
 
 \subsection{Label Shuffling \& Permutation Control}
 Training the hybrid pipeline on randomly permuted labels ($y_{\text{train}}$) yields a raw accuracy of $68.10\%$ (matching the majority class prior of $68.06\%$), a balanced accuracy of exactly $50.00\%$, and a ROC-AUC of $0.4731$. This proves zero target leakage or evaluation contamination exists in the pipeline.
@@ -273,7 +306,7 @@ We extract 12 standardized physical transport features (`dur`, `spkts`, `dpkts`,
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.82\columnwidth]{results/figures/rff_quantum_comparison.png}
+\includegraphics[width=0.75\columnwidth]{results/figures/rff_quantum_comparison.png}
 \caption{Classical Fourier Surrogates vs. Quantum VQC: (a) In-domain (UNSW-NB15) and cross-domain (CIC-IDS2017) Macro F1-scores, and (b) Domain Generalization F1 Retention Ratios.}
 \label{fig:rff_quantum}
 \end{figure}
@@ -304,24 +337,24 @@ Hybrid VQC ($4$-Qubit Circuit) & $87.90\% \pm 1.22\%$ & $48.22\% \pm 4.31\%$ & $
 \end{table}
 
 \section{Operational Discussion \& UC-029 SOC Feasibility}
-The deployment feasibility of QML in enterprise SOCs hinges on the operational trade-off between inference latency and False Positive Rate:
+The deployment feasibility of QML in enterprise SOCs hinges on the trade-off between latency and False Positive Rate:
 \begin{itemize}
-    \item \textit{Throughput Realities:} Classical MLPs process flows in $18.9\,\mu\text{s}$, enabling line-rate 100 Gbps stream classification. In contrast, simulated QML circuits require $2.85\text{ ms}$ (VQC) and $4.76\text{ ms}$ (QCNN). While unsuited for inline per-packet filtering, this latency profile is compatible with secondary, asynchronous flow-level triage.
-    \item \textit{SOC Deployment Considerations:} While early point estimates suggested a modest nominal drop in FPR ($14.67\%$ vs $16.80\%$), the rigorous 30-seed diagnostic reveals that this difference is within statistical variance. Consequently, current 4-qubit NISQ architectures should be viewed not as a magical false-positive suppressor, but as a bounded, parameter-efficient representation that preserves classical decision boundaries under hardware noise.
+    \item \textit{Throughput Realities:} Classical MLPs process flows in $18.9\,\mu\text{s}$, enabling line-rate 100 Gbps stream classification. In contrast, simulated QML circuits require $2.85\text{ ms}$ (VQC) and $4.76\text{ ms}$ (QCNN). While unsuited for inline per-packet filtering, this latency is compatible with asynchronous flow triage.
+    \item \textit{SOC Deployment Considerations:} While early point estimates suggested a nominal drop in FPR ($14.67\%$ vs $16.80\%$), the rigorous 30-seed diagnostic reveals that this difference is within statistical variance. Current 4-qubit NISQ architectures act as a bounded, parameter-efficient representation preserving classical decision boundaries under noise.
 \end{itemize}
 
 \section{Conclusion \& Future Roadmap}
-This work presented a comprehensive empirical benchmark of hybrid quantum neural architectures for intrusion detection under a strict 4-qubit budget. Our findings show that while classical tree ensembles remain superior in raw accuracy and speed, Hybrid VQC provides competitive representation, tracking classical neural models while demonstrating mathematical resilience under physical NISQ readout noise. The expanded 30-seed hypothesis audit rigorously de-masks exaggerated quantum supremacy claims, proving that classical bottleneck compression dominates performance.
+This work presented an empirical benchmark of hybrid quantum neural architectures for intrusion detection under a strict 4-qubit budget. While classical tree ensembles remain superior in raw accuracy and speed, Hybrid VQC provides competitive representation while demonstrating mathematical resilience under NISQ readout noise. The expanded 30-seed hypothesis audit de-masks exaggerated quantum supremacy claims, proving that classical bottleneck compression dominates performance.
 
-Future work will expand the detection engine to the full 9-class attack taxonomy and, separately, validate a raw-PCAP packet-streaming study under realistic packet-prefix conditions. The present Phase 4 evidence remains limited to the $k=2$ connection-setup header proxy defined above.
+Future work will expand to the full 9-class attack taxonomy and validate raw-PCAP streaming under realistic packet-prefix conditions (Phase 4 evidence remains limited to the $k=2$ connection-setup proxy).
 
 \bibliographystyle{IEEEtran}
 \begin{thebibliography}{00}
-\bibitem{abreu2024qml} D. Abreu, C. E. Rothenberg, and A. Abel\'em, ``QML-IDS: Quantum Machine Learning Intrusion Detection System,'' arXiv:2410.16308, 2024. DOI: 10.48550/arXiv.2410.16308.
-\bibitem{abreu2025quantumnetsec} D. Abreu, D. Moura, C. E. Rothenberg, and A. Abel\'em, ``QuantumNetSec: Quantum Machine Learning for Network Security,'' Preprints, 2024. DOI: 10.22541/au.172540693.31989215.
-\bibitem{spadari2024edge} V. Spadari, I. Guarino, D. Ciuonzo, and A. Pescap\`e, ``A Comparison Between Classical and Quantum Machine Learning for Mobile App Traffic Classification,'' in \textit{Proc. 2024 IEEE/ACM Symposium on Edge Computing (SEC)}, 2024, pp. 461--467. DOI: 10.1109/SEC62691.2024.00053.
-\bibitem{spadari2025reality} V. Spadari, I. Guarino, D. Ciuonzo, and A. Pescap\`e, ``Towards Network Intrusion Detection via Quantum Machine Learning: A Reality Check,'' in \textit{Proc. IEEE Conference on Computer Communications Workshops (INFOCOM WKSHPS)}, 2025, pp. 1--6. DOI: 10.1109/infocomwkshps65812.2025.11152772.
-\bibitem{schuld2021effect} M. Schuld, R. Sweke, and J. J. Meyer, ``Effect of data encoding on the expressive power of variational quantum-machine-learning models,'' \textit{Physical Review A}, vol. 103, no. 3, p. 032430, 2021.
+\bibitem{abreu2024qml} D. Abreu, et al., ``QML-IDS: Quantum Machine Learning Intrusion Detection System,'' arXiv:2410.16308, 2024.
+\bibitem{abreu2025quantumnetsec} D. Abreu, et al., ``QuantumNetSec: Quantum Machine Learning for Network Security,'' Preprints, 2024.
+\bibitem{spadari2024edge} V. Spadari, et al., ``A Comparison Between Classical and Quantum Machine Learning for Mobile App Traffic Classification,'' in \textit{Proc. IEEE SEC}, 2024, pp. 461--467.
+\bibitem{spadari2025reality} V. Spadari, et al., ``Towards Network Intrusion Detection via Quantum Machine Learning: A Reality Check,'' in \textit{Proc. IEEE INFOCOM WKSHPS}, 2025, pp. 1--6.
+\bibitem{schuld2021effect} M. Schuld, et al., ``Effect of data encoding on the expressive power of variational quantum-machine-learning models,'' \textit{Phys. Rev. A}, vol. 103, no. 3, p. 032430, 2021.
 \end{thebibliography}
 
 \end{document}

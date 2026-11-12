@@ -255,6 +255,55 @@ def recompute_m3_noise():
     print(f"  Finite-Shot Recovery %:     {np.mean(rec_nl):.2f}% +/- {np.std(rec_nl, ddof=1):.2f}%")
 
 
+def recompute_tost_sensitivity():
+    print_section("6. TOST SENSITIVITY ANALYSIS & HOLM CORRECTION ACROSS FAMILY")
+    csv_path5 = os.path.join(RESULTS_DIR, "ablation_results.csv")
+    csv_path30 = os.path.join(RESULTS_DIR, "stress_30seeds.csv")
+    if not os.path.exists(csv_path5) or not os.path.exists(csv_path30):
+        print("[WARN] Ablation or stress results CSV missing.")
+        return
+    df5 = pd.read_csv(csv_path5)
+    df30 = pd.read_csv(csv_path30)
+    
+    margins = [0.005, 0.010, 0.020]
+    metrics = ["Accuracy", "Macro_F1", "FPR"]
+    records = []
+    p_vals = []
+    
+    # 5-seed family
+    for m in metrics:
+        full = df5[df5["Model"] == "Full_HybridQNN"].sort_values("Seed")[m].values
+        byp = df5[df5["Model"] == "Control_A_Quantum_Bypassed"].sort_values("Seed")[m].values
+        froz = df5[df5["Model"] == "Control_B_Quantum_Frozen"].sort_values("Seed")[m].values
+        for b in margins:
+            _, _, p_byp = tost_paired(full, byp, bound=b)
+            records.append(("5-seed", m, "Full vs Bypassed", b, p_byp))
+            p_vals.append(p_byp)
+            _, _, p_froz = tost_paired(full, froz, bound=b)
+            records.append(("5-seed", m, "Full vs Frozen", b, p_froz))
+            p_vals.append(p_froz)
+            
+    # 30-seed family
+    for m in metrics:
+        full = df30[df30["Model"] == "Full_HybridQNN"].sort_values("Seed")[m].values
+        byp = df30[df30["Model"] == "Control_A_Quantum_Bypassed"].sort_values("Seed")[m].values
+        froz = df30[df30["Model"] == "Control_B_Quantum_Frozen"].sort_values("Seed")[m].values
+        for b in margins:
+            _, _, p_byp = tost_paired(full, byp, bound=b)
+            records.append(("30-seed", m, "Full vs Bypassed", b, p_byp))
+            p_vals.append(p_byp)
+            _, _, p_froz = tost_paired(full, froz, bound=b)
+            records.append(("30-seed", m, "Full vs Frozen", b, p_froz))
+            p_vals.append(p_froz)
+            
+    adj_p = holm_bonferroni(p_vals)
+    print(f"Total TOST comparisons in family: {len(p_vals)}")
+    print(f"{'Dataset':<8} {'Metric':<10} {'Comparison':<18} {'Margin':<8} {'p_raw':<14} {'p_Holm':<14}")
+    print("-" * 74)
+    for i, r in enumerate(records):
+        print(f"{r[0]:<8} {r[1]:<10} {r[2]:<18} {r[3]:<8.3f} {r[4]:<14.4e} {adj_p[i]:<14.4e}")
+
+
 def main():
     print("=" * 80)
     print("  PROJECT HQ-IDS-029: RECOMPUTED STATISTICAL AUDIT REPORT")
@@ -264,6 +313,7 @@ def main():
     recompute_rff_surrogate()
     recompute_zeroday()
     recompute_m3_noise()
+    recompute_tost_sensitivity()
     print("\n" + "=" * 80)
     print("  END OF STATISTICAL AUDIT REPORT")
     print("=" * 80)
