@@ -82,7 +82,14 @@ For end-to-end models, the joint cross-entropy loss is minimized:
 $$\mathcal{L}_{\text{total}}(\boldsymbol{\theta}_{\text{enc}}, \boldsymbol{\theta}_{\text{qml}}, \mathbf{W}_{\text{head}}) = \mathcal{L}_{\text{CE}}(\text{Softmax}(\mathbf{W}_{\text{head}} \mathbf{q} + \mathbf{b}), \mathbf{y}),$$
 where $\mathbf{q}$ denotes the quantum expectation vector.
 
-### C. Variational Quantum Classifier (Hybrid VQC)
+### C. Training Protocols and Hyperparameter Disclosure
+To ensure scientific reproducibility and rigorous benchmarking, we explicitly disclose the training protocols across architectures:
+- **Baseline MLP ($39 \to 16 \to 4 \to 2$):** $\eta = 0.005$, 40 epochs, weight decay $10^{-4}$, early stopping patience 8, standard $\tanh$.
+- **Hybrid VQC ($4$-Qubit):** $\eta = 0.01$, 20 epochs, weight decay $0$, no early stopping, $\tanh \cdot \pi$ latent scaling.
+- **Matched MLP Control:** Evaluated under the exact VQC training schedule ($\eta = 0.01$, 20 epochs, $\text{wd}=0$, $\tanh \cdot \pi$). Across 5 seeds, the Matched MLP achieves $93.64\% \pm 0.89\%$ accuracy (Macro F1: $92.49\% \pm 1.00\%$, ROC-AUC: $0.9776 \pm 0.0061$, FPR: $14.55\% \pm 2.36\%$), which is statistically indistinguishable from Full VQC ($93.96\% \pm 0.74\%$, paired $t = 1.3021, p = 0.2628$).
+- **Cross-Dataset & Fourier Surrogates:** In Section VI, the 12-feature `ClassicalMLPModel` operates under its own isolated protocol ($\eta = 0.01$, 20 epochs).
+
+### D. Variational Quantum Classifier (Hybrid VQC)
 The 4-qubit VQC encodes latent angles using single-qubit $R_y$ rotation gates:
 $$|\psi(\mathbf{z})\rangle = \bigotimes_{i=0}^{3} R_y(z_i) |0\rangle^{\otimes 4}.$$
 The variational ansatz follows the `RealAmplitudes` topology with $L=2$ repetitions:
@@ -91,13 +98,13 @@ yielding 12 trainable variational parameters. The observables are the multi-qubi
 $$q_i = \langle \psi(\mathbf{z}) | U^\dagger(\boldsymbol{\theta}) Z_i U(\boldsymbol{\theta}) | \psi(\mathbf{z}) \rangle \in [-1, 1], \quad i \in \{0, 1, 2, 3\}.$$
 Gradients are computed via PennyLane's analytical reverse-mode backpropagation (`diff_method="backprop"`).
 
-### D. Quantum Convolutional Neural Network (Hybrid QCNN)
+### E. Quantum Convolutional Neural Network (Hybrid QCNN)
 The QCNN introduces hierarchical dimensionality reduction directly within the quantum circuit:
 1. **Convolution Layer:** Parameterized 2-qubit unitary blocks $U(\boldsymbol{\theta}_{\text{conv}})$ applied across adjacent pairs $(q_0, q_1)$, $(q_2, q_3)$, and interlaced $(q_1, q_2)$. Each block comprises single-qubit rotations ($R_x, R_y, R_z$) and CNOT gates (8 parameters per pair, 24 total).
 2. **Pooling Layer:** Controlled rotations $V(\boldsymbol{\phi}_{\text{pool}}) \in \{CR_x, CR_y, CR_z\}$ from $q_1 \to q_0$ and $q_3 \to q_2$, condensing correlation into active qubits $q_0$ and $q_2$ (6 parameters).
 3. **Readout:** Expectation values $\langle Z_0 \rangle$ and $\langle Z_2 \rangle$ are measured and mapped to class logits via $\mathbf{W} \in \mathbb{R}^{2 \times 2}$.
 
-### E. Quantum Support Vector Machine (QSVM)
+### F. Quantum Support Vector Machine (QSVM)
 The QSVM is a kernel-based model operating on precomputed quantum state overlaps. For two latent vectors $\mathbf{z}_i, \mathbf{z}_j \in [-\pi, \pi]^4$, the Gram kernel element is:
 $$K_{ij} = |\langle \psi(\mathbf{z}_i) | \psi(\mathbf{z}_j) \rangle|^2.$$
 To optimize execution speed, statevectors $|\psi(\mathbf{z})\rangle \in \mathbb{C}^{16}$ are precomputed using an unsupervised autoencoder, and the Gram matrix is evaluated via vectorized Hermitian matrix multiplication:

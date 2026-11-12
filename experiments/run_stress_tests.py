@@ -416,7 +416,7 @@ def test_5_adversarial_and_noise_stress(config: Dict[str, Any], raw_df: pd.DataF
     X_val, y_val = arrays["val"]
     X_test, y_test = arrays["test"]
 
-    # 1. Adversarial FGSM Stressing
+    # 1. Adversarial FGSM Stressing (epochs=15 is a matched adversarial FGSM evaluation budget between QNN and MLP)
     qnn = HybridQNNClassifier(input_dim=X_train.shape[1], hidden_dim=16, num_qubits=4, epochs=15, batch_size=64, random_state=seed)
     qnn.fit(X_train, y_train, X_val, y_val, epochs=15, verbose=False)
 

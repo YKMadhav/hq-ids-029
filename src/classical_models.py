@@ -207,23 +207,25 @@ class _PyTorchMLPModule(nn.Module):
     """
     Feedforward Neural Network with bottleneck representation matching
     the parameter depth of the hybrid QML architecture:
-    Input [40] -> Hidden [16] -> Bottleneck [4] -> Output [2].
+    Input [39] -> Hidden [16] -> Bottleneck [4] -> Output [2].
     """
 
     def __init__(
         self,
-        input_dim: int = 40,
+        input_dim: int = 39,
         hidden_dim: int = 16,
         bottleneck_dim: int = 4,
-        output_dim: int = 2
+        output_dim: int = 2,
+        scale_latent_by_pi: bool = False
     ):
         super().__init__()
+        self.scale_latent_by_pi = scale_latent_by_pi
         self.encoder = nn.Sequential(
             nn.Linear(input_dim, hidden_dim),
             nn.BatchNorm1d(hidden_dim),
             nn.ReLU(),
             nn.Linear(hidden_dim, bottleneck_dim),
-            nn.Tanh()  # Output in [-1, 1], scaled by pi in forward
+            nn.Tanh()  # Output in [-1, 1]
         )
         self.classifier = nn.Linear(bottleneck_dim, output_dim)
 
@@ -231,13 +233,18 @@ class _PyTorchMLPModule(nn.Module):
         if x.dim() == 1:
             x = x.unsqueeze(0)
         latent = self.encoder(x)
+        if self.scale_latent_by_pi:
+            latent = latent * np.pi
         logits = self.classifier(latent)
         return logits
 
     def extract_features(self, x: torch.Tensor) -> torch.Tensor:
         if x.dim() == 1:
             x = x.unsqueeze(0)
-        return self.encoder(x)
+        latent = self.encoder(x)
+        if self.scale_latent_by_pi:
+            latent = latent * np.pi
+        return latent
 
 
 class ClassicalMLPBaseline:
@@ -249,7 +256,7 @@ class ClassicalMLPBaseline:
 
     def __init__(
         self,
-        input_dim: int = 40,
+        input_dim: int = 39,
         hidden_dim: int = 16,
         bottleneck_dim: int = 4,
         output_dim: int = 2,
@@ -410,7 +417,7 @@ if __name__ == "__main__":
     baselines = {
         "RandomForest": RandomForestBaseline(n_estimators=50, max_depth=8, random_state=42),
         "XGBoost": XGBoostBaseline(n_estimators=50, max_depth=4, random_state=42),
-        "ClassicalMLP": ClassicalMLPBaseline(input_dim=D, epochs=10, random_state=42),
+        "ClassicalMLP": ClassicalMLPBaseline(input_dim=D, epochs=10, random_state=42),  # epochs=10 is for unit-level smoke testing only
     }
 
     for name, model in baselines.items():

@@ -8,6 +8,7 @@
 \usepackage{booktabs}
 \usepackage{microtype}
 \usepackage{hyperref}
+\setlength{\textfloatsep}{8pt plus 2pt minus 2pt}
 
 \hypersetup{
     colorlinks=true,
@@ -130,6 +131,9 @@ For end-to-end models, the joint cross-entropy loss is minimized:
 \end{equation}
 where $\mathbf{q}$ denotes the quantum expectation vector.
 
+\subsection{Training Protocols and Hyperparameter Disclosure}
+To ensure reproducibility and rigorous benchmarking, we explicitly disclose the training protocols across architectures. The standard \textit{Baseline MLP} ($39 \to 16 \to 4 \to 2$) in Table~\ref{tab:benchmark_results} is trained under the default tabular benchmark configuration ($\eta = 0.005$, 40 epochs, weight decay $10^{-4}$, early stopping patience 8, standard $\tanh$). The \textit{Hybrid VQC} employs a distinct training schedule ($\eta = 0.01$, 20 epochs, weight decay $0$, no early stopping, and $\tanh \cdot \pi$ latent scaling). To evaluate whether these protocol differences influence conclusions, we evaluated a \textit{Matched MLP Control} identical to the VQC schedule ($\eta = 0.01$, 20 epochs, $\text{wd}=0$, $\tanh \cdot \pi$). Across the 5 benchmark seeds, the Matched MLP achieves $93.64\% \pm 0.89\%$ accuracy (Macro F1: $92.49\% \pm 1.00\%$, ROC-AUC: $0.9776 \pm 0.0061$, FPR: $14.55\% \pm 2.36\%$), which is statistically indistinguishable from Full VQC ($93.96\% \pm 0.74\%$, paired $t = 1.3021, p = 0.2628$). Furthermore, the cross-dataset and Fourier surrogate benchmarks (Section~\ref{sec:rff_surrogates}) employ their own isolated, 12-feature \texttt{ClassicalMLPModel} protocol ($\eta = 0.01$, 20 epochs).
+
 \subsection{Variational Quantum Classifier (Hybrid VQC)}
 The 4-qubit VQC encodes latent angles using single-qubit $R_y$ rotation gates:
 \begin{equation}
@@ -167,7 +171,7 @@ enforcing $K_{ii} = 1.0$ and $\mathbf{K} = \mathbf{K}^T$. The precomputed kernel
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.88\columnwidth]{results/figures/qml_architecture_comparison.png}
+\includegraphics[width=0.82\columnwidth]{results/figures/qml_architecture_comparison.png}
 \caption{Comprehensive performance comparison across seven model architectures on UNSW-NB15 traffic over 5 seeds: (a) Test Accuracy, (b) Macro F1-score, (c) False Positive Rate (FPR), and (d) Single-sample inference latency (log scale).}
 \label{fig:qml_comparison}
 \end{figure}
@@ -208,14 +212,14 @@ The complete benchmark was executed across five fixed seeds ($[42, 43, 44, 45, 4
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.88\columnwidth]{results/figures/bottleneck_capacity_sweep.png}
+\includegraphics[width=0.82\columnwidth]{results/figures/bottleneck_capacity_sweep.png}
 \caption{Latent Bottleneck Capacity Sweep ($d \in [2, 8]$): Test accuracy comparison between Classical MLP and Hybrid QNN across varying latent dimensions.}
 \label{fig:bottleneck_sweep}
 \end{figure}
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.88\columnwidth]{results/figures/noise_degradation.png}
+\includegraphics[width=0.82\columnwidth]{results/figures/noise_degradation.png}
 \caption{NISQ 1,024-shot Aer simulation under depolarizing and readout noise: (a) End-to-end accuracy resilience, and (b) Pauli-$Z$ expectation drift recovery under M3 matrix inversion mitigation.}
 \label{fig:noise_degradation}
 \end{figure}
@@ -268,7 +272,7 @@ We extract 12 standardized physical transport features (`dur`, `spkts`, `dpkts`,
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.88\columnwidth]{results/figures/rff_quantum_comparison.png}
+\includegraphics[width=0.82\columnwidth]{results/figures/rff_quantum_comparison.png}
 \caption{Classical Fourier Surrogates vs. Quantum VQC: (a) In-domain (UNSW-NB15) and cross-domain (CIC-IDS2017) Macro F1-scores, and (b) Domain Generalization F1 Retention Ratios.}
 \label{fig:rff_quantum}
 \end{figure}
@@ -280,21 +284,23 @@ The empirical findings (Table~\ref{tab:rff_summary} and Fig.~\ref{fig:rff_quantu
     \item \textit{Latency Reality:} Classical Fourier surrogates execute in $0.065$--$0.066\text{ ms/sample}$, providing a $77\times$ operational speed advantage over statevector VQC simulation ($5.088\text{ ms/sample}$).
 \end{itemize}
 
-\begin{table*}[t]
+\begin{table}[t]
 \centering
 \caption{CLASSICAL FOURIER SURROGATES VS. HYBRID VQC (5 SEEDS)}
 \label{tab:rff_summary}
+\resizebox{\columnwidth}{!}{%
 \begin{tabular}{l c c c c}
 \toprule
-\textbf{Model Architecture} & \textbf{In-Domain Macro F1} & \textbf{Cross-Domain Macro F1} & \textbf{F1 Retention Ratio} & \textbf{Single-Sample Latency} \\
+\textbf{Model Architecture} & \textbf{In-Domain F1} & \textbf{Cross-Domain F1} & \textbf{Retention} & \textbf{Latency} \\
 \midrule
 Classical MLP (12 $\to$ 16 $\to$ 4 $\to$ 2) & $88.22\% \pm 1.06\%$ & $44.97\% \pm 6.29\%$ & $50.96\% \pm 7.00\%$ & $\mathbf{0.054\text{ ms}}$ \\
-Classical RFF Surrogate (Random Fourier) & $88.57\% \pm 0.76\%$ & $49.06\% \pm 13.71\%$ & $\mathbf{55.30\% \pm 15.21\%}$ & $0.066\text{ ms}$ \\
+Classical RFF (Random Fourier) & $88.57\% \pm 0.76\%$ & $49.06\% \pm 13.71\%$ & $\mathbf{55.30\% \pm 15.21\%}$ & $0.066\text{ ms}$ \\
 Trainable Fourier Network & $\mathbf{89.30\% \pm 0.67\%}$ & $\mathbf{49.20\% \pm 3.59\%}$ & $55.10\% \pm 4.07\%$ & $0.065\text{ ms}$ \\
-Hybrid VQC ($4$-Qubit Variational Circuit) & $87.90\% \pm 1.22\%$ & $48.22\% \pm 4.31\%$ & $54.85\% \pm 4.72\%$ & $5.088\text{ ms}$ \\
+Hybrid VQC ($4$-Qubit Circuit) & $87.90\% \pm 1.22\%$ & $48.22\% \pm 4.31\%$ & $54.85\% \pm 4.72\%$ & $5.088\text{ ms}$ \\
 \bottomrule
-\end{tabular}
-\end{table*}
+\end{tabular}%
+}
+\end{table}
 
 \section{Operational Discussion \& UC-029 SOC Feasibility}
 The deployment feasibility of QML in enterprise SOCs hinges on the operational trade-off between inference latency and False Positive Rate:
