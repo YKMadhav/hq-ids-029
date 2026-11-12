@@ -115,4 +115,4 @@ baselines:
     batch_size: 64
     epochs: 20
     weight_decay: 0.0
-    patience: 8
+    patience: 20

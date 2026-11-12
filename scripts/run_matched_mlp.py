@@ -3,7 +3,9 @@
 import os, sys, time
 import numpy as np
 import pandas as pd
+
 import torch
+import argparse
 
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if REPO_ROOT not in sys.path:
@@ -18,6 +20,10 @@ def main():
     config = load_config()
     seeds = config.get("baselines", {}).get("seeds", [42, 43, 44, 45, 46])
     cfg = config["baselines"]["matched_mlp"]
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--patience', type=int, default=cfg.get('patience', 20))
+    args = parser.parse_args()
+    cfg['patience'] = args.patience
     raw_df = load_flow_data(config)
     rows = []
     for seed in seeds:
