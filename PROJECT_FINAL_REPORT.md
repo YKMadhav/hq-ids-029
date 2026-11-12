@@ -207,18 +207,14 @@ $$\mathbf{f}_{\text{true}} = M^{-1}\,\mathbf{f}_{\text{meas}},\qquad
 - **Expectation fidelity.** Even noiseless 1024-shot Aer deviates from the analytic
   PennyLane result by $\langle Z\rangle$ MAE 0.0154 - pure shot noise. Injecting
   the full NISQ model raises this to 0.0709, a 4.6x degradation.
-- **Mitigation works.** M3 matrix inversion reduces the drift to 0.0378,
-  recovering **46.6%** of the readout-induced error in $\langle Z_i\rangle$ -
+- **Mitigation works.** M3 matrix inversion reduces Pauli-$Z$ expectation drift relative to analytic ground truth from 0.0686 (per-seed range: 0.0600--0.0759) to 0.0339 (per-seed range: 0.0316--0.0368),
+  recovering **50.5%** (range: 46.0%--53.4%) of the readout-induced error in $\langle Z_i\rangle$ -
   exactly what the theory predicts, since a product-form readout channel is linear
   in the expectations and is therefore *exactly* invertible (the condition number
-  of $M$ at $p=0.03$ is 1.2808, so the inversion is numerically well-conditioned).
+  of $M$ at $p=0.03$ is 1.2808, and remains bounded at $\kappa \le 2.44$ at $p=0.10$).
 - **End-to-end accuracy is robust.** Despite the expectation drift, test accuracy
-  moves only from 0.9382 (noiseless) to 0.9388 (noisy) and 0.9384 (mitigated).
-  This is a genuine and important finding rather than an artefact: at $N = 4$ the
-  circuit is shallow enough that gate depolarising error barely accumulates, the
-  dominant error term is the $3\,\%$ readout channel, and M3 removes most of it.
-  The linear readout head is additionally robust to small perturbations in
-  $\langle Z\rangle$.
+  remains stable at 0.9388 (noisy) and 0.9384 (mitigated) with F1 at 0.9274 vs 0.9270 (paired $p > 0.80$).
+  This is a genuine finding: at $N = 4$ the circuit is shallow enough that expectation drift does not cross the decision hyperplane.
 - **Honest caveat.** These noise levels are optimistic relative to current IBM/Eronica
   devices, where two-qubit gate error is often $0.5\,\%-1\,\%$ and readout error
   $1\,\%-3\,\%$. The finding that holds is the *mechanism* - M3 removes readout
@@ -253,10 +249,10 @@ operational costs of compressing 39 features into a 4-qubit bottleneck.
    the performance gap between Full VQC and Bypassed controls is statistically non-significant,
    confirming that classical bottleneck compression, rather than quantum kernel supremacy, is the dominant factor.
 3. **Readout mitigation is the correct lever under NISQ conditions.** M3 matrix
-   inversion recovers 46.6% of the readout-induced drift in $\langle Z_i\rangle$
+   inversion recovers 50.5% (range: 46.0%--53.4%) of readout-induced drift relative to analytic ground truth
    at negligible cost, and is mathematically exact for product-form readout
-   channels. Under the modelled noise levels, end-to-end accuracy is essentially
-   unchanged - a 4-qubit circuit is simply too shallow for gate error to compound.
+   channels. Under the modelled noise levels, end-to-end classification accuracy remains stable (0.9384 mitigated vs 0.9388 noisy) -
+   a 4-qubit circuit is simply too shallow for expectation drift to alter discrete classification decisions.
 4. **Methodological hygiene mattered more than any modelling choice.** Two defects
    were found and fixed before results could be trusted: retaining the `id` column
    (which drove every metric to a meaningless 1.000) and a mismatch between the
