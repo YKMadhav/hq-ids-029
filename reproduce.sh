@@ -76,23 +76,31 @@ else
     "$PYTHON" experiments/run_baselines.py
 
     echo ""
-    echo "[Step 5] Running ablation study ..."
+    echo "[Step 5] Running QML comparison benchmark ..."
+    "$PYTHON" experiments/run_qml_comparison.py
+
+    echo ""
+    echo "[Step 6] Running ablation and NISQ noise / M3 mitigation study ..."
     "$PYTHON" experiments/run_ablation.py
 
     echo ""
-    echo "[Step 6] Running RFF surrogate benchmark ..."
+    echo "[Step 7] Running RFF surrogate benchmark ..."
     "$PYTHON" experiments/run_rff_surrogate_benchmark.py
 
     echo ""
-    echo "[Step 7] Running cross-dataset benchmark ..."
+    echo "[Step 8] Running cross-dataset benchmark ..."
     "$PYTHON" experiments/run_cross_dataset_benchmark.py
 
     echo ""
-    echo "[Step 8] Running stress tests (30 seeds) ..."
+    echo "[Step 9] Running zero-day anomaly benchmark ..."
+    "$PYTHON" scripts/run_zeroday_benchmark.py
+
+    echo ""
+    echo "[Step 10] Running stress tests (30 seeds) ..."
     "$PYTHON" experiments/run_stress_tests.py
 
     echo ""
-    echo "[Step 9] Generating plots and report ..."
+    echo "[Step 11] Generating plots and report ..."
     "$PYTHON" experiments/generate_plots_and_report.py
 fi
 
@@ -101,7 +109,7 @@ fi
 # ---------------------------------------------------------------------------
 if command -v pdflatex &>/dev/null; then
     echo ""
-    echo "[Step 10] Compiling IEEE manuscript (paper_draft.tex) ..."
+    echo "[Step 12] Compiling IEEE manuscript (paper_draft.tex) ..."
     pdflatex -interaction=nonstopmode paper_draft.tex > /dev/null
     pdflatex -interaction=nonstopmode paper_draft.tex 2>&1 | grep -E "Output written|Warning|Error"
 
@@ -119,7 +127,7 @@ print(m[-1] if m else 'Unknown')
         echo "WARN: manuscript exceeds 6 pages (${PAGES} pages)."
     fi
 else
-    echo "[Step 10] pdflatex not found; skipping PDF compilation."
+    echo "[Step 12] pdflatex not found; skipping PDF compilation."
 fi
 
 echo ""
