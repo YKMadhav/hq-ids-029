@@ -108,3 +108,11 @@ baselines:
     epochs: 40
     weight_decay: 0.0001
     patience: 8
+  matched_mlp:
+    hidden_dim: 16
+    bottleneck_dim: 4
+    learning_rate: 0.01
+    batch_size: 64
+    epochs: 20
+    weight_decay: 0.0
+    patience: 8

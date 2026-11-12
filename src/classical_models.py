@@ -267,7 +267,8 @@ class ClassicalMLPBaseline:
         patience: int = 8,
         loss_fn: Optional[nn.Module] = None,
         random_state: int = 42,
-        device: str = "cpu"
+        device: str = "cpu",
+        scale_latent_by_pi: bool = False,
     ):
         self.input_dim = input_dim
         self.hidden_dim = hidden_dim
@@ -281,6 +282,7 @@ class ClassicalMLPBaseline:
         self.loss_fn = loss_fn
         self.random_state = random_state
         self.device = torch.device(device)
+        self.scale_latent_by_pi = scale_latent_by_pi
 
         # Set seeds
         torch.manual_seed(random_state)
@@ -290,7 +292,8 @@ class ClassicalMLPBaseline:
             input_dim=input_dim,
             hidden_dim=hidden_dim,
             bottleneck_dim=bottleneck_dim,
-            output_dim=output_dim
+            output_dim=output_dim,
+            scale_latent_by_pi=scale_latent_by_pi,
         ).to(self.device)
 
         self.criterion = loss_fn if loss_fn is not None else nn.CrossEntropyLoss()
