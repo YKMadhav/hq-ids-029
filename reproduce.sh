@@ -28,7 +28,24 @@ echo "========================================================================"
 # ---------------------------------------------------------------------------
 # 1. Create / activate a virtual environment and install dependencies
 # ---------------------------------------------------------------------------
-BASE_PYTHON="${PYTHON_BIN:-python3}"
+# The pinned stack needs Python 3.11: pandas==2.0.3 has no wheels for >=3.12
+# (installing on 3.12/3.13 fails with a source-build error).
+if [ -n "${PYTHON_BIN:-}" ]; then
+    BASE_PYTHON="$PYTHON_BIN"
+elif command -v python3.11 &>/dev/null; then
+    BASE_PYTHON="python3.11"
+else
+    BASE_PYTHON="python3"
+fi
+BASE_VERSION="$("$BASE_PYTHON" -c 'import sys; print("%d.%d" % sys.version_info[:2])')"
+if [ "$BASE_VERSION" != "3.11" ]; then
+    echo "ERROR: Python 3.11 is required (found $BASE_VERSION via $BASE_PYTHON)." >&2
+    echo "       Set PYTHON_BIN=/path/to/python3.11 (the pins, e.g. pandas==2.0.3, do not install on >=3.12)." >&2
+    exit 1
+fi
+
+# Results are only portable across machines when thread counts are pinned (src/determinism.py).
+unset HQIDS_ALLOW_MULTITHREAD
 
 VENV_DIR="$REPO_ROOT/.venv"
 if [ ! -d "$VENV_DIR" ]; then
@@ -50,7 +67,13 @@ echo "[Setup] Installing / verifying dependencies from requirements.txt ..."
 # ---------------------------------------------------------------------------
 echo ""
 echo "[Step 1] Running pytest leakage and preprocessing verification ..."
-"$PYTHON" -m pytest -v
+"$PYTHON" -m pytest -v -m "not manuscript_sync"
+
+# Manuscript-vs-results sync is reported, not gated: the manuscripts quote the pre-correction
+# numbers (duplicate-inflated, thread-dependent) and are marked historical in SCIENTIFIC_STATUS.md.
+# These tests are expected to FAIL after a corrected rerun until the paper is rewritten from
+# the regenerated artifacts; a failure here is the tripwire that says so.
+"$PYTHON" -m pytest -q -m manuscript_sync 2>&1 | tail -3 || true
 
 # ---------------------------------------------------------------------------
 # 3. Recompute statistics
@@ -74,8 +97,13 @@ if [ "${REPRO_QUICK:-0}" = "1" ]; then
     echo "[REPRO_QUICK=1] Skipping long experiments."
 else
     echo ""
-    echo "[Step 4] Running baselines ..."
+    echo "[Step 4] Running baselines (writes results/metrics.csv) ..."
     "$PYTHON" experiments/run_baselines.py
+
+    echo ""
+    echo "[Step 4b] Running the HybridQNN 5-seed benchmark (appends the HybridQNN row to metrics.csv) ..."
+    echo "          (run_baselines.py overwrites metrics.csv, so this MUST come after it)"
+    "$PYTHON" experiments/run_hybrid_sim.py
 
     echo ""
     echo "[Step 5] Running QML comparison benchmark ..."
@@ -85,13 +113,20 @@ else
     echo "[Step 6] Running ablation and NISQ noise / M3 mitigation study ..."
     "$PYTHON" experiments/run_ablation.py
 
-    echo ""
-    echo "[Step 7] Running RFF surrogate benchmark ..."
-    "$PYTHON" experiments/run_rff_surrogate_benchmark.py
+    if [ -f data/aligned_data_manifest.json ]; then
+        echo ""
+        echo "[Step 7] Running RFF surrogate benchmark ..."
+        "$PYTHON" experiments/run_rff_surrogate_benchmark.py
 
-    echo ""
-    echo "[Step 8] Running cross-dataset benchmark ..."
-    "$PYTHON" experiments/run_cross_dataset_benchmark.py
+        echo ""
+        echo "[Step 8] Running cross-dataset benchmark ..."
+        "$PYTHON" experiments/run_cross_dataset_benchmark.py
+    else
+        echo ""
+        echo "[Step 7/8] SKIPPED: data/aligned_data_manifest.json is absent. The aligned UNSW/CIC CSVs have"
+        echo "           no generating code or verified field semantics (see data/ALIGNED_DATA_PROVENANCE.md);"
+        echo "           the RFF-surrogate and cross-dataset claims are therefore withdrawn, not reproduced."
+    fi
 
     echo ""
     echo "[Step 9] Running zero-day anomaly benchmark ..."
@@ -113,6 +148,20 @@ else
         echo "[Step 12] Skipping Phase 4: official UNSW training/testing CSVs are absent."
     fi
 
+    if [ -f data/UNSW_NB15_testing-set.csv ]; then
+        echo ""
+        echo "[Step 13] Official-test-set held-out evaluation (all models, 5 seeds) ..."
+        "$PYTHON" scripts/run_official_heldout_eval.py
+        "$PYTHON" scripts/run_official_heldout_eval.py --dedup-test --tag _dedup_test \
+            --models Majority,Stump,RandomForest,XGBoost,ClassicalMLP
+    else
+        echo "[Step 13] SKIPPED: data/UNSW_NB15_testing-set.csv is absent."
+    fi
+
+    echo ""
+    echo "[Step 14] Writing run manifest (versions, thread pinning, data hashes) ..."
+    "$PYTHON" scripts/write_run_manifest.py
+
     if [ "${REGENERATE_REPORT:-0}" = "1" ]; then
         echo ""
         echo "[Optional] Regenerating PROJECT_FINAL_REPORT.md from current artifacts ..."
@@ -125,7 +174,9 @@ fi
 # ---------------------------------------------------------------------------
 # 6. Compile LaTeX manuscript
 # ---------------------------------------------------------------------------
-if command -v pdflatex &>/dev/null; then
+# The manuscript is historical (see SCIENTIFIC_STATUS.md); compiling it is optional and must
+# never turn a finished experimental run into a failed one.
+if command -v pdflatex &>/dev/null && command -v kpsewhich &>/dev/null && [ -n "$(kpsewhich IEEEtran.cls 2>/dev/null)" ]; then
     echo ""
     echo "[Final] Compiling IEEE manuscript (paper_draft.tex) ..."
     pdflatex -interaction=nonstopmode paper_draft.tex > /dev/null
@@ -145,7 +196,7 @@ print(m[-1] if m else 'Unknown')
         echo "WARN: manuscript exceeds 6 pages (${PAGES} pages)."
     fi
 else
-    echo "[Step 12] pdflatex not found; skipping PDF compilation."
+    echo "[Final] pdflatex or IEEEtran.cls not available; skipping optional PDF compilation."
 fi
 
 echo ""

@@ -43,6 +43,7 @@ from sklearn.metrics import (
 )
 
 from src.anomaly_loader import get_zeroday_anomaly_dataloaders
+from src.determinism import seed_everything
 from src.anomaly_models import ClassicalAutoencoder, QuantumAutoencoder
 
 SEEDS = [42, 43, 44, 45, 46]
@@ -192,6 +193,7 @@ def run_benchmark():
         # -------------------------------------------------------------
         print("  Training Classical Autoencoder (39 -> 16 -> 4 -> 16 -> 39)...")
         t0 = time.time()
+        seed_everything(seed)  # init weights are drawn here, before fit_model() seeds
         cae = ClassicalAutoencoder(input_dim=input_dim, hidden_dim=16, latent_dim=4)
         cae_history = cae.fit_model(
             train_loader,
@@ -223,6 +225,7 @@ def run_benchmark():
         # -------------------------------------------------------------
         print("  Training Quantum Autoencoder (Romero et al. 4-Qubit Compression)...")
         t0 = time.time()
+        seed_everything(seed)
         qae = QuantumAutoencoder(classical_encoder=cae, n_qubits=4, n_layers=2)
         qae_history = qae.fit_model(
             train_loader,

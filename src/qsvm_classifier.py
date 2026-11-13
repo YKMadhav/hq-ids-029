@@ -28,6 +28,7 @@ if REPO_ROOT not in sys.path:
 import numpy as np
 from sklearn.svm import SVC
 import pennylane as qml
+from src import determinism as _determinism  # noqa: F401  (pins threads; see src/determinism.py)
 import torch
 
 from src.encoders import FlowAutoencoder, BottleneckMLPEncoder

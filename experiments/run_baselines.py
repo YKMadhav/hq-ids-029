@@ -33,6 +33,7 @@ from common import (  # noqa: E402
     RESULTS_DIR,
     aggregate_by_model,
     compute_metrics,
+    deduplicate_flows,
     load_config,
     load_flow_data,
     log_decision,
@@ -45,6 +46,7 @@ from src.classical_models import (  # noqa: E402
     RandomForestBaseline,
     XGBoostBaseline,
 )
+from src.trivial_baselines import MajorityClassBaseline, SingleSplitBaseline  # noqa: E402
 
 METRIC_COLUMNS = [
     "accuracy",
@@ -53,6 +55,9 @@ METRIC_COLUMNS = [
     "f1_macro",
     "f1_weighted",
     "roc_auc",
+    "balanced_accuracy",
+    "mcc",
+    "test_attack_rate",
     "fpr",
     "latency_ms",
 ]
@@ -73,6 +78,10 @@ def run_baselines_benchmark(config: Dict[str, Any]) -> Tuple[pd.DataFrame, pd.Da
           f"({int((raw_df['label'] == 1).sum())} attack / {int((raw_df['label'] == 0).sum())} benign, "
           f"attack ratio {raw_df['label'].mean():.2%})")
 
+    n_unique = len(deduplicate_flows(raw_df))
+    print(f"[Benchmark] After exact-duplicate removal: {n_unique} unique flows "
+          f"({len(raw_df) - n_unique} duplicates dropped before splitting)")
+
     detailed_records: List[Dict[str, Any]] = []
     feature_dim = None
 
@@ -92,6 +101,9 @@ def run_baselines_benchmark(config: Dict[str, Any]) -> Tuple[pd.DataFrame, pd.Da
               f"| model input dim={feature_dim}")
 
         models = {
+            # Reference detectors: every headline number must be read against these.
+            "MajorityClass(flag-all)": MajorityClassBaseline(random_state=seed),
+            "SingleSplitStump": SingleSplitBaseline(random_state=seed),
             "RandomForest": RandomForestBaseline(
                 n_estimators=rf_cfg.get("n_estimators", 100),
                 max_depth=rf_cfg.get("max_depth", 12),
@@ -128,7 +140,7 @@ def run_baselines_benchmark(config: Dict[str, Any]) -> Tuple[pd.DataFrame, pd.Da
             latency_ms = model.measure_latency(X_test[0], n_runs=latency_runs)
 
             print(
-                f"  [{model_name:13s}] Acc {metrics['accuracy']:.4f} | "
+                f"  [{model_name:24s}] Acc {metrics['accuracy']:.4f} | "
                 f"F1-Macro {metrics['f1_macro']:.4f} | ROC-AUC {metrics['roc_auc']:.4f} | "
                 f"FPR {metrics['fpr']:.4f} | Latency {latency_ms:.4f} ms | Train {train_time:.2f}s"
             )

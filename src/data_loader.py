@@ -19,6 +19,7 @@ from typing import Tuple, List, Optional, Dict
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 
+from src import determinism as _determinism  # noqa: F401  (pins threads; see src/determinism.py)
 import torch
 from torch.utils.data import Dataset, DataLoader
 
@@ -468,6 +469,7 @@ class FlowPreprocessor:
         self.scaler = MinMaxScaler(feature_range=feature_range)
         self.skewed_features_: List[str] = []
         self.feature_names_: List[str] = []
+        self.constant_features_: List[str] = []
 
     def fit(self, df: pd.DataFrame) -> "FlowPreprocessor":
         """Fits skewness detectors and MinMaxScaler on training data only."""
@@ -495,6 +497,17 @@ class FlowPreprocessor:
 
         # Fit MinMaxScaler
         self.scaler.fit(transformed_df.values)
+
+        # A column that is constant in the training partition has zero range.
+        # sklearn then substitutes range=1, i.e. a scale of 2*pi per raw unit, so
+        # any deviation seen at test time would saturate to +/-pi and act as a
+        # hidden anomaly indicator. Map such columns to the range midpoint instead.
+        zero_range = np.where(self.scaler.data_range_ == 0.0)[0]
+        self.constant_features_ = [self.feature_names_[i] for i in zero_range]
+        if len(zero_range):
+            midpoint = 0.5 * (self.feature_range[0] + self.feature_range[1])
+            self.scaler.scale_[zero_range] = 0.0
+            self.scaler.min_[zero_range] = midpoint
         return self
 
     def transform(self, df: pd.DataFrame) -> Tuple[np.ndarray, np.ndarray]:

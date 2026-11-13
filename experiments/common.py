@@ -23,6 +23,8 @@ import yaml
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import (
     accuracy_score,
+    balanced_accuracy_score,
+    matthews_corrcoef,
     precision_score,
     recall_score,
     f1_score,
@@ -34,6 +36,7 @@ REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if REPO_ROOT not in sys.path:
     sys.path.insert(0, REPO_ROOT)
 
+from src import determinism as _determinism  # noqa: E402,F401  (pins threads before any torch work)
 from src.data_loader import FlowPreprocessor  # noqa: E402
 
 CONFIG_PATH = os.path.join(REPO_ROOT, "configs", "config.yaml")
@@ -60,13 +63,41 @@ def load_flow_data(config: Dict[str, Any]) -> pd.DataFrame:
     return pd.read_csv(path)
 
 
+IDENTIFIER_AND_LABEL_COLUMNS = ("id", "label", "attack_cat", "attack_category", "binary_label", "clean_cat")
+
+
+def deduplicate_flows(frame: pd.DataFrame) -> pd.DataFrame:
+    """
+    Drop rows whose complete feature vector (every column except the record id and
+    the label columns) already occurred earlier in the frame.
+
+    Why: in the 5,000-flow UNSW-NB15 sample 571 rows are exact feature-vector
+    duplicates of another row. Under a random split ~17 % of test flows then have an
+    identical twin in the training partition (166 / 1000 at seed 42), which is
+    memorisation credit, not generalisation. The first occurrence is kept, so the
+    result does not depend on the split seed. Rows whose duplicates carry
+    conflicting labels are kept once with the label of the first occurrence.
+    """
+    feature_cols = [c for c in frame.columns if c not in IDENTIFIER_AND_LABEL_COLUMNS]
+    return frame.drop_duplicates(subset=feature_cols, keep="first").reset_index(drop=True)
+
+
 def stratified_split(
     frame: pd.DataFrame,
     seed: int,
     test_size: float = 0.2,
     val_size: float = 0.1,
+    deduplicate: bool = True,
 ) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
-    """Deterministic stratified 70 / 10 / 20 train / validation / test partition."""
+    """
+    Deterministic stratified 70 / 10 / 20 train / validation / test partition.
+
+    ``deduplicate=True`` (default) removes exact feature-vector duplicates BEFORE
+    splitting so no test flow has an identical twin in train. Pass False only to
+    reproduce the historical protocol.
+    """
+    if deduplicate:
+        frame = deduplicate_flows(frame)
     train_val_df, test_df = train_test_split(
         frame, test_size=test_size, random_state=seed, stratify=frame["label"]
     )
@@ -120,6 +151,11 @@ def compute_metrics(y_true: np.ndarray, y_pred: np.ndarray, y_prob: np.ndarray) 
         "f1_macro": float(f1_score(y_true, y_pred, average="macro", zero_division=0)),
         "f1_weighted": float(f1_score(y_true, y_pred, average="weighted", zero_division=0)),
         "roc_auc": float(roc_auc_score(y_true, scores)),
+        # Accuracy depends on class prevalence (a flag-everything detector scores the
+        # attack rate); balanced accuracy and MCC do not, so report them alongside it.
+        "balanced_accuracy": float(balanced_accuracy_score(y_true, y_pred)),
+        "mcc": float(matthews_corrcoef(y_true, y_pred)),
+        "test_attack_rate": float(np.mean(np.asarray(y_true) == 1)),
         "fpr": float(fp / (fp + tn)) if (fp + tn) > 0 else 0.0,
         "tn": int(tn),
         "fp": int(fp),

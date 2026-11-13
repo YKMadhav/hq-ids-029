@@ -1,3 +1,4 @@
+# Python 3.11 required: pandas==2.0.3 has no wheels for >=3.12.
 qiskit==2.2.1
 qiskit-aer==0.17.1
 pennylane==0.42.3
@@ -12,3 +13,4 @@ PyYAML==6.0.2
 scapy==2.5.0
 matplotlib==3.10.0
 seaborn==0.13.2
+pytest==9.2.0

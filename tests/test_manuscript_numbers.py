@@ -16,6 +16,8 @@ import pytest
 
 TOL = 0.0005  # 0.05 pp absolute tolerance
 
+pytestmark = pytest.mark.manuscript_sync
+
 
 # ---------------------------------------------------------------------------
 # Helpers for ground truth computation

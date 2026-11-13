@@ -15,6 +15,7 @@ import copy
 import numpy as np
 from typing import Optional, Tuple, Dict, Any, List
 
+from src import determinism as _determinism  # noqa: F401  (pins threads; see src/determinism.py)
 import torch
 import torch.nn as nn
 from torch.utils.data import TensorDataset, DataLoader

@@ -12,6 +12,7 @@ from typing import Any
 
 import joblib
 import numpy as np
+from src import determinism as _determinism  # noqa: F401  (pins threads; see src/determinism.py)
 import torch
 from torch.utils.data import DataLoader
 

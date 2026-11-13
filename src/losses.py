@@ -10,6 +10,7 @@ Formulation:
     L_FL = -alpha_y * (1 - p_t)^gamma * log(p_t + eps)
 """
 
+from src import determinism as _determinism  # noqa: F401  (pins threads; see src/determinism.py)
 import torch
 import torch.nn as nn
 import torch.nn.functional as F

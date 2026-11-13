@@ -24,6 +24,7 @@ from typing import Dict, Any, Tuple, Optional, List
 os.environ.setdefault("MPLCONFIGDIR", "/tmp/matplotlib")
 
 import numpy as np
+from src import determinism as _determinism  # noqa: F401  (pins threads; see src/determinism.py)
 import torch
 import torch.nn as nn
 import pennylane as qml

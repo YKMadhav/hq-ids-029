@@ -32,6 +32,7 @@ if REPO_ROOT not in sys.path:
     sys.path.insert(0, REPO_ROOT)
 
 import numpy as np
+from src import determinism as _determinism  # noqa: F401  (pins threads; see src/determinism.py)
 import torch
 import torch.nn as nn
 from torch.utils.data import TensorDataset, DataLoader

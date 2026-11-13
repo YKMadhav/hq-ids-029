@@ -61,6 +61,7 @@ except Exception as e:
     _XGBOOST_AVAILABLE = False
     from sklearn.ensemble import HistGradientBoostingClassifier
 
+from src import determinism as _determinism  # noqa: F401  (pins threads; see src/determinism.py)
 import torch
 import torch.nn as nn
 from torch.utils.data import TensorDataset, DataLoader
@@ -77,7 +78,7 @@ class RandomForestBaseline:
         n_estimators: int = 100,
         max_depth: int = 12,
         random_state: int = 42,
-        n_jobs: int = -1,
+        n_jobs: int = 1,  # 1 => thread-count independent results
         **kwargs
     ):
         self.model = RandomForestClassifier(
@@ -138,7 +139,7 @@ class XGBoostBaseline:
         learning_rate: float = 0.1,
         random_state: int = 42,
         eval_metric: str = "logloss",
-        n_jobs: int = -1,
+        n_jobs: int = 1,  # 1 => thread-count independent results
         **kwargs
     ):
         self.random_state = random_state

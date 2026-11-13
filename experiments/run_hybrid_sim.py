@@ -54,6 +54,9 @@ METRIC_COLUMNS = [
     "f1_macro",
     "f1_weighted",
     "roc_auc",
+    "balanced_accuracy",
+    "mcc",
+    "test_attack_rate",
     "fpr",
     "latency_ms",
 ]

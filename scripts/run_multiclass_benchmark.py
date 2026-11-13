@@ -124,6 +124,9 @@ def stratified_multiclass_split(
     val_size: float = 0.1,
 ) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """Stratified 70/10/20 train/val/test split preserving attack_cat distribution."""
+    # Exact feature-vector duplicates would otherwise sit on both sides of the split.
+    from experiments.common import deduplicate_flows
+    frame = deduplicate_flows(frame)
     # Ensure targets are defined
     y = map_attack_categories(frame["attack_cat"])
     

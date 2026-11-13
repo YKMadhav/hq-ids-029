@@ -23,6 +23,7 @@ import math
 from typing import Tuple, Dict, Any, Optional, List
 import numpy as np
 import pandas as pd
+from src import determinism as _determinism  # noqa: F401  (pins threads; see src/determinism.py)
 import torch
 from torch.utils.data import Dataset, DataLoader
 

@@ -164,3 +164,29 @@ This document provides a real-time, chronological audit trail of all architectur
   5. Documented Phase 4 post-hoc proxy boundaries ($k=2$, setup-header allow-list) and single-sample re-splitting in tabular flows; disclosed that unentangled angle-encoded QSVM evaluates to an analytically closed classical product kernel ($\prod \cos^2$) without quantum hardness; and confirmed cross-dataset equivalence across all non-tree models ($p > 0.38$).
   6. Implemented end-to-end `reproduce.sh` pipeline, passed 5-test forensic leakage test suite (`tests/test_leakage.py`), and sanitized absolute machine paths.
   7. Recompiled `paper_draft.pdf` strictly to 6 pages IEEE conference format with all documentation synchronized.
+- `[2026-11-13 03:19:51] [VERIFICATION]` Official held-out evaluation: 5 runs on 53758 unseen official-test flows.
+- `[2026-11-13 03:20:29] [VERIFICATION]` Official held-out evaluation: 6 runs on 80717 unseen official-test flows.
+- `[2026-11-13 03:33:49] [ACTION]` Started Step 1 classical baseline benchmark over seeds [42, 43, 44, 45, 46] on real UNSW-NB15 flows.
+- `[2026-11-13 03:34:16] [VERIFICATION]` Step 1 complete: 25 per-seed trials (5 models x 5 seeds) written to results/baselines_all_seeds.csv and results/metrics.csv.
+- `[2026-11-13 03:34:19] [ACTION]` Started Step 2 hybrid QNN training over seeds [42, 43, 44, 45, 46] on real UNSW-NB15 flows.
+- `[2026-11-13 03:35:57] [VERIFICATION]` Step 2 complete: 5 hybrid QNN runs saved to results/hybrid_all_seeds.csv; trained circuit depth 9, CNOTs 6, parameters 16; ZZ reference depth 18, CNOTs 12.
+- `[2026-11-13 03:39:49] [run_qml_comparison.py]` Completed 5-seed master benchmark across all 3 QML paradigms (VQC, QCNN, QSVM), classical baselines, and ablation controls.
+- `[2026-11-13 03:39:53] [ACTION]` Started Step 3 ablation (3 variants) and 1024-shot Qiskit Aer NISQ simulation over seeds [42, 43, 44, 45, 46].
+- `[2026-11-13 03:39:53] [AUTONOMOUS CHOICE]` Ran the NISQ replay on the complete 1000-flow held-out test partition for every seed rather than a subsample: Aer executes 1000 four-qubit circuits at 1024 shots in about 1.3 s, so subsampling would have discarded statistical power for no benefit.
+- `[2026-11-13 03:42:35] [VERIFICATION]` Step 3 complete: 15 ablation rows (3 variants x 5 seeds) and 5 shot-based Aer NISQ rows written to results/ablation_results.csv and results/noise_results.csv.
+- `[2026-11-13 04:02:35] [ACTION]` Completed 5-pillar stress-test battery in 476.7s. Report written to /home/claude/hq-ids-029/results/stress_test_report.json
+- `[2026-11-13 04:07:24] [run_multiclass_benchmark.py]` Completed 10-class multi-class threat taxonomy benchmark with Class-Weighted Focal Loss across 7 paradigms.
+- `[2026-11-13 04:09:18] [VERIFICATION]` Official held-out evaluation: 30 runs on 80717 unseen official-test flows.
+- `[2026-11-13 04:09:38] [VERIFICATION]` Official held-out evaluation: 25 runs on 53758 unseen official-test flows.
+- `[2026-11-13 04:14:06] [ACTION]` Started Step 1 classical baseline benchmark over seeds [42, 43, 44, 45, 46] on real UNSW-NB15 flows.
+- `[2026-11-13 04:14:34] [VERIFICATION]` Step 1 complete: 25 per-seed trials (5 models x 5 seeds) written to results/baselines_all_seeds.csv and results/metrics.csv.
+- `[2026-11-13 04:14:37] [ACTION]` Started Step 2 hybrid QNN training over seeds [42, 43, 44, 45, 46] on real UNSW-NB15 flows.
+- `[2026-11-13 04:16:23] [VERIFICATION]` Step 2 complete: 5 hybrid QNN runs saved to results/hybrid_all_seeds.csv; trained circuit depth 9, CNOTs 6, parameters 16; ZZ reference depth 18, CNOTs 12.
+- `[2026-11-13 04:20:20] [run_qml_comparison.py]` Completed 5-seed master benchmark across all 3 QML paradigms (VQC, QCNN, QSVM), classical baselines, and ablation controls.
+- `[2026-11-13 04:20:23] [ACTION]` Started Step 3 ablation (3 variants) and 1024-shot Qiskit Aer NISQ simulation over seeds [42, 43, 44, 45, 46].
+- `[2026-11-13 04:20:23] [AUTONOMOUS CHOICE]` Ran the NISQ replay on the complete 1000-flow held-out test partition for every seed rather than a subsample: Aer executes 1000 four-qubit circuits at 1024 shots in about 1.3 s, so subsampling would have discarded statistical power for no benefit.
+- `[2026-11-13 04:23:08] [VERIFICATION]` Step 3 complete: 15 ablation rows (3 variants x 5 seeds) and 5 shot-based Aer NISQ rows written to results/ablation_results.csv and results/noise_results.csv.
+- `[2026-11-13 09:11:25] [ACTION]` Completed 5-pillar stress-test battery in 705.7s. Report written to /home/claude/hq-ids-029/results/stress_test_report.json
+- `[2026-11-13 09:17:41] [run_multiclass_benchmark.py]` Completed 10-class multi-class threat taxonomy benchmark with Class-Weighted Focal Loss across 7 paradigms.
+- `[2026-11-13 09:19:56] [VERIFICATION]` Official held-out evaluation: 30 runs on 80717 unseen official-test flows.
+- `[2026-11-13 09:20:18] [VERIFICATION]` Official held-out evaluation: 25 runs on 53758 unseen official-test flows.
