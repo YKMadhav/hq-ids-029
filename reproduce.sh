@@ -12,8 +12,8 @@
 #     data/UNSW_NB15_testing-set.csv
 #   Source: https://research.unsw.edu.au/projects/unsw-nb15-dataset
 #
-# Checkpoints: pre-trained weights in models/checkpoints/ are included in repo.
-#   They are only needed by run_scaled_inference.py and Phase 4 scripts.
+# Phase 4 requires the official CSVs and is run only when they are present.
+# Historical reports are never overwritten unless REGENERATE_REPORT=1 is set.
 # ==============================================================================
 
 set -euo pipefail
@@ -28,20 +28,13 @@ echo "========================================================================"
 # ---------------------------------------------------------------------------
 # 1. Create / activate a virtual environment and install dependencies
 # ---------------------------------------------------------------------------
-BASE_PYTHON=""
-if [ -x "/Library/Frameworks/Python.framework/Versions/3.10/bin/python3" ]; then
-    BASE_PYTHON="/Library/Frameworks/Python.framework/Versions/3.10/bin/python3"
-elif [ -x "/usr/local/bin/python3" ]; then
-    BASE_PYTHON="/usr/local/bin/python3"
-else
-    BASE_PYTHON="python3"
-fi
+BASE_PYTHON="${PYTHON_BIN:-python3}"
 
 VENV_DIR="$REPO_ROOT/.venv"
 if [ ! -d "$VENV_DIR" ]; then
     echo ""
     echo "[Setup] Creating virtual environment at .venv using $BASE_PYTHON ..."
-    "$BASE_PYTHON" -m venv --system-site-packages "$VENV_DIR"
+    "$BASE_PYTHON" -m venv "$VENV_DIR"
 fi
 
 # shellcheck source=/dev/null
@@ -78,7 +71,7 @@ echo "[Step 3] Reproducing matched-MLP Control A results ..."
 # ---------------------------------------------------------------------------
 if [ "${REPRO_QUICK:-0}" = "1" ]; then
     echo ""
-    echo "[REPRO_QUICK=1] Skipping long experiments (ablation, baselines, stress tests)."
+    echo "[REPRO_QUICK=1] Skipping long experiments."
 else
     echo ""
     echo "[Step 4] Running baselines ..."
@@ -109,8 +102,24 @@ else
     "$PYTHON" experiments/run_stress_tests.py
 
     echo ""
-    echo "[Step 11] Generating plots and report ..."
-    "$PYTHON" experiments/generate_plots_and_report.py
+    echo "[Step 11] Running multiclass benchmark ..."
+    "$PYTHON" scripts/run_multiclass_benchmark.py
+
+    if [ -f data/UNSW_NB15_training-set.csv ] && [ -f data/UNSW_NB15_testing-set.csv ]; then
+        echo ""
+        echo "[Step 12] Running Phase 4 CSV setup-header proxy ..."
+        "$PYTHON" scripts/run_phase4_earlypacket_benchmark.py
+    else
+        echo "[Step 12] Skipping Phase 4: official UNSW training/testing CSVs are absent."
+    fi
+
+    if [ "${REGENERATE_REPORT:-0}" = "1" ]; then
+        echo ""
+        echo "[Optional] Regenerating PROJECT_FINAL_REPORT.md from current artifacts ..."
+        "$PYTHON" experiments/generate_plots_and_report.py
+    else
+        echo "[Optional] Historical report left untouched (set REGENERATE_REPORT=1 to replace it)."
+    fi
 fi
 
 # ---------------------------------------------------------------------------
@@ -118,7 +127,7 @@ fi
 # ---------------------------------------------------------------------------
 if command -v pdflatex &>/dev/null; then
     echo ""
-    echo "[Step 12] Compiling IEEE manuscript (paper_draft.tex) ..."
+    echo "[Final] Compiling IEEE manuscript (paper_draft.tex) ..."
     pdflatex -interaction=nonstopmode paper_draft.tex > /dev/null
     pdflatex -interaction=nonstopmode paper_draft.tex 2>&1 | grep -E "Output written|Warning|Error"
 

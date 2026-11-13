@@ -1,34 +1,46 @@
+"""Validate the actual Phase 4 scaled-inference artifact schema.
+
+This is intentionally a validator, not an experiment runner: it refuses absent
+labels/predictions instead of printing a misleading success message.
+"""
+
+from __future__ import annotations
+
 import json
-import pandas as pd
+from pathlib import Path
+
 import numpy as np
-import sys
-import glob
+import pandas as pd
 
-print("Checking JSON metrics")
-try:
-    with open("results/scaled_inference_summary.json", "r") as f:
-        metrics = json.load(f)
-        print("JSON metrics keys:", metrics.keys())
-        print("Model names:", metrics.get("models", {}).keys())
-except Exception as e:
-    print(e)
 
-print("Checking CSV predictions")
-try:
-    df = pd.read_csv("results/scaled_predictions.csv")
-    print("CSV Shape:", df.shape)
-    for col in df.columns:
-        if col.endswith('_pred'):
-            y_pred = df[col]
-            y_true = df['label']
-            acc = np.mean(y_pred == y_true)
-            tp = np.sum((y_pred == 1) & (y_true == 1))
-            tn = np.sum((y_pred == 0) & (y_true == 0))
-            fp = np.sum((y_pred == 1) & (y_true == 0))
-            fn = np.sum((y_pred == 0) & (y_true == 1))
-            fpr = fp / (fp + tn) if (fp+tn) > 0 else 0
-            tpr = tp / (tp + fn) if (tp+fn) > 0 else 0
-            print(f"{col}: Acc: {acc:.4f}, FPR: {fpr:.4f}, TPR: {tpr:.4f}")
-except Exception as e:
-    print(e)
+ROOT = Path(__file__).resolve().parent
+SUMMARY = ROOT / "results" / "scaled_inference_summary.json"
+PREDICTIONS = ROOT / "results" / "scaled_predictions.csv"
 
+
+def main() -> None:
+    if not SUMMARY.is_file() or not PREDICTIONS.is_file():
+        raise FileNotFoundError("Run scripts/run_scaled_inference.py before validating its artifacts.")
+    summary = json.loads(SUMMARY.read_text(encoding="utf-8"))
+    frame = pd.read_csv(PREDICTIONS)
+    label_column = "true_label" if "true_label" in frame else "label"
+    if label_column not in frame:
+        raise ValueError("scaled_predictions.csv has no ground-truth 'true_label' or 'label' column.")
+    prediction_columns = [column for column in frame if column.startswith("pred_") or column.endswith("_pred")]
+    if not prediction_columns:
+        raise ValueError("scaled_predictions.csv has no '*_pred' columns.")
+    if not set(np.unique(frame[label_column])).issubset({0, 1}):
+        raise ValueError("Labels must be binary 0/1 for this validator.")
+    print(f"Summary model entries: {sorted(summary.get('models', {}))}")
+    for column in prediction_columns:
+        prediction = frame[column]
+        if not set(np.unique(prediction)).issubset({0, 1}):
+            raise ValueError(f"{column} is not binary.")
+        accuracy = float((prediction == frame[label_column]).mean())
+        negatives = frame[label_column] == 0
+        fpr = float(((prediction == 1) & negatives).sum() / negatives.sum()) if negatives.any() else 0.0
+        print(f"{column}: accuracy={accuracy:.4f}, fpr={fpr:.4f}")
+
+
+if __name__ == "__main__":
+    main()

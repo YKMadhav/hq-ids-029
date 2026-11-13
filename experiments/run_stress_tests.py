@@ -23,6 +23,7 @@ import pandas as pd
 import torch
 import torch.nn as nn
 from scipy.stats import ttest_rel
+from sklearn.metrics import roc_auc_score
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
@@ -54,7 +55,7 @@ FIGURE_SWEEP_PATH = os.path.join(RESULTS_DIR, "figures", "bottleneck_capacity_sw
 
 def test_1_label_shuffling(config: Dict[str, Any], raw_df: pd.DataFrame) -> Dict[str, Any]:
     print("\n" + "=" * 70)
-    print("TEST 1: Label Shuffling / Permutation Control (Zero-Information Check)")
+    print("TEST 1: Leakage Screening + Label-Shuffling Negative Control")
     print("=" * 70)
 
     seed = 42
@@ -99,8 +100,30 @@ def test_1_label_shuffling(config: Dict[str, Any], raw_df: pd.DataFrame) -> Dict
     print(f"  [Macro F1]            : {metrics['f1_macro']:.4f}")
     print(f"  [ROC-AUC]             : {metrics['roc_auc']:.4f}")
 
-    # Integrity verification: ROC-AUC must be approx 0.50 (random guessing), and balanced accuracy ~0.50
-    passed = abs(bal_acc - 0.50) <= 0.05 and abs(metrics["roc_auc"] - 0.50) <= 0.05
+    # Label shuffling alone cannot detect a feature that directly copies y: its
+    # association is destroyed in the training labels. Screen every *original*
+    # feature against the held-out label first. This is a diagnostic, not proof
+    # that a high-AUC feature is invalid (for example, TTL can be a testbed cue).
+    feature_auc = []
+    for index, name in enumerate(preprocessor.feature_names_):
+        auc = roc_auc_score(y_test, X_test[:, index])
+        feature_auc.append({"feature": name, "single_feature_auc": float(max(auc, 1.0 - auc))})
+    feature_auc.sort(key=lambda item: item["single_feature_auc"], reverse=True)
+    suspicious = [item for item in feature_auc if item["single_feature_auc"] >= 0.98]
+    print("  [Top single-feature AUC] : " + ", ".join(
+        f"{item['feature']}={item['single_feature_auc']:.3f}" for item in feature_auc[:5]
+    ))
+    sentinel_auc = float(max(roc_auc_score(y_test, y_test), roc_auc_score(y_test, -y_test)))
+    if sentinel_auc != 1.0:
+        raise AssertionError("Single-feature leakage screen failed its direct-label sentinel.")
+
+    # Shuffled training must be chance-like AND no near-perfect feature may be
+    # silently described as a clean result.
+    passed = (
+        abs(bal_acc - 0.50) <= 0.05
+        and abs(metrics["roc_auc"] - 0.50) <= 0.05
+        and not suspicious
+    )
 
     result = {
         "seed": seed,
@@ -109,8 +132,15 @@ def test_1_label_shuffling(config: Dict[str, Any], raw_df: pd.DataFrame) -> Dict
         "balanced_accuracy": bal_acc,
         "macro_f1": metrics["f1_macro"],
         "roc_auc": metrics["roc_auc"],
+        "single_feature_auc": feature_auc,
+        "near_perfect_feature_flags": suspicious,
+        "screen_sentinel_auc": sentinel_auc,
         "status": "PASSED" if passed else "FAILED",
-        "verdict": "Zero-information baseline verified: model learns no predictive shortcuts when labels are scrambled."
+        "verdict": (
+            "Negative control is chance-like and no near-perfect feature was found. "
+            "This is evidence against direct target copies, not proof of zero leakage."
+            if passed else "Leakage diagnostic requires investigation; do not claim zero target leakage."
+        ),
     }
     return result
 
@@ -131,7 +161,8 @@ def test_2_thirty_seed_hypothesis(config: Dict[str, Any], raw_df: pd.DataFrame) 
         ("Control_B_Quantum_Frozen", "frozen"),
     ]
 
-    if os.path.exists(CSV_30SEEDS_PATH):
+    # Reusing an old file hides code/data changes. Caching is explicitly opt-in.
+    if os.environ.get("ALLOW_CACHED_STRESS_RESULTS") == "1" and os.path.exists(CSV_30SEEDS_PATH):
         df_30 = pd.read_csv(CSV_30SEEDS_PATH)
         if len(df_30) == len(seeds) * len(variants):
             print(f"  Loaded existing 30-seed results ({len(df_30)} runs) from {CSV_30SEEDS_PATH}")
@@ -544,7 +575,7 @@ def main():
                 "p_value_vs_frozen": t2_results["paired_ttest_full_vs_frozen"]["p_value"],
                 "cohens_d_vs_frozen": t2_results["paired_ttest_full_vs_frozen"]["cohens_d"],
             },
-            "scientific_publishability_verdict": "STRONG EMPIRICAL VALIDITY",
+            "scientific_publishability_verdict": "NOT_ASSIGNED_BY_CODE; requires independent review and dataset-provenance checks",
         }
     }
 

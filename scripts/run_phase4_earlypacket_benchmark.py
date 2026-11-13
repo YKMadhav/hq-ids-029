@@ -86,7 +86,7 @@ def run_phase4_benchmark() -> None:
             ("ClassicalMLP", BiflowMLPClassifier(k_packets=2), False, 6, 0.008, X_flat[:1]),
             ("CNN1D", BiflowCNN1DClassifier(k_packets=2), True, 6, 0.008, X_seq[:1]),
             ("LSTM", BiflowLSTMClassifier(k_packets=2), True, 6, 0.008, X_seq[:1]),
-            ("SequentialQNN", SequentialQNNClassifier(k_packets=2, n_layers=2), False, 4, 0.015, X_flat[:1]),
+            ("SequentialQNN", SequentialQNNClassifier(k_packets=2, n_layers=2), False, 6, 0.008, X_flat[:1]),
         )
         for name, model, use_sequence, epochs, lr, latency_input in models:
             metrics = train_eval_model(model, train_loader, test_loader, use_sequence, epochs, lr)
@@ -106,6 +106,7 @@ def run_phase4_benchmark() -> None:
             "testing_source": metadata["testing_source"],
             "testing_id_sha256": metadata["testing_id_sha256"],
             "qiskit_hardware_profile": qiskit_profile,
+            "training_recipe": "All models: full official training partition, 6 epochs, Adam lr=0.008, weight_decay=1e-4.",
         },
         "models": {},
     }

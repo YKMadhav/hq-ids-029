@@ -1,5 +1,11 @@
 # Project HQ-IDS-029: NISQ-Compatible Hybrid Quantum-Classical Network Intrusion Detection System
 
+> **Research status — do not cite the committed result files as validated or
+> publication-ready.** See [SCIENTIFIC_STATUS.md](SCIENTIFIC_STATUS.md): the
+> historical cross-dataset inputs lack provenance, Phase 4 has an operationally
+> high false-positive rate, and the current reports/manuscripts await a complete
+> corrected rerun.
+
 ## 1. Overview
 Project **HQ-IDS-029** (`hq-ids-029`) investigates and implements a resource-constrained, NISQ-compatible Hybrid Quantum-Classical Network Intrusion Detection System. Operating within a strict hardware budget of $\le 4$ to $6$ qubits, the architecture integrates:
 - High-throughput classical network flow preprocessing and skew reduction.
@@ -11,7 +17,7 @@ Project **HQ-IDS-029** (`hq-ids-029`) investigates and implements a resource-con
 ## 2. Theoretical & Literature Backbone
 This codebase operationalizes key insights from foundational literature in QML network security:
 1. **Abreu et al. (QuantumNetSec / QML-IDS)**: Benchmarking VQC, QSVM, and QCNN against flow datasets (UNSW-NB15, CICIDS2017, CICIoT23).
-2. **Resource-Constrained Encoders**: Compressed feature representations ($\le 4$ qubits) via classical MLP encoders + VQC with M3 readout mitigation on noisy NISQ hardware.
+2. **Resource-Constrained Encoders**: Compressed feature representations ($\le 4$ qubits) via classical MLP encoders + VQC with simulated assignment-matrix readout correction.
 3. **Critical Baseline Auditing**: Rigorous benchmarking demonstrating that classical tree ensembles (Random Forest, XGBoost) remain formidable baselines, mandating strict ablation controls to prevent attribution of classical post-processing power to "quantum advantage."
 4. **Fourier Expansion in QML (Schuld et al.)**: Proving that single-qubit rotation encoding in variational circuits computes truncated Fourier series, motivating parameter-matched classical Fourier surrogates.
 5. **Spadari et al. (University of Napoli Federico II / Verona)**: Quantum and classical traffic classification studies at the mobile-network edge. This repository's separate Phase 4 experiment is only a $k=2$ connection-setup header proxy using proto, sttl, dttl, swin, and dwin; it is not a raw-PCAP or literal packet-prefix study.

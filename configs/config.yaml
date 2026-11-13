@@ -48,10 +48,9 @@ quantum_circuit:
   num_qubits: 4 # Strict NISQ budget: N <= 4
   ansatz: "RealAmplitudes" # Ry rotation layers + linear CNOT rings
   reps: 2 # Variational layer repetitions
-  # PennyLaneVQCModule also supports "ZZFeatureMap". AngleEmbedding is used because it
-  # is measurably more trainable: its data encoding is a direct Ry(z) map, whereas
-  # ZZFeatureMap's 2*(pi - z_i)*(pi - z_j) phase saturates the oscillatory
-  # 4-dimensional latent bottleneck (72% vs 94% test accuracy, see EXECUTION_LOG.md).
+  # AngleEmbedding was selected in an earlier exploratory comparison on this
+  # corpus. It is a fixed protocol choice here, not a test-selected winner or a
+  # claim of superiority over ZZFeatureMap.
   # QiskitVQCBuilder transcribes the SAME circuit (verified to <2e-7 in <Z_i>), so the
   # shot-based Aer NISQ replay in Step 3 still matches the trained model exactly.
   feature_map: "AngleEmbedding"

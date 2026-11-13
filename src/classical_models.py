@@ -52,7 +52,8 @@ _ensure_openmp_loaded()
 
 from sklearn.ensemble import RandomForestClassifier
 
-# Resilient XGBoost import with HistGradientBoosting fallback if native dylib fails
+# XGBoost is optional.  A fallback is explicitly labelled in every caller; it
+# must never be presented as an XGBoost result.
 try:
     from xgboost import XGBClassifier
     _XGBOOST_AVAILABLE = True
@@ -153,6 +154,8 @@ class XGBoostBaseline:
             )
             self.is_native_xgb = True
         else:
+            # HistGradientBoosting has no XGBoost ``objective`` argument.
+            kwargs.pop("objective", None)
             self.model = HistGradientBoostingClassifier(
                 max_iter=n_estimators,
                 max_depth=max_depth,
@@ -161,6 +164,10 @@ class XGBoostBaseline:
                 **kwargs
             )
             self.is_native_xgb = False
+
+    @property
+    def backend_name(self) -> str:
+        return "xgboost" if self.is_native_xgb else "sklearn_hist_gradient_boosting"
 
     def fit(
         self,
@@ -311,7 +318,9 @@ class ClassicalMLPBaseline:
         X_t = torch.tensor(X_train, dtype=torch.float32)
         y_t = torch.tensor(y_train, dtype=torch.long)
         dataset = TensorDataset(X_t, y_t)
-        loader = DataLoader(dataset, batch_size=self.batch_size, shuffle=True)
+        # BatchNorm cannot estimate variance from a singleton final batch.
+        drop_last = len(dataset) % self.batch_size == 1
+        loader = DataLoader(dataset, batch_size=self.batch_size, shuffle=True, drop_last=drop_last)
 
         if X_val is not None and y_val is not None:
             X_v = torch.tensor(X_val, dtype=torch.float32).to(self.device)

@@ -1,9 +1,9 @@
 """Classical Random Fourier Feature (RFF) Surrogate Control Benchmark.
 
-Tests the hypothesis:
-'Does a 4-qubit parameterized variational quantum circuit provide any discriminative
-or domain-generalization capability beyond a classical Fourier feature surrogate
-with matched input dimensions and frequency spectrum?'
+Provides exploratory classical Fourier controls. These controls share input and
+output dimensions, but they are not spectrum- or parameter-matched to the VQC:
+the VQC uses StronglyEntanglingLayers (24 trainable parameters), frozen RFF has
+no trainable Fourier parameters, and the trainable Fourier layer has 20.
 
 Evaluates across 5 seeds:
 1. Classical MLP (Direct Linear Bottleneck)
@@ -16,6 +16,7 @@ Measures In-Domain (UNSW-NB15) and Cross-Domain (CIC-IDS2017) transfer stability
 """
 
 import json
+import hashlib
 import os
 import sys
 import time
@@ -51,6 +52,7 @@ LR = 0.01
 REPO_ROOT = Path(__file__).resolve().parents[1]
 UNSW_PATH = REPO_ROOT / "data" / "unsw_aligned_5k.csv"
 CIC_PATH = REPO_ROOT / "data" / "cic_aligned_5k.csv"
+ALIGNED_MANIFEST_PATH = REPO_ROOT / "data" / "aligned_data_manifest.json"
 RESULTS_DIR = REPO_ROOT / "results"
 FIGURES_DIR = RESULTS_DIR / "figures"
 FIGURES_DIR.mkdir(parents=True, exist_ok=True)
@@ -84,10 +86,10 @@ class ClassicalBottleneckEncoder(nn.Module):
         return self.net(x) * np.pi  # scaled to [-pi, pi]
 
 class RandomFourierFeatureLayer(nn.Module):
-    """Classical RFF Surrogate (Rahimi & Recht 2007, Gil-Fuster et al. 2024).
+    """Classical Gaussian RFF control (not an exact angle-encoding surrogate).
 
     Maps z in [-pi, pi]^d to d Fourier features cos(W z + b), bounded in [-1, 1],
-    matching the exact output range of Pauli-Z expectation values.
+    matching only the output range of Pauli-Z expectation values.
     """
     def __init__(self, in_features=LATENT_DIM, out_features=LATENT_DIM, sigma=1.0):
         super().__init__()
@@ -214,6 +216,24 @@ def main():
     print("Comparing 4-Qubit Hybrid VQC against Classical Fourier Surrogates")
     print(f"Features: {INPUT_DIM} | Latent Dim: {LATENT_DIM} | Seeds: {SEEDS}")
     print("=" * 75)
+
+    # Field names alone do not establish cross-dataset semantic equivalence.
+    # Require an explicit, versioned provenance record before this experiment can
+    # make a transfer claim. The historical aligned CSVs intentionally have no
+    # such record and therefore cannot silently be rerun as research evidence.
+    if not ALIGNED_MANIFEST_PATH.is_file():
+        raise FileNotFoundError(
+            "Missing data/aligned_data_manifest.json. Provide source versions, field "
+            "semantics, preprocessing, and SHA-256 hashes before running this benchmark."
+        )
+    manifest = json.loads(ALIGNED_MANIFEST_PATH.read_text(encoding="utf-8"))
+    for dataset_path, key in ((UNSW_PATH, "unsw_aligned_5k.csv"), (CIC_PATH, "cic_aligned_5k.csv")):
+        expected = manifest.get("sha256", {}).get(key)
+        actual = hashlib.sha256(dataset_path.read_bytes()).hexdigest()
+        if expected != actual:
+            raise ValueError(f"Aligned-data hash mismatch for {key}; refusing stale or undocumented data.")
+    if not manifest.get("field_semantics_verified", False):
+        raise ValueError("Aligned-data manifest must explicitly verify source-field semantic equivalence.")
 
     unsw_df = pd.read_csv(UNSW_PATH)
     cic_df = pd.read_csv(CIC_PATH)

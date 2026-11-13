@@ -77,12 +77,11 @@ def train_and_save_checkpoints() -> None:
         torch.save(model.state_dict(), path)
         print(f"Saved {path}")
 
-    # Retain the project's bounded QNN training subset, selected deterministically.
-    qnn_subset = torch.utils.data.Subset(train_loader.dataset, range(min(1200, len(train_loader.dataset))))
-    qnn_loader = torch.utils.data.DataLoader(qnn_subset, batch_size=64, shuffle=True)
     qnn = SequentialQNNClassifier(k_packets=2, n_layers=2)
     print("Training SequentialQNN on the k=2 setup-header proxy...")
-    _train(qnn, qnn_loader, False, 4, 0.015)
+    # Match the public benchmark's full-training-partition recipe; using a
+    # private 1,200-row subset made checkpoint and table provenance ambiguous.
+    _train(qnn, train_loader, False, 6, 0.008)
     qnn_path = CHECKPOINT_DIR / CHECKPOINT_NAMES["SequentialQNN"]
     torch.save(qnn.state_dict(), qnn_path)
     print(f"Saved {qnn_path}")
@@ -94,6 +93,7 @@ def train_and_save_checkpoints() -> None:
         "scaler_bundle": str(SCALER_BUNDLE),
         "checkpoints": CHECKPOINT_NAMES,
         "scaler_metadata": metadata,
+        "training_recipe": {"epochs": 6, "learning_rate": 0.008, "weight_decay": 0.0001},
     }
     MANIFEST_PATH.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
     print(f"Saved checkpoint provenance manifest to {MANIFEST_PATH}")

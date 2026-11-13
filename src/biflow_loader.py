@@ -143,7 +143,10 @@ def _protocol_code(values: pd.Series) -> np.ndarray:
         "eigrp": 88.0,
         "ospf": 89.0,
         "sctp": 132.0,
-        "arp": 0.0,
+        # ARP is an Ethernet EtherType, not IP protocol 0 (HOPOPT).  Keep it
+        # distinct from the IANA IP protocol registry rather than creating an
+        # ordinal collision with hopopt.
+        "arp": -2.0,
         "any": 255.0,
     }
     mapped = values.astype(str).str.strip().str.lower().map(protocol_map).fillna(-1.0)

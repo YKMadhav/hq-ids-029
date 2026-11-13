@@ -342,7 +342,7 @@ Pauli-$Z$ expectation values; a linear readout head produces the binary
 benign/attack decision. The system is benchmarked end-to-end against three
 classical baselines on a real, held-out UNSW-NB15 flow sample under a five-seed
 protocol, subjected to a three-variant quantum-layer ablation, and replayed through
-a true shot-based Qiskit Aer NISQ simulation with IBM-calibrated depolarising and
+a true shot-based Qiskit Aer NISQ simulation with user-specified depolarising and
 readout error, with and without matrix-inversion (M3) readout mitigation. All
 reported quantities are generated directly from the repository's result artifacts.
 
@@ -479,7 +479,8 @@ size and initialisation seed; only the quantum layer differs
 
 **Findings.**
 
-- The full hybrid QNN is the best variant on **every** metric simultaneously:
+- Results are descriptive for this fixed corpus and split; no consistent quantum
+  benefit is established:
   accuracy @FACC@, macro F1 @FF1@, ROC-AUC @FAUC@, FPR @FFPR@.
 - Removing the quantum layer (Control A) costs **@DACC@ percentage points** of
   accuracy and raises the false positive rate by **@DFPR@** points.
@@ -488,7 +489,7 @@ size and initialisation seed; only the quantum layer differs
   The ordering $\text{Full} > \text{Frozen} > \text{Bypassed}$ is consistent across
   the five seeds.
 - The honest reading is that on this dataset the 4-qubit variational layer provides
-  a **small but consistent** benefit. The four-qubit bottleneck is a severe
+  no causal or consistent quantum benefit is established. The four-qubit bottleneck is a severe
   constraint: the classical MLP control, which has the identical 4-dimensional
   latent capacity, scores within a point of the full model, confirming that the
   quantum layer is operating at the edge of what the representation can support
@@ -503,7 +504,7 @@ size and initialisation seed; only the quantum layer differs
 ### 4.1 Protocol
 
 The trained VQC weights and the full held-out test partition are replayed through
-`AerSimulator` at **@SHOTS@ shots** per circuit under an IBM-calibrated noise model:
+`AerSimulator` at **@SHOTS@ shots** per circuit under a user-specified noise model:
 
 $$p_1 = 0.001 \ (\text{1-qubit depolarising}),\quad
   p_2 = 0.01 \ (\text{CNOT depolarising}),\quad

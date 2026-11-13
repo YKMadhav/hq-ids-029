@@ -7,7 +7,8 @@ Implements:
      - single-qubit depolarizing error, p = 0.001 on 1q gates
      - two-qubit CNOT depolarizing error, p = 0.01
      - symmetric readout bit-flip error, p_readout = 0.03 on all qubits
-2. M3ReadoutMitigator: Matrix-inversion readout error mitigation. Builds the
+2. MatrixInversionReadoutMitigator: tensor-product assignment-matrix readout
+   mitigation.  This is *not* IBM's M3 package or a hardware calibration run.
    2^N x 2^N assignment matrix M (readout = tensor product of per-qubit
    channels, so f_measured = M f_true), inverts it exactly, and inverts raw shot
    counts to recover unbiased Pauli-Z expectation values.
@@ -46,9 +47,9 @@ class NISQNoiseModelBuilder:
         return noise_model
 
 
-class M3ReadoutMitigator:
+class MatrixInversionReadoutMitigator:
     """
-    Matrix Inversion Readout Error Mitigation (M3) for N-qubit quantum measurements.
+    Tensor-product matrix-inversion readout mitigation for N-qubit measurements.
 
     With an independent symmetric bit-flip channel on every qubit, the measured
     distribution is related to the ideal one by
@@ -56,7 +57,9 @@ class M3ReadoutMitigator:
         f_measured = M f_true,      M = kron_{i=1..N} A1,
         A1 = [[1 - p, p], [p, 1 - p]].
 
-    M is a 2^N x 2^N tensor-product assignment matrix. M3 inverts it exactly:
+    M is a 2^N x 2^N tensor-product assignment matrix.  This implementation
+    inverts that *assumed simulated* matrix exactly; it must not be described as
+    M3 or as hardware-calibrated mitigation.
 
         f_true = M^{-1} f_measured,
 
@@ -119,20 +122,28 @@ class M3ReadoutMitigator:
 
     def mitigate_counts(self, counts):
         """
-        True M3: invert the 2^N x 2^N assignment matrix on the measured distribution
+        Invert the 2^N x 2^N assignment matrix on the measured distribution
         and return the corrected Pauli-Z expectation values.
 
         The inverted distribution is projected back onto the probability simplex
-        (clipped at zero, renormalised) because M^{-1} f can leave the simplex
-        when the channel is ill-conditioned.
+        with the Euclidean projection (not clipping-and-renormalising), because
+        M^{-1} f can leave the simplex when the channel is ill-conditioned.
         """
         measured = self.counts_to_distribution(counts)
-        mitigated = self.M_inv @ measured
-        mitigated = np.clip(mitigated, 0.0, None)
-        total = mitigated.sum()
-        if total > 0:
-            mitigated = mitigated / total
+        mitigated = self._project_to_simplex(self.M_inv @ measured)
         return self.expectations_from_distribution(mitigated)
+
+    @staticmethod
+    def _project_to_simplex(values):
+        """Euclidean projection onto {p: p >= 0, sum(p) = 1} (Duchi et al.)."""
+        values = np.asarray(values, dtype=np.float64)
+        ordered = np.sort(values)[::-1]
+        cssv = np.cumsum(ordered) - 1.0
+        rho = np.nonzero(ordered - cssv / np.arange(1, len(values) + 1) > 0)[0]
+        if len(rho) == 0:  # Defensive; a finite vector always has a solution.
+            return np.full_like(values, 1.0 / len(values))
+        theta = cssv[rho[-1]] / float(rho[-1] + 1)
+        return np.maximum(values - theta, 0.0)
 
     def raw_expectations(self, counts):
         """Unmitigated Pauli-Z expectation values <Z_i> = (N_0 - N_1) / shots."""
@@ -146,21 +157,26 @@ class M3ReadoutMitigator:
         E_meas[Z_i] = (1 - 2 p) E_true[Z_i] exactly, so rescaling by 1/(1 - 2p)
         is the closed-form limit of the matrix inversion restricted to one qubit.
         Provided for callers that only have expectation values, not counts;
-        `mitigate_counts` is the full M3 path used in the NISQ experiments.
+        `mitigate_counts` is the full distribution-level path used in the NISQ
+        experiments.
         """
         raw = np.asarray(raw_expectations, dtype=np.float64)
         corrected = raw / (1.0 - 2.0 * self.p_readout)
         return np.clip(corrected, -1.0, 1.0)
 
 
+M3ReadoutMitigator = MatrixInversionReadoutMitigator
+"""Deprecated compatibility alias; retained to avoid silently breaking old scripts."""
+
+
 if __name__ == "__main__":
-    print("Testing NISQNoiseModelBuilder & M3ReadoutMitigator...")
+    print("Testing NISQNoiseModelBuilder & MatrixInversionReadoutMitigator...")
 
     builder = NISQNoiseModelBuilder()
     noise_model = builder.build_ibm_noise_model()
     print("Noise Model created successfully!")
 
-    mitigator = M3ReadoutMitigator(num_qubits=4, p_readout=0.03)
+    mitigator = MatrixInversionReadoutMitigator(num_qubits=4, p_readout=0.03)
     print(f"Assignment matrix shape: {mitigator.M.shape}, condition number: {mitigator.condition_number:.4f}")
 
     # Synthetic check: an ideal distribution pushed through a known readout channel

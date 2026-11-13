@@ -107,6 +107,16 @@ PALETTE = {
 }
 
 
+def map_attack_categories(values: pd.Series) -> np.ndarray:
+    """Map labels losslessly; unknown attack families must stop the benchmark."""
+    cleaned = values.astype(str).str.strip()
+    mapped = cleaned.map(ATTACK_CAT_MAPPING)
+    if mapped.isna().any():
+        unknown = sorted(cleaned[mapped.isna()].unique())
+        raise ValueError(f"Unknown attack categories; refusing to map them to Normal: {unknown}")
+    return mapped.to_numpy(dtype=np.int64)
+
+
 def stratified_multiclass_split(
     frame: pd.DataFrame,
     seed: int,
@@ -115,13 +125,13 @@ def stratified_multiclass_split(
 ) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """Stratified 70/10/20 train/val/test split preserving attack_cat distribution."""
     # Ensure targets are defined
-    y = frame["attack_cat"].map(lambda c: ATTACK_CAT_MAPPING.get(str(c).strip(), 0))
+    y = map_attack_categories(frame["attack_cat"])
     
     # Stratified split with fallback if extremely small classes have fewer than 2 samples
     train_val_df, test_df = train_test_split(
         frame, test_size=test_size, random_state=seed, stratify=y
     )
-    y_tv = train_val_df["attack_cat"].map(lambda c: ATTACK_CAT_MAPPING.get(str(c).strip(), 0))
+    y_tv = map_attack_categories(train_val_df["attack_cat"])
     val_rel_size = val_size / (1.0 - test_size)
     train_df, val_df = train_test_split(
         train_val_df, test_size=val_rel_size, random_state=seed, stratify=y_tv

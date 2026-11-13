@@ -1,5 +1,10 @@
 # HQ-IDS-029 - Final Report
 
+> **Historical artifact, not a publication-ready report.** The current protocol
+> has been remediated after forensic review; see `SCIENTIFIC_STATUS.md`. Do not
+> cite the numerical or mitigation claims below until the complete corrected
+> pipeline has been rerun.
+
 ### A Resource-Constrained Hybrid Quantum-Classical Intrusion Detection System on Real UNSW-NB15 Traffic
 
 **Generated:** 2026-09-30  |  **Dataset:** UNSW-NB15, 5,000 flows, 39 predictive
@@ -17,7 +22,7 @@ Pauli-$Z$ expectation values; a linear readout head produces the binary
 benign/attack decision. The system is benchmarked end-to-end against three
 classical baselines on a real, held-out UNSW-NB15 flow sample under a five-seed
 protocol, subjected to a three-variant quantum-layer ablation, and replayed through
-a true shot-based Qiskit Aer NISQ simulation with IBM-calibrated depolarising and
+a true shot-based Qiskit Aer NISQ simulation with user-specified depolarising and
 readout error, with and without matrix-inversion (M3) readout mitigation. All
 reported quantities are generated directly from the repository's result artifacts.
 
@@ -173,7 +178,7 @@ size and initialisation seed; only the quantum layer differs
 ### 4.1 Protocol
 
 The trained VQC weights and the full held-out test partition are replayed through
-`AerSimulator` at **1,024 shots** per circuit under an IBM-calibrated noise model:
+`AerSimulator` at **1,024 shots** per circuit under a user-specified noise model:
 
 $$p_1 = 0.001 \ (\text{1-qubit depolarising}),\quad
   p_2 = 0.01 \ (\text{CNOT depolarising}),\quad

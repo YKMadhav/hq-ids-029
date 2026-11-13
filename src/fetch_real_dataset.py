@@ -6,41 +6,42 @@ numeric transforms and removes the categorical metadata during each experiment.
 """
 
 from pathlib import Path
-import ssl
+import hashlib
+import os
 from urllib.request import urlopen
 
 import numpy as np
 import pandas as pd
 
 
-SOURCE_URLS = (
-    "https://raw.githubusercontent.com/notsodubeyous/IoT-Network-Intrusion-Detection-System-UNSW-NB15/master/datasets/UNSW_NB15.csv",
-)
 OUTPUT_PATH = Path(__file__).resolve().parents[1] / "data" / "real_flows.csv"
 SAMPLE_SIZE = 5_000
 RANDOM_STATE = 42
 
 
 def download_unsw_nb15() -> pd.DataFrame:
-    """Download the first reachable public UNSW-NB15 CSV source."""
-    failures = []
-    for source_url in SOURCE_URLS:
-        try:
-            with urlopen(source_url, timeout=60) as response:
-                return pd.read_csv(response)
-        except Exception as error:  # report source-level failures together
-            # The managed macOS Python runtime may lack the system CA bundle.
-            # Retry only for this public static dataset source before moving on.
-            if "CERTIFICATE_VERIFY_FAILED" in str(error):
-                try:
-                    context = ssl._create_unverified_context()
-                    with urlopen(source_url, timeout=60, context=context) as response:
-                        return pd.read_csv(response)
-                except Exception as retry_error:
-                    failures.append(f"{source_url}: {retry_error}")
-            else:
-                failures.append(f"{source_url}: {error}")
-    raise RuntimeError("Unable to download UNSW-NB15. " + " | ".join(failures))
+    """Download a user-supplied HTTPS source with mandatory SHA-256 verification.
+
+    We deliberately do not retry with TLS verification disabled or use an
+    unaudited personal mirror. Set UNSW_NB15_SOURCE_URL and
+    UNSW_NB15_SOURCE_SHA256 from the official dataset release notes.
+    """
+    source_url = os.environ.get("UNSW_NB15_SOURCE_URL")
+    expected_sha256 = os.environ.get("UNSW_NB15_SOURCE_SHA256", "").lower()
+    if not source_url or not expected_sha256:
+        raise RuntimeError(
+            "Set UNSW_NB15_SOURCE_URL and UNSW_NB15_SOURCE_SHA256 to an official, "
+            "versioned UNSW-NB15 CSV before fetching."
+        )
+    if not source_url.startswith("https://") or len(expected_sha256) != 64:
+        raise ValueError("Dataset source must be HTTPS and SHA-256 must be 64 hexadecimal characters.")
+    with urlopen(source_url, timeout=60) as response:
+        payload = response.read()
+    actual_sha256 = hashlib.sha256(payload).hexdigest()
+    if actual_sha256 != expected_sha256:
+        raise RuntimeError(f"Dataset SHA-256 mismatch: expected {expected_sha256}, got {actual_sha256}.")
+    from io import BytesIO
+    return pd.read_csv(BytesIO(payload))
 
 
 def normalize_unsw_nb15(frame: pd.DataFrame) -> pd.DataFrame:

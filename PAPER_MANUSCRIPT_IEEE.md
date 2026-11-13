@@ -1,5 +1,10 @@
 # A Rigorous Reality Check on Quantum-Enhanced Network Intrusion Detection: Empirical Benchmarking, Classical Surrogates, and Cross-Dataset Limits
 
+> **DRAFT WITHDRAWN PENDING CORRECTED RERUN.** This historical manuscript
+> contains unsupported cross-dataset, mitigation, and statistical claims. It is
+> retained for traceability only; see `SCIENTIFIC_STATUS.md` and do not submit or
+> cite it.
+
 **Author:** Khatwang Madhav Yippili  
 **Affiliation:** Department of Mathematical Sciences and Computing, Sri Sathya Sai Institute of Higher Learning, Prasanthi Nilayam, Andhra Pradesh, India  
 **Target:** IEEE Conference on Quantum Engineering / Cybersecurity (AQV Use Case UC-029)  
