@@ -1,0 +1,88 @@
+{
+  "metadata": {
+    "protocol": "tcp_setup_header_proxy_v1",
+    "seed_values": [
+      42,
+      43,
+      44,
+      45,
+      46
+    ],
+    "k_packets": 2,
+    "claim_boundary": "CSV setup-header proxy; not a chronological PCAP packet-prefix result.",
+    "training_source": "/home/claude/hq-ids-029/data/UNSW_NB15_training-set.csv",
+    "testing_source": "/home/claude/hq-ids-029/data/UNSW_NB15_testing-set.csv",
+    "testing_id_sha256": "02935e7c6be3e73dd142911436bc7e99314127b0a5b2da38f1f3a020f4bf3c98",
+    "qiskit_hardware_profile": {
+      "n_qubits": 5,
+      "n_layers": 2,
+      "circuit_depth": 25,
+      "cnot_count": 10,
+      "total_gates": 64,
+      "gate_breakdown": {
+        "rz": 32,
+        "sx": 22,
+        "cx": 10
+      }
+    },
+    "training_recipe": "All models: full official training partition, 6 epochs, Adam lr=0.008, weight_decay=1e-4."
+  },
+  "models": {
+    "CNN1D": {
+      "accuracy_mean": 0.7858548316571928,
+      "accuracy_std": 0.0,
+      "f1_macro_mean": 0.7626464893584401,
+      "recall_mean": 0.997595517515221,
+      "fpr_mean": 0.47356756756756757,
+      "latency_ms_seed42": 0.059936503333422785
+    },
+    "ClassicalMLP": {
+      "accuracy_mean": 0.7858475440897827,
+      "accuracy_std": 3.70401561530723e-05,
+      "f1_macro_mean": 0.7626404077527793,
+      "recall_mean": 0.9975778699373512,
+      "fpr_mean": 0.4735621621621622,
+      "latency_ms_seed42": 0.041032713334061555
+    },
+    "LSTM": {
+      "accuracy_mean": 0.7858305397658262,
+      "accuracy_std": 8.588480556604977e-06,
+      "f1_macro_mean": 0.7626155673761961,
+      "recall_mean": 0.997595517515221,
+      "fpr_mean": 0.47362162162162164,
+      "latency_ms_seed42": 0.09952360333348528
+    },
+    "LookupTable(exact-match)": {
+      "accuracy_mean": 0.7864402662391294,
+      "accuracy_std": 2.172732815915392e-05,
+      "f1_macro_mean": 0.7629553775014364,
+      "recall_mean": 1.0,
+      "fpr_mean": 0.4752108108108108,
+      "latency_ms_seed42": null
+    },
+    "MajorityClass(flag-all)": {
+      "accuracy_mean": 0.5506000097167566,
+      "accuracy_std": 0.0,
+      "f1_macro_mean": 0.3550883569369595,
+      "recall_mean": 1.0,
+      "fpr_mean": 1.0,
+      "latency_ms_seed42": null
+    },
+    "SequentialQNN": {
+      "accuracy_mean": 0.785789243550503,
+      "accuracy_std": 5.862856914028406e-05,
+      "f1_macro_mean": 0.7625629939345601,
+      "recall_mean": 0.997595517515221,
+      "fpr_mean": 0.47371351351351354,
+      "latency_ms_seed42": 10.114885809998668
+    },
+    "SingleSplitStump": {
+      "accuracy_mean": 0.7663241509983967,
+      "accuracy_std": 0.0,
+      "f1_macro_mean": 0.7371026945209335,
+      "recall_mean": 0.9986543721874173,
+      "fpr_mean": 0.5183243243243243,
+      "latency_ms_seed42": null
+    }
+  }
+}

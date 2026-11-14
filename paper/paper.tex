@@ -1,0 +1,102 @@
+% Manuscript for HQ-IDS-029. EVERY result number comes from paper/generated_numbers.tex or paper/tab_*.tex,
+% which scripts/generate_paper_numbers.py writes from results/. tests/test_paper_numbers.py rejects typed results.
+\IfFileExists{IEEEtran.cls}{\documentclass[conference]{IEEEtran}}{\documentclass[10pt,twocolumn]{article}\usepackage[margin=0.8in]{geometry}}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\input{generated_numbers}
+
+\title{Does a Variational Quantum Layer Help Network Intrusion Detection? A Leakage-Audited, Controlled Negative Result on UNSW-NB15}
+\author{[Author names to be added]}
+\date{}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Hybrid quantum--classical classifiers are frequently reported to match or beat classical baselines on network intrusion detection, usually on a single random split of a public dataset. We audit and re-evaluate a four-qubit hybrid model (a classical encoder, a variational circuit, a linear head; simulated, \paramsHqnn{} trainable parameters of which \paramsVqc{} are in the circuit) on UNSW-NB15. Before any model comparison we find that the common protocol is contaminated: \sampleDupRows{} of \sampleRows{} sampled flows are exact duplicates, so \sampleTwinPct\% of test flows have an identical twin in training, and \offTestTwinPct\% of the official test set has an exact twin in the official training set. With duplicates removed and the official train$\to$test partition as the primary protocol (\offTestFinal{} unseen test flows, five seeds), the trained hybrid reaches \accHqnn\,$\pm$\,\accSdHqnn\% accuracy against \accMlp\,$\pm$\,\accSdMlp\% for a classical MLP and \accXgb\% for XGBoost; its accuracy deficit against the MLP has a paired-bootstrap interval excluding zero in \bootExcludeZero{} of \bootSeeds{} seeds, while ranking quality (AUC) is indistinguishable (\aucHqnn{} vs.\ \aucMlp{}). Replacing the trained circuit by identity or by a frozen random circuit does not reduce accuracy. A single-split decision stump already reaches \accStump\%, every model produces \fprXgb--\fprStump\% false alarms at the default threshold, and a five-field header proxy is capped at the accuracy of an exact-match lookup table. We find no evidence that the variational layer contributes to detection, and we release code that regenerates every number in this paper.
+\end{abstract}
+
+\section{Introduction}
+Quantum machine learning (QML) for intrusion detection is attractive because flows are low-dimensional once compressed and circuits are small enough to simulate~\cite{schuld2020circuit,cerezo2021variational}. Published comparisons are fragile for reasons that are not specific to quantum computing: single splits, tuned quantum models against untuned baselines, no trivial baselines, and datasets with well-known artifacts~\cite{arp2022dos,engelen2021troubleshooting,bowles2024better}. This paper asks one narrow question under a protocol designed to remove those weaknesses: \emph{does a trained variational circuit improve a classical network that is otherwise identical?}
+
+Contributions: (i) a leakage audit of UNSW-NB15~\cite{moustafa2015unsw} showing duplicate-induced contamination in both a 5{,}000-flow sample and the official split; (ii) a controlled ablation (trained / bypassed / frozen circuit) with matched classical backbone and paired bootstrap; (iii) trivial and ceiling baselines (majority class, one-split stump, exact-match lookup) that bound what any model can show; (iv) a fully scripted pipeline in which every reported number is machine-generated and two independent end-to-end runs are bit-identical.
+
+\section{Data and Protocol}
+\textbf{Dataset.} UNSW-NB15 official training (\offTrainRows{} flows, \offTrainAttackPct\% attack) and testing (\offTestRows{} flows, \offTestAttackPct\% attack after filtering) partitions~\cite{moustafa2015unsw}. Identifiers, labels, \texttt{attack\_cat} and the categorical fields \texttt{proto}, \texttt{service}, \texttt{state} are removed before tensor creation, leaving 39 numeric features. A smaller 5{,}000-flow sample is used for secondary experiments.
+
+\textbf{Duplicate removal.} Exact feature-vector duplicates are collapsed (first occurrence kept) and any training flow whose vector also occurs in the test set is dropped; any test flow whose vector occurs in the training set is dropped. Disjointness is asserted in code. This removes \offTrainDupPct\% of training rows and \offTestTwinPct\% of test rows, leaving \offTrainPool{} training and \offTestFinal{} test flows; the training pool is \offPoolAttackPct\% attack versus \offTestAttackPct\% in test, so accuracy and false-positive rate are prevalence-dependent and we also report balanced accuracy, MCC and AUC.
+
+\textbf{Preprocessing.} Skewed features are log-transformed and scaled to $[-\pi,\pi]$ with statistics fitted on the training partition only; validation and test are transformed with those statistics. Columns that are constant in training are mapped to the range midpoint rather than the default unit-range scaling, which would otherwise saturate any deviation at test time.
+
+\textbf{Training budget.} Each seed (42--46) draws a stratified training subsample of 30{,}000 flows (90/10 train/validation) so that the simulated quantum model is trainable; classical models are also reported with the full pool. All models of a seed see the same data; test flows are identical across seeds, so across-seed variance measures training variability only.
+
+\textbf{Leakage controls.} (a) A label-shuffle control over \shuffleN{} shuffles gives balanced accuracy at most \shuffleBal\% and mean AUC \shuffleAuc{} ($\pm$\shuffleAucSe{} s.e.), consistent with chance; individual shuffles scatter between \shuffleAucLo{} and \shuffleAucHi{} AUC, so a single-run gate is not informative. (b) Because a shuffle cannot detect a feature that copies the label, we also screen every feature with a held-out single-feature AUC and a sentinel that injects a label copy (sentinel AUC \sentinelAuc{}, i.e.\ the screen flags a true leak); the largest legitimate single-feature AUCs are \topFeatOne{} (\topFeatOneAuc) and \texttt{\topFeatTwo} (\topFeatTwoAuc). These tests are evidence against direct target copies, not proof of zero leakage.
+
+\section{Models}
+\textbf{Hybrid QNN.} A classical encoder (39$\to$16 with batch normalisation and ReLU, $\to$4 with $\tanh$, scaled by $\pi$) feeds four rotation angles to a four-qubit circuit: $R_Y$ angle embedding followed by a RealAmplitudes ansatz (two repetitions, linear CNOT entanglement, \paramsVqc{} parameters). The four Pauli-$Z$ expectations feed a linear head to two logits. Training: Adam, learning rate 0.01, batch 64, 20 epochs, cross-entropy, checkpoint with lowest validation loss, decision at $p=0.5$. The circuit is simulated exactly; no hardware was used.
+
+\textbf{Controls.} \emph{Bypassed}: the circuit is replaced by the identity (backbone and head unchanged, \paramsMlp{} parameters, identical recipe). \emph{Frozen}: the circuit keeps its random initial parameters and is not trained. A \emph{classical MLP} baseline with the same layer sizes uses its own recipe (learning rate 0.005, up to 40 epochs, patience 8).
+
+\textbf{Reference detectors.} Majority class; a depth-one decision stump (best single feature and threshold on training data); random forest and XGBoost~\cite{chen2016xgboost} with fixed, untuned hyperparameters; for the five-field header experiment an exact-match lookup table.
+
+\textbf{Statistics.} Results are mean $\pm$ s.d.\ over five seeds. Within a seed, a paired bootstrap over test flows (1{,}000 resamples) gives an interval for the accuracy difference to the classical MLP. For the 5{,}000-flow sample we also report 30 random re-splits; those $p$-values describe split variance of one fixed sample, not generalisation to new traffic.
+
+\section{Results}
+\subsection{Primary protocol: official train$\to$test}
+Table~\ref{tab:primary} gives the main result. The majority-class detector scores \accMaj\%; a single threshold on a single feature scores \accStump\%. Gradient boosting is best (\accXgb\%), the classical MLP reaches \accMlp\%, and the hybrid QNN \accHqnn\%. The hybrid is on average \bootDiffHqnnMlp{} points relative to the MLP, with a bootstrap interval that excludes zero in \bootExcludeZero{} of \bootSeeds{} seeds. Its AUC (\aucHqnn) equals the MLP's (\aucMlp), so the deficit lies in the operating point rather than in ranking. With the full training pool, the MLP and XGBoost reach \accMlpFull\% and \accXgbFull\% (Table~\ref{tab:full}). Every learned model raises \fprXgb--\fprHqnn\% false alarms at the default threshold, which is far above what an operational IDS can tolerate; we did not study threshold re-calibration.
+
+\begin{table}[t]\centering\caption{Official train$\to$test, de-duplicated, 30{,}000 training flows per seed, five seeds.}\label{tab:primary}\small
+\input{tab_primary}\end{table}
+
+\begin{table}[t]\centering\caption{Same protocol, full de-duplicated training pool (classical models only).}\label{tab:full}\small
+\input{tab_primary_fulltrain}\end{table}
+
+\subsection{Does the circuit matter?}
+Table~\ref{tab:abl} compares the trained circuit with the identity bypass and a frozen random circuit on the same backbone. The bypassed variant (\accByp\,$\pm$\,\accSdByp\%) and the frozen variant (\accFrz\,$\pm$\,\accSdFrz\%) are not worse than the trained circuit (\accHqnn\%); the trained circuit has the lowest mean accuracy. With five seeds the differences among bypassed, frozen and MLP are within seed variability, so we claim only that there is no evidence of a benefit from training the circuit. On the 5{,}000-flow sample with 30 re-splits (Table~\ref{tab:s30}) the trained circuit is again slightly below both controls (paired $p=\pFullByp$ and $\pFullFrz$, Cohen's $d=\dFullByp$ and $\dFullFrz$, uncorrected, split variance only).
+
+\begin{table}[t]\centering\caption{Circuit ablation on the primary protocol.}\label{tab:abl}\small
+\input{tab_ablation_official}\end{table}
+\begin{table}[t]\centering\caption{Circuit ablation, 5{,}000-flow sample, 30 re-splits.}\label{tab:s30}\small
+\input{tab_sample30}\end{table}
+
+\subsection{What the models rely on}
+Permutation importance of the hybrid (5{,}000-flow sample) is dominated by \texttt{\permFeatOne} ($-\permDropOne$ points when permuted), \texttt{\permFeatTwo} ($-\permDropTwo$) and \texttt{\permFeatThree} ($-\permDropThree$), i.e.\ time-to-live and TCP-window fields that characterise the capture testbed rather than attack semantics. Together with the strong stump, this suggests much of the signal is available through a few testbed-specific fields; classical models can substitute other correlated features, so this is evidence of reliance, not of uniqueness.
+
+\subsection{Five-field header proxy}
+A proxy restricted to five fields (protocol, source/destination TTL and window) is evaluated with five seeds on the full official partition (Table~\ref{tab:p4}). \pFourSeenPct\% of test vectors occur verbatim in training, and an exact-match lookup table matches the neural models, including the sequential quantum model, to within a tenth of a point. The accuracy is therefore capped by these five fields, not by model capacity. Because the Argus window fields summarise a flow and are not verified here to be first-packet values, we do not claim early-packet detection.
+
+\begin{table}[t]\centering\caption{Five-field header proxy, official partition.}\label{tab:p4}\small\resizebox{\columnwidth}{!}{\input{tab_phase4}}\end{table}
+
+\subsection{Zero-day (unseen attack families) and noise}
+Anomaly detectors trained on benign flows only separate unseen families poorly (Table~\ref{tab:zd}). For readout noise on the simulated circuit ($p_{\text{readout}}=\noisePReadout$, \noiseShots{} shots, \noiseSamples{} flows), classification accuracy changes by at most \noiseAccDelta{} points, while the mean absolute expectation error versus the analytic value falls from \maeNoisyLo--\maeNoisyHi{} to \maeMitLo--\maeMitHi{} after inverting the simulator's own (known) readout assignment matrix and projecting onto the probability simplex, so no calibration error is modelled (\mitRecoveryPct\% of the total deviation; shot noise alone contributes \maeShot{}). The correction improves expectation fidelity but not detection.
+
+\begin{table}[t]\centering\caption{Zero-day detection (benign-only training).}\label{tab:zd}\small
+\input{tab_zeroday}\end{table}
+
+\subsection{Multiclass (exploratory)}
+On the 5{,}000-flow sample, tree ensembles lead all neural and quantum models in macro-F1 (Table~\ref{tab:mc}); rare classes (Worms, about five flows) are unestimable, so we regard this as exploratory.
+
+\begin{table}[t]\centering\caption{Multiclass, 5{,}000-flow sample, five seeds.}\label{tab:mc}\small
+\input{tab_multiclass}\end{table}
+
+\section{Threats to Validity}
+\textbf{Random, not temporal, partition.} The official partitions are a random split of the same captures; the files carry no timestamps or host identifiers, so no grouped or temporal split was possible. Absolute numbers will overstate performance on new networks. \textbf{Single dataset and simulator only.} No hardware execution and no second dataset are reported; an earlier cross-dataset experiment is withdrawn because the aligned files lack generating code and verified field semantics. \textbf{Hyperparameters.} Models use fixed recipes without per-model tuning; the angle-embedding feature map was chosen in an earlier exploratory comparison on this corpus whose selection data we cannot rule out overlapped the test data, which if anything favours the quantum model. The hybrid and MLP recipes differ; the bypassed control isolates the circuit under an identical recipe. \textbf{Parameter count.} The trained circuit adds \paramsVqc{} parameters to \paramsMlp{}. \textbf{Prevalence shift} between training and test affects accuracy and false-positive rate. \textbf{Float determinism.} Results are bit-reproducible only for a fixed thread count (1 vs.\ 2 threads change the sum of predicted probabilities by \threadSumPDiff{} but, in a three-epoch probe, not accuracy: \threadAccOne\% vs.\ \threadAccTwo\%); we pin one thread.
+
+\section{Conclusion}
+After removing duplicate-induced leakage and adding trivial baselines, a trained variational layer gives no measurable detection benefit over an otherwise identical classical network on UNSW-NB15, and is slightly worse at the default operating point. Reported accuracy in this setting is largely explained by a few testbed fields and is bounded by simple lookups. Claims of quantum advantage for intrusion detection should be tested against such baselines, with duplicates removed.
+
+\section*{Reproducibility}
+\texttt{reproduce.sh} (Python 3.11, pinned dependencies, one thread) regenerates all results; \texttt{scripts/generate\_paper\_numbers.py} writes every macro and table in this paper. Repeated runs of each experiment produced bit-identical result files (timing columns excluded) once one seeding bug in the zero-day script was fixed. Data are the public UNSW-NB15 files; \texttt{results/RUN\_MANIFEST.json} records versions and file hashes.
+
+\begin{thebibliography}{9}
+\bibitem{moustafa2015unsw} N.~Moustafa and J.~Slay, ``UNSW-NB15: a comprehensive data set for network intrusion detection systems,'' in \emph{Proc.\ MilCIS}, 2015.
+\bibitem{schuld2020circuit} M.~Schuld, A.~Bocharov, K.~M.~Svore, and N.~Wiebe, ``Circuit-centric quantum classifiers,'' \emph{Phys.\ Rev.\ A}, vol.~101, 032308, 2020.
+\bibitem{cerezo2021variational} M.~Cerezo \emph{et al.}, ``Variational quantum algorithms,'' \emph{Nat.\ Rev.\ Phys.}, vol.~3, pp.~625--644, 2021.
+\bibitem{arp2022dos} D.~Arp \emph{et al.}, ``Dos and don'ts of machine learning in computer security,'' in \emph{Proc.\ USENIX Security}, 2022.
+\bibitem{engelen2021troubleshooting} G.~Engelen, V.~Rimmer, and W.~Joosen, ``Troubleshooting an intrusion detection dataset: the CICIDS2017 case study,'' in \emph{IEEE Security and Privacy Workshops}, 2021.
+\bibitem{bowles2024better} J.~Bowles, S.~Ahmed, and M.~Schuld, ``Better than classical? The subtle art of benchmarking quantum machine learning models,'' arXiv:2403.07059, 2024.
+\bibitem{chen2016xgboost} T.~Chen and C.~Guestrin, ``XGBoost: a scalable tree boosting system,'' in \emph{Proc.\ KDD}, 2016.
+\end{thebibliography}
+\end{document}

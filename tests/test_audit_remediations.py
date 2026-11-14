@@ -100,3 +100,13 @@ def test_seed_before_construction_makes_initial_weights_reproducible():
         return torch.cat([p.detach().flatten() for p in m.parameters()])
 
     assert torch.equal(weights(), weights())
+
+
+def test_sequential_qnn_batched_circuit_matches_per_sample_reference():
+    from src.models.sequential_qnn import SequentialQNNClassifier
+
+    torch.manual_seed(0)
+    model = SequentialQNNClassifier(k_packets=2, n_layers=2)
+    z = (torch.rand(16, 5) * 2 - 1) * 3.14159
+    torch.testing.assert_close(model._quantum_features(z), model._quantum_features_per_sample(z), atol=1e-6, rtol=0)
+    torch.testing.assert_close(model._quantum_features(z[:1]), model._quantum_features_per_sample(z[:1]), atol=1e-6, rtol=0)

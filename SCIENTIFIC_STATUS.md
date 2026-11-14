@@ -37,9 +37,11 @@ What changed the numbers:
 1. **Exact-duplicate leakage removed.** 571 of 5,000 sample rows are duplicate feature
    vectors; 166 of 1,000 test flows at seed 42 had an identical training twin. The
    splitter now de-duplicates first (`experiments/common.py`).
-2. **Thread count pinned.** Same seed gave 93.3 % (1 thread) vs 93.7 % (2 threads) for
-   the HybridQNN after 3 epochs. Differences between quantum variants are smaller than
-   that spread, so `src/determinism.py` pins 1 thread.
+2. **Thread count pinned.** 1 vs 2 torch threads give bit-different outputs for the same seed
+   (`results/thread_sensitivity.json`). On the current de-duplicated protocol this did not
+   change any 3-epoch test prediction, but on the earlier non-de-duplicated split it moved
+   accuracy 93.3 % -> 93.7 % at seed 42, so `src/determinism.py` pins 1 thread as a precaution.
+   (An earlier version of this note stated the accuracy effect without this qualification.)
 3. **Zero-day autoencoders** drew initial weights before seeding; now seeded.
 4. **Label-shuffle gate** was mis-calibrated (null AUC scatters 0.27-0.70 across
    shuffles, balanced accuracy is exactly 0.50); it now uses 10 shuffles.

@@ -159,6 +159,21 @@ else
     fi
 
     echo ""
+    echo "[Step 13b] Official-protocol benchmarks (primary results for the paper) ..."
+    if [ -f data/UNSW_NB15_training-set.csv ] && [ -f data/UNSW_NB15_testing-set.csv ]; then
+        "$PYTHON" scripts/run_official_heldout_eval.py --train-source official --max-train 30000 --tag _official_30k
+        "$PYTHON" scripts/run_official_heldout_eval.py --train-source official --max-train 30000 \
+            --models ClassicalMLP,HybridQNN,QNN_Bypassed,QNN_Frozen --tag _official_30k_ablation
+        "$PYTHON" scripts/run_official_heldout_eval.py --train-source official \
+            --models Majority,Stump,RandomForest,XGBoost,ClassicalMLP --tag _official_full
+        "$PYTHON" scripts/check_thread_sensitivity.py > /dev/null
+        "$PYTHON" scripts/generate_paper_numbers.py
+        "$PYTHON" -m pytest -q tests/test_paper_numbers.py
+    else
+        echo "           SKIPPED: official training/testing CSVs absent (data/UNSW_NB15_*-set.csv)."
+    fi
+
+    echo ""
     echo "[Step 14] Writing run manifest (versions, thread pinning, data hashes) ..."
     "$PYTHON" scripts/write_run_manifest.py
 

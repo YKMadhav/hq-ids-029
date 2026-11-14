@@ -61,7 +61,7 @@ from src.hybrid_pipeline import HybridQNNClassifier  # noqa: E402
 from src.trivial_baselines import MajorityClassBaseline, SingleSplitBaseline  # noqa: E402
 
 SEEDS = [42, 43, 44, 45, 46]
-ALL_MODELS = ["Majority", "Stump", "RandomForest", "XGBoost", "ClassicalMLP", "HybridQNN"]
+ALL_MODELS = ["Majority", "Stump", "RandomForest", "XGBoost", "ClassicalMLP", "HybridQNN", "QNN_Bypassed", "QNN_Frozen"]
 
 
 def row_hashes(frame: pd.DataFrame) -> pd.Series:
@@ -104,6 +104,37 @@ def build_partitions(sample: pd.DataFrame, official_test: pd.DataFrame, max_test
     return train_pool, test, info
 
 
+def build_official_partitions(official_train: pd.DataFrame, official_test: pd.DataFrame, dedup_test: bool = False):
+    """Primary protocol: official training partition -> official testing partition.
+
+    train : official training set, exact feature-vector duplicates collapsed, minus every flow
+            whose feature vector also occurs in the official testing set
+    test  : official testing set minus every flow whose feature vector occurs in the training
+            set (within-test repeats are kept unless ``dedup_test``)
+    """
+    train_hash_all = set(row_hashes(official_train))
+    test_hash_all = set(row_hashes(official_test))
+    unique_train = deduplicate_flows(official_train)
+    train_pool = unique_train[~row_hashes(unique_train).isin(test_hash_all)].reset_index(drop=True)
+    test = official_test[~row_hashes(official_test).isin(train_hash_all)].reset_index(drop=True)
+    if dedup_test:
+        test = deduplicate_flows(test)
+    assert not set(row_hashes(train_pool)) & set(row_hashes(test)), "train/test overlap survived filtering"
+    info = {
+        "protocol": "official_train_to_official_test",
+        "official_train_rows": int(len(official_train)),
+        "official_train_attack_rate": float(official_train["label"].mean()),
+        "train_pool_rows": int(len(train_pool)),
+        "train_attack_rate": float(train_pool["label"].mean()),
+        "official_test_rows": int(len(official_test)),
+        "official_test_attack_rate": float(official_test["label"].mean()),
+        "test_rows_final": int(len(test)),
+        "test_attack_rate": float(test["label"].mean()),
+        "within_test_deduplicated": bool(dedup_test),
+    }
+    return train_pool, test, info
+
+
 def make_model(name: str, seed: int, input_dim: int, config: dict):
     base = config.get("baselines", {})
     hyb = config.get("hybrid_classifier", {})
@@ -125,12 +156,13 @@ def make_model(name: str, seed: int, input_dim: int, config: dict):
                                     bottleneck_dim=m.get("bottleneck_dim", 4), output_dim=m.get("output_dim", 2),
                                     learning_rate=m.get("learning_rate", 0.005), batch_size=m.get("batch_size", 64),
                                     epochs=m.get("epochs", 40), patience=m.get("patience", 8), random_state=seed)
-    if name == "HybridQNN":
+    if name in ("HybridQNN", "QNN_Bypassed", "QNN_Frozen"):
+        layer = {"HybridQNN": "vqc", "QNN_Bypassed": "identity", "QNN_Frozen": "frozen"}[name]
         return HybridQNNClassifier(
             input_dim=input_dim, hidden_dim=config.get("classical_encoder", {}).get("hidden_dim", 16),
             num_qubits=qc.get("num_qubits", 4), num_layers=qc.get("reps", 2), output_dim=2,
             ansatz_type=qc.get("ansatz", "RealAmplitudes"), feature_map=qc.get("feature_map", "AngleEmbedding"),
-            feature_map_reps=qc.get("feature_map_reps", 1), learning_rate=hyb.get("learning_rate", 0.01),
+            feature_map_reps=qc.get("feature_map_reps", 1), quantum_layer=layer, learning_rate=hyb.get("learning_rate", 0.01),
             batch_size=hyb.get("batch_size", 64), epochs=hyb.get("epochs", 20), random_state=seed)
     raise ValueError(f"Unknown model {name}")
 
@@ -143,6 +175,11 @@ def main() -> int:
     parser.add_argument("--seeds", default=",".join(map(str, SEEDS)))
     parser.add_argument("--dedup-test", action="store_true", help="also collapse duplicates inside the test set")
     parser.add_argument("--tag", default="", help="suffix for output file names")
+    parser.add_argument("--train-source", choices=["sample", "official"], default="sample",
+                        help="'official' trains on the official training CSV (primary protocol)")
+    parser.add_argument("--official-train", default=os.path.join(REPO_ROOT, "data", "UNSW_NB15_training-set.csv"))
+    parser.add_argument("--max-train", type=int, default=0,
+                        help="stratified training subsample per seed (0 = all); same for every model")
     args = parser.parse_args()
 
     if not os.path.exists(args.official_test):
@@ -150,16 +187,32 @@ def main() -> int:
         return 0
 
     config = load_config()
-    sample = load_flow_data(config)
-    official = pd.read_csv(args.official_test)
-    train_pool, test, info = build_partitions(sample, official, args.max_test, args.dedup_test)
+    official = pd.read_csv(args.official_test, encoding="utf-8-sig")
+    if args.train_source == "official":
+        if not os.path.exists(args.official_train):
+            print(f"SKIP: official training set not found at {args.official_train}")
+            return 0
+        official_train = pd.read_csv(args.official_train, encoding="utf-8-sig")
+        train_pool, test, info = build_official_partitions(official_train, official, args.dedup_test)
+        if args.max_test and len(test) > args.max_test:
+            test, _ = train_test_split(test, train_size=args.max_test, random_state=0, stratify=test["label"])
+            test = test.reset_index(drop=True)
+            info["test_rows_final"], info["max_test_subsample"] = int(len(test)), int(args.max_test)
+    else:
+        sample = load_flow_data(config)
+        train_pool, test, info = build_partitions(sample, official, args.max_test, args.dedup_test)
+    info["max_train_per_seed"] = int(args.max_train)
     print("[Partitions]", json.dumps(info, indent=1))
 
     models = [m for m in args.models.split(",") if m]
     seeds = [int(s) for s in args.seeds.split(",") if s]
     records = []
+    records_boot = []
     for seed in seeds:
-        train_df, val_df = train_test_split(train_pool, test_size=0.1, random_state=seed, stratify=train_pool["label"])
+        pool = train_pool
+        if args.max_train and len(pool) > args.max_train:
+            pool, _ = train_test_split(pool, train_size=args.max_train, random_state=seed, stratify=pool["label"])
+        train_df, val_df = train_test_split(pool, test_size=0.1, random_state=seed, stratify=pool["label"])
         pre = FlowPreprocessor(
             feature_range=tuple(config["dataset"].get("scaler_range", [-np.pi, np.pi])),
             log_transform_skewed=config["dataset"].get("log_transform_skewed", True),
@@ -170,6 +223,7 @@ def main() -> int:
         X_test, y_test = pre.transform(test)
         print(f"\n[seed {seed}] train={len(X_train)} val={len(X_val)} test={len(X_test)} dim={X_train.shape[1]}")
 
+        seed_preds = {}
         for name in models:
             start = time.perf_counter()
             model = make_model(name, seed, X_train.shape[1], config)
@@ -180,9 +234,27 @@ def main() -> int:
             elapsed = time.perf_counter() - start
             print(f"  [{name:12s}] acc {metrics['accuracy']:.4f} bal-acc {metrics['balanced_accuracy']:.4f} "
                   f"AUC {metrics['roc_auc']:.4f} MCC {metrics['mcc']:.4f} FPR {metrics['fpr']:.4f} ({elapsed:.1f}s)")
+            seed_preds[name] = y_pred
             records.append({"seed": seed, "model": name, **metrics, "seconds": elapsed})
 
+        # Paired bootstrap over TEST FLOWS (accuracy difference vs the classical MLP, same seed).
+        # Captures test-sampling uncertainty only; training variance is the across-seed SD.
+        if "ClassicalMLP" in seed_preds:
+            rng = np.random.default_rng(seed)
+            idx = rng.integers(0, len(y_test), size=(1000, len(y_test)), dtype=np.int32)
+            ref_correct = (seed_preds["ClassicalMLP"] == y_test).astype(np.float32)
+            for name, pred in seed_preds.items():
+                if name == "ClassicalMLP":
+                    continue
+                diff = ((pred == y_test).astype(np.float32) - ref_correct)[idx].mean(axis=1)
+                records_boot.append({"seed": seed, "model": name, "vs": "ClassicalMLP",
+                                     "acc_diff": float((pred == y_test).mean() - ref_correct.mean()),
+                                     "ci_low": float(np.percentile(diff, 2.5)), "ci_high": float(np.percentile(diff, 97.5))})
+            del idx
+
     frame = pd.DataFrame(records)
+    if records_boot:
+        pd.DataFrame(records_boot).to_csv(os.path.join(RESULTS_DIR, f"official_heldout_bootstrap{args.tag}.csv"), index=False)
     os.makedirs(RESULTS_DIR, exist_ok=True)
     frame.to_csv(os.path.join(RESULTS_DIR, f"official_heldout_results{args.tag}.csv"), index=False)
     cols = ["accuracy", "balanced_accuracy", "roc_auc", "mcc", "fpr"]

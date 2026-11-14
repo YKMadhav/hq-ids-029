@@ -1,0 +1,12 @@
+\begin{tabular}{lrrrrr}
+\toprule
+Model & Acc.\ (\%) & Bal.\ acc.\ (\%) & AUC & MCC & FPR (\%) \\
+\midrule
+Majority class (train prior) & 48.15\,$\pm$\,0.00 & 50.00\,$\pm$\,0.00 & 0.500 & 0.000 & 0.0\,$\pm$\,0.0 \\
+One-split stump & 74.88\,$\pm$\,0.01 & 73.92\,$\pm$\,0.02 & 0.739 & 0.567 & 52.1\,$\pm$\,0.0 \\
+Random forest & 85.54\,$\pm$\,0.20 & 85.03\,$\pm$\,0.21 & 0.977 & 0.734 & 28.7\,$\pm$\,0.5 \\
+XGBoost & 86.35\,$\pm$\,0.26 & 85.88\,$\pm$\,0.27 & 0.981 & 0.746 & 26.6\,$\pm$\,0.6 \\
+Classical MLP & 84.76\,$\pm$\,1.10 & 84.24\,$\pm$\,1.15 & 0.969 & 0.719 & 29.8\,$\pm$\,2.5 \\
+Hybrid QNN (trained VQC) & 83.38\,$\pm$\,0.80 & 82.78\,$\pm$\,0.84 & 0.970 & 0.700 & 33.5\,$\pm$\,2.0 \\
+\bottomrule
+\end{tabular}

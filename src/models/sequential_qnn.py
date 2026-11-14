@@ -68,8 +68,10 @@ class SequentialQNNClassifier(nn.Module):
         @qml.qnode(self.dev, interface="torch", diff_method="backprop")
         def _circuit(inputs, weights):
             # Angle embedding on 5 qubits
+            # ``inputs`` is (batch, 5); PennyLane parameter-broadcasts the whole batch through
+            # one circuit execution (mathematically identical to looping over samples).
             for i in range(self.n_qubits):
-                qml.RY(inputs[i], wires=i)
+                qml.RY(inputs[..., i], wires=i)
 
             # Parameterized layers
             for l in range(weights.shape[0]):
@@ -90,6 +92,15 @@ class SequentialQNNClassifier(nn.Module):
         # 3. Classical Readout Head
         self.readout = nn.Linear(5, 2)
 
+    def _quantum_features(self, z: torch.Tensor) -> torch.Tensor:
+        res = self.circuit(z, self.q_weights)
+        return torch.stack(list(res), dim=1).reshape(z.shape[0], self.n_qubits).to(torch.float32)
+
+    def _quantum_features_per_sample(self, z: torch.Tensor) -> torch.Tensor:
+        """Reference implementation (one circuit execution per sample); used only by tests."""
+        q_outs = [self.circuit(sample, self.q_weights) for sample in z]
+        return torch.stack([torch.stack(list(res)) for res in q_outs]).to(torch.float32)
+
     def forward(self, x_flat: torch.Tensor) -> torch.Tensor:
         if x_flat.dim() == 1:
             x_flat = x_flat.unsqueeze(0)
@@ -98,8 +109,7 @@ class SequentialQNNClassifier(nn.Module):
         z = self.encoder(x_flat) * math.pi
 
         # 2. Quantum circuit evaluation
-        q_outs = [self.circuit(sample, self.q_weights) for sample in z]
-        q_tensor = torch.stack([torch.stack(res) for res in q_outs]).to(torch.float32)  # (batch_size, 5)
+        q_tensor = self._quantum_features(z)  # (batch_size, 5)
 
         # 3. Linear classification head
         logits = self.readout(q_tensor)

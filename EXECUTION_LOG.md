@@ -190,3 +190,8 @@ This document provides a real-time, chronological audit trail of all architectur
 - `[2026-11-13 09:17:41] [run_multiclass_benchmark.py]` Completed 10-class multi-class threat taxonomy benchmark with Class-Weighted Focal Loss across 7 paradigms.
 - `[2026-11-13 09:19:56] [VERIFICATION]` Official held-out evaluation: 30 runs on 80717 unseen official-test flows.
 - `[2026-11-13 09:20:18] [VERIFICATION]` Official held-out evaluation: 25 runs on 53758 unseen official-test flows.
+- `[2026-11-13 10:52:30] [VERIFICATION]` Official held-out evaluation: 4 runs on 73791 unseen official-test flows.
+- `[2026-11-13 11:05:47] [VERIFICATION]` Official held-out evaluation: 30 runs on 73791 unseen official-test flows.
+- `[2026-11-13 11:12:29] [VERIFICATION]` Official held-out evaluation: 25 runs on 73791 unseen official-test flows.
+- `[2026-11-13 11:26:23] [VERIFICATION]` Official held-out evaluation: 30 runs on 73791 unseen official-test flows.
+- `[2026-11-13 11:50:16] [VERIFICATION]` Official held-out evaluation: 20 runs on 73791 unseen official-test flows.

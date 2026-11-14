@@ -1,17 +1,14 @@
 """
 Project HQ-IDS-029: Deterministic execution controls
 ====================================================
-Measured fact (see SCIENTIFIC_STATUS.md): with an identical seed and identical
-code, ``HybridQNNClassifier`` reaches a different test accuracy when torch runs on
-1 thread than on 2 threads (93.3 % vs 93.7 % after 3 epochs at seed 42). Each
-setting is bit-reproducible on its own, so "same seed => same result" holds only
-for a fixed thread count. Intra-op parallelism changes the floating-point
-reduction order inside the complex matmuls of the statevector simulator, and a
-few-epoch SGD trajectory amplifies that.
-
-Differences between quantum variants in this repository are 0.1-0.5 accuracy
-points, i.e. smaller than that machine-dependent spread. Every experiment must
-therefore pin the thread count so results are portable across machines.
+Measured fact (results/thread_sensitivity.json, scripts/check_thread_sensitivity.py): with
+identical seed and code, 1 vs 2 torch threads give DIFFERENT floating-point outputs (the sum of
+predicted probabilities differs in the 5th significant digit) while each thread count is
+bit-reproducible on its own. In the current de-duplicated protocol that did not flip a single
+test prediction after 3 epochs, but an earlier, non-de-duplicated run at the same seed did change
+accuracy (93.3 % vs 93.7 %), so thread count can steer a few-epoch SGD trajectory. Differences
+between quantum variants here are small (0.1-1 accuracy points), so every experiment pins the
+thread count to make results portable bit-for-bit.
 
 Importing this module applies the pinned configuration. Set
 ``HQIDS_ALLOW_MULTITHREAD=1`` to opt out (results are then machine-dependent).

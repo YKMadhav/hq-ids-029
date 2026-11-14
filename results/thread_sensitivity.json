@@ -1,0 +1,33 @@
+{
+  "epochs": 3,
+  "seed": 42,
+  "runs": {
+    "1": [
+      {
+        "threads": 1,
+        "accuracy": 0.9209932279909706,
+        "sum_p": 565.0634155273438
+      },
+      {
+        "threads": 1,
+        "accuracy": 0.9209932279909706,
+        "sum_p": 565.0634155273438
+      }
+    ],
+    "2": [
+      {
+        "threads": 2,
+        "accuracy": 0.9209932279909706,
+        "sum_p": 565.058837890625
+      },
+      {
+        "threads": 2,
+        "accuracy": 0.9209932279909706,
+        "sum_p": 565.058837890625
+      }
+    ]
+  },
+  "bit_identical_at_fixed_threads": true,
+  "accuracy_1_thread": 0.9209932279909706,
+  "accuracy_2_threads": 0.9209932279909706
+}

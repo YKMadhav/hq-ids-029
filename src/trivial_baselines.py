@@ -54,3 +54,22 @@ class SingleSplitBaseline(_TrivialBase):
         self.split_feature_index_ = int(tree.feature[0])
         self.split_threshold_ = float(tree.threshold[0])
         return self
+
+
+class LookupTableBaseline:
+    """Exact-match lookup: majority training label per unique feature vector (rounded to 6
+    decimals); unseen vectors get the global training majority. For a low-cardinality feature
+    set this is the empirical ceiling of any model that sees only those features."""
+
+    def fit(self, X_train, y_train, X_val=None, y_val=None):
+        keys = [tuple(r) for r in np.round(np.asarray(X_train, dtype=np.float64), 6)]
+        counts = {}
+        for key, label in zip(keys, np.asarray(y_train).astype(int)):
+            c = counts.setdefault(key, [0, 0])
+            c[label] += 1
+        self.table_ = {k: int(v[1] > v[0]) for k, v in counts.items()}
+        self.default_ = int(np.mean(y_train) >= 0.5)
+        return self
+
+    def predict(self, X):
+        return np.array([self.table_.get(tuple(r), self.default_) for r in np.round(np.asarray(X, dtype=np.float64), 6)])
