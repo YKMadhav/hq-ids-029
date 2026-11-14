@@ -10,7 +10,8 @@
     "test_rows_final": 53758,
     "test_attack_rate": 0.3648759254436549,
     "max_test_subsample": 0,
-    "within_test_deduplicated": true
+    "within_test_deduplicated": true,
+    "max_train_per_seed": 0
   },
   "caveat": "random partition of the same captures; not temporal/cross-network; accuracy/FPR are prevalence-dependent",
   "models": {

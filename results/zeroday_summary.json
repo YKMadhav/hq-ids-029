@@ -41,8 +41,8 @@
       "fpr_std": 0.012836344352345872,
       "specificity_mean": 0.9613832853025936,
       "specificity_std": 0.012836344352345886,
-      "train_time_sec_mean": 0.9046929359436036,
-      "train_time_sec_std": 0.35555251763683676,
+      "train_time_sec_mean": 0.8530400276184082,
+      "train_time_sec_std": 0.4024417892862555,
       "per_category": {
         "Analysis": {
           "samples": 52,
@@ -105,8 +105,8 @@
       "fpr_std": 0.015951991358038094,
       "specificity_mean": 0.9291066282420749,
       "specificity_std": 0.01595199135803807,
-      "train_time_sec_mean": 141.19106578826904,
-      "train_time_sec_std": 0.626524039018689,
+      "train_time_sec_mean": 141.91273913383483,
+      "train_time_sec_std": 2.1462344274538623,
       "per_category": {
         "Analysis": {
           "samples": 52,
@@ -169,8 +169,8 @@
       "fpr_std": 0.012758468945924297,
       "specificity_mean": 0.9596541786743517,
       "specificity_std": 0.012758468945924317,
-      "train_time_sec_mean": 142.09575872421266,
-      "train_time_sec_std": 0.7149463306703098,
+      "train_time_sec_mean": 142.76577916145325,
+      "train_time_sec_std": 2.4610713220648672,
       "per_category": {
         "Analysis": {
           "samples": 52,

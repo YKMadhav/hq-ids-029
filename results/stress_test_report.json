@@ -1,6 +1,6 @@
 {
-  "timestamp": "2026-11-13 09:11:25",
-  "total_runtime_seconds": 705.725245224,
+  "timestamp": "2026-11-14 09:06:15",
+  "total_runtime_seconds": 615.836052503,
   "test_1_label_shuffling": {
     "seed": 42,
     "raw_accuracy": 0.6444695259593678,

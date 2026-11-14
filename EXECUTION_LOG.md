@@ -195,3 +195,18 @@ This document provides a real-time, chronological audit trail of all architectur
 - `[2026-11-13 11:12:29] [VERIFICATION]` Official held-out evaluation: 25 runs on 73791 unseen official-test flows.
 - `[2026-11-13 11:26:23] [VERIFICATION]` Official held-out evaluation: 30 runs on 73791 unseen official-test flows.
 - `[2026-11-13 11:50:16] [VERIFICATION]` Official held-out evaluation: 20 runs on 73791 unseen official-test flows.
+- `[2026-11-14 08:32:05] [ACTION]` Started Step 1 classical baseline benchmark over seeds [42, 43, 44, 45, 46] on real UNSW-NB15 flows.
+- `[2026-11-14 08:32:38] [VERIFICATION]` Step 1 complete: 25 per-seed trials (5 models x 5 seeds) written to results/baselines_all_seeds.csv and results/metrics.csv.
+- `[2026-11-14 08:32:42] [ACTION]` Started Step 2 hybrid QNN training over seeds [42, 43, 44, 45, 46] on real UNSW-NB15 flows.
+- `[2026-11-14 08:34:42] [VERIFICATION]` Step 2 complete: 5 hybrid QNN runs saved to results/hybrid_all_seeds.csv; trained circuit depth 9, CNOTs 6, parameters 16; ZZ reference depth 18, CNOTs 12.
+- `[2026-11-14 08:39:11] [run_qml_comparison.py]` Completed 5-seed master benchmark across all 3 QML paradigms (VQC, QCNN, QSVM), classical baselines, and ablation controls.
+- `[2026-11-14 08:39:15] [ACTION]` Started Step 3 ablation (3 variants) and 1024-shot Qiskit Aer NISQ simulation over seeds [42, 43, 44, 45, 46].
+- `[2026-11-14 08:39:15] [AUTONOMOUS CHOICE]` Ran the NISQ replay on the complete 1000-flow held-out test partition for every seed rather than a subsample: Aer executes 1000 four-qubit circuits at 1024 shots in about 1.3 s, so subsampling would have discarded statistical power for no benefit.
+- `[2026-11-14 08:42:23] [VERIFICATION]` Step 3 complete: 15 ablation rows (3 variants x 5 seeds) and 5 shot-based Aer NISQ rows written to results/ablation_results.csv and results/noise_results.csv.
+- `[2026-11-14 09:06:15] [ACTION]` Completed 5-pillar stress-test battery in 615.8s. Report written to /home/claude/hq-ids-029/results/stress_test_report.json
+- `[2026-11-14 09:11:23] [run_multiclass_benchmark.py]` Completed 10-class multi-class threat taxonomy benchmark with Class-Weighted Focal Loss across 7 paradigms.
+- `[2026-11-14 09:45:47] [VERIFICATION]` Official held-out evaluation: 40 runs on 80717 unseen official-test flows.
+- `[2026-11-14 09:46:15] [VERIFICATION]` Official held-out evaluation: 25 runs on 53758 unseen official-test flows.
+- `[2026-11-14 10:09:30] [VERIFICATION]` Official held-out evaluation: 40 runs on 73791 unseen official-test flows.
+- `[2026-11-14 10:32:02] [VERIFICATION]` Official held-out evaluation: 20 runs on 73791 unseen official-test flows.
+- `[2026-11-14 10:38:49] [VERIFICATION]` Official held-out evaluation: 25 runs on 73791 unseen official-test flows.

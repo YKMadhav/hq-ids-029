@@ -34,7 +34,7 @@
       "f1_macro_mean": 0.7626464893584401,
       "recall_mean": 0.997595517515221,
       "fpr_mean": 0.47356756756756757,
-      "latency_ms_seed42": 0.059936503333422785
+      "latency_ms_seed42": 0.07219843000105661
     },
     "ClassicalMLP": {
       "accuracy_mean": 0.7858475440897827,
@@ -42,7 +42,7 @@
       "f1_macro_mean": 0.7626404077527793,
       "recall_mean": 0.9975778699373512,
       "fpr_mean": 0.4735621621621622,
-      "latency_ms_seed42": 0.041032713334061555
+      "latency_ms_seed42": 0.04600238333296147
     },
     "LSTM": {
       "accuracy_mean": 0.7858305397658262,
@@ -50,7 +50,7 @@
       "f1_macro_mean": 0.7626155673761961,
       "recall_mean": 0.997595517515221,
       "fpr_mean": 0.47362162162162164,
-      "latency_ms_seed42": 0.09952360333348528
+      "latency_ms_seed42": 0.090536703332873
     },
     "LookupTable(exact-match)": {
       "accuracy_mean": 0.7864402662391294,
@@ -74,7 +74,7 @@
       "f1_macro_mean": 0.7625629939345601,
       "recall_mean": 0.997595517515221,
       "fpr_mean": 0.47371351351351354,
-      "latency_ms_seed42": 10.114885809998668
+      "latency_ms_seed42": 8.204368109998843
     },
     "SingleSplitStump": {
       "accuracy_mean": 0.7663241509983967,

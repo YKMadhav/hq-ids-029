@@ -98,3 +98,11 @@ because the official test set is about one-third duplicate attack vectors.
   generating code and no verified field semantics (no manifest, so the steps are skipped).
 - No temporal or grouped split exists in these CSVs (no timestamps or host IDs).
 - Manuscripts, README and report have not been rewritten from these numbers.
+
+## Final status (full reproduction, `reproduce.sh` exit 0)
+- Primary protocol: official UNSW-NB15 train→test, exact duplicates removed, 5 seeds, balanced accuracy/MCC/AUC, paired bootstrap vs MLP. Numbers: `results/PAPER_NUMBERS.json`, macros in `paper/generated_numbers.tex` (enforced by `tests/test_paper_numbers.py`).
+- Conclusion: no evidence the trained variational layer helps; identity/frozen controls are not worse; a one-split stump reaches ~75% accuracy; false-alarm rates are high for all learned models.
+- Reproducibility: CSVs re-run bit-identically (timing columns excluded) across independent runs.
+- Withdrawn: cross-dataset and RFF claims (aligned CSVs have no generator); no temporal split possible (no timestamps).
+- Open items: author names in `paper/paper.tex`; compile with the real IEEEtran class; human read-through.
+- Earlier tables in this file reflect the 5k-sample runs and are historical.

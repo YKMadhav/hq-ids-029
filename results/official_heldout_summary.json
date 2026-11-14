@@ -10,7 +10,8 @@
     "test_rows_final": 80717,
     "test_attack_rate": 0.5452754686125599,
     "max_test_subsample": 0,
-    "within_test_deduplicated": false
+    "within_test_deduplicated": false,
+    "max_train_per_seed": 0
   },
   "caveat": "random partition of the same captures; not temporal/cross-network; accuracy/FPR are prevalence-dependent",
   "models": {
@@ -144,6 +145,50 @@
       "fpr": {
         "mean": 0.3772395379250218,
         "std": 0.012828417167756859
+      }
+    },
+    "QNN_Bypassed": {
+      "accuracy": {
+        "mean": 0.8173222493402876,
+        "std": 0.010814850231452943
+      },
+      "balanced_accuracy": {
+        "mean": 0.8004633385369754,
+        "std": 0.012766403028721618
+      },
+      "roc_auc": {
+        "mean": 0.9507038149008483,
+        "std": 0.002191638584558734
+      },
+      "mcc": {
+        "mean": 0.6621753381739639,
+        "std": 0.014597529545551931
+      },
+      "fpr": {
+        "mean": 0.3857181778552746,
+        "std": 0.034410578112797706
+      }
+    },
+    "QNN_Frozen": {
+      "accuracy": {
+        "mean": 0.8197703086090911,
+        "std": 0.007405070380425269
+      },
+      "balanced_accuracy": {
+        "mean": 0.8031524285886565,
+        "std": 0.008374343859636271
+      },
+      "roc_auc": {
+        "mean": 0.9443031690590307,
+        "std": 0.010587337077401485
+      },
+      "mcc": {
+        "mean": 0.6660824621065333,
+        "std": 0.011822735698410141
+      },
+      "fpr": {
+        "mean": 0.38036726242371405,
+        "std": 0.019329660605749553
       }
     }
   }
