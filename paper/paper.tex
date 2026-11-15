@@ -6,6 +6,8 @@
 \usepackage{graphicx}
 \usepackage{hyperref}
 \input{generated_numbers}
+% shrink a table to the column width only when it is wider (never enlarge)
+\newcommand{\fit}[1]{\resizebox{\ifdim\width>\columnwidth\columnwidth\else\width\fi}{!}{#1}}
 
 \title{Does a Variational Quantum Layer Help Network Intrusion Detection? A Leakage-Audited, Controlled Negative Result on UNSW-NB15}
 \author{[Author names to be added]}
@@ -48,18 +50,18 @@ Contributions: (i) a leakage audit of UNSW-NB15~\cite{moustafa2015unsw} showing 
 Table~\ref{tab:primary} gives the main result. The majority-class detector scores \accMaj\%; a single threshold on a single feature scores \accStump\%. Gradient boosting is best (\accXgb\%), the classical MLP reaches \accMlp\%, and the hybrid QNN \accHqnn\%. The hybrid is on average \bootDiffHqnnMlp{} points relative to the MLP, with a bootstrap interval that excludes zero in \bootExcludeZero{} of \bootSeeds{} seeds. Its AUC (\aucHqnn) equals the MLP's (\aucMlp), so the deficit lies in the operating point rather than in ranking. With the full training pool, the MLP and XGBoost reach \accMlpFull\% and \accXgbFull\% (Table~\ref{tab:full}). Every learned model raises \fprXgb--\fprHqnn\% false alarms at the default threshold, which is far above what an operational IDS can tolerate; we did not study threshold re-calibration.
 
 \begin{table}[t]\centering\caption{Official train$\to$test, de-duplicated, 30{,}000 training flows per seed, five seeds.}\label{tab:primary}\small
-\input{tab_primary}\end{table}
+\fit{\input{tab_primary}}\end{table}
 
 \begin{table}[t]\centering\caption{Same protocol, full de-duplicated training pool (classical models only).}\label{tab:full}\small
-\input{tab_primary_fulltrain}\end{table}
+\fit{\input{tab_primary_fulltrain}}\end{table}
 
 \subsection{Does the circuit matter?}
 Table~\ref{tab:abl} compares the trained circuit with the identity bypass and a frozen random circuit on the same backbone. The bypassed variant (\accByp\,$\pm$\,\accSdByp\%) and the frozen variant (\accFrz\,$\pm$\,\accSdFrz\%) are not worse than the trained circuit (\accHqnn\%); the trained circuit has the lowest mean accuracy. With five seeds the differences among bypassed, frozen and MLP are within seed variability, so we claim only that there is no evidence of a benefit from training the circuit. On the 5{,}000-flow sample with 30 re-splits (Table~\ref{tab:s30}) the trained circuit is again slightly below both controls (paired $p=\pFullByp$ and $\pFullFrz$, Cohen's $d=\dFullByp$ and $\dFullFrz$, uncorrected, split variance only).
 
 \begin{table}[t]\centering\caption{Circuit ablation on the primary protocol.}\label{tab:abl}\small
-\input{tab_ablation_official}\end{table}
+\fit{\input{tab_ablation_official}}\end{table}
 \begin{table}[t]\centering\caption{Circuit ablation, 5{,}000-flow sample, 30 re-splits.}\label{tab:s30}\small
-\input{tab_sample30}\end{table}
+\fit{\input{tab_sample30}}\end{table}
 
 \subsection{What the models rely on}
 Permutation importance of the hybrid (5{,}000-flow sample) is dominated by \texttt{\permFeatOne} ($-\permDropOne$ points when permuted), \texttt{\permFeatTwo} ($-\permDropTwo$) and \texttt{\permFeatThree} ($-\permDropThree$), i.e.\ time-to-live and TCP-window fields that characterise the capture testbed rather than attack semantics. Together with the strong stump, this suggests much of the signal is available through a few testbed-specific fields; classical models can substitute other correlated features, so this is evidence of reliance, not of uniqueness.
@@ -67,19 +69,19 @@ Permutation importance of the hybrid (5{,}000-flow sample) is dominated by \text
 \subsection{Five-field header proxy}
 A proxy restricted to five fields (protocol, source/destination TTL and window) is evaluated with five seeds on the full official partition (Table~\ref{tab:p4}). \pFourSeenPct\% of test vectors occur verbatim in training, and an exact-match lookup table matches the neural models, including the sequential quantum model, to within a tenth of a point. The accuracy is therefore capped by these five fields, not by model capacity. Because the Argus window fields summarise a flow and are not verified here to be first-packet values, we do not claim early-packet detection.
 
-\begin{table}[t]\centering\caption{Five-field header proxy, official partition.}\label{tab:p4}\small\resizebox{\columnwidth}{!}{\input{tab_phase4}}\end{table}
+\begin{table}[t]\centering\caption{Five-field header proxy, official partition.}\label{tab:p4}\small\fit{\input{tab_phase4}}\end{table}
 
 \subsection{Zero-day (unseen attack families) and noise}
 Anomaly detectors trained on benign flows only separate unseen families poorly (Table~\ref{tab:zd}). For readout noise on the simulated circuit ($p_{\text{readout}}=\noisePReadout$, \noiseShots{} shots, \noiseSamples{} flows), classification accuracy changes by at most \noiseAccDelta{} points, while the mean absolute expectation error versus the analytic value falls from \maeNoisyLo--\maeNoisyHi{} to \maeMitLo--\maeMitHi{} after inverting the simulator's own (known) readout assignment matrix and projecting onto the probability simplex, so no calibration error is modelled (\mitRecoveryPct\% of the total deviation; shot noise alone contributes \maeShot{}). The correction improves expectation fidelity but not detection.
 
 \begin{table}[t]\centering\caption{Zero-day detection (benign-only training).}\label{tab:zd}\small
-\input{tab_zeroday}\end{table}
+\fit{\input{tab_zeroday}}\end{table}
 
 \subsection{Multiclass (exploratory)}
 On the 5{,}000-flow sample, tree ensembles lead all neural and quantum models in macro-F1 (Table~\ref{tab:mc}); rare classes (Worms, about five flows) are unestimable, so we regard this as exploratory.
 
 \begin{table}[t]\centering\caption{Multiclass, 5{,}000-flow sample, five seeds.}\label{tab:mc}\small
-\input{tab_multiclass}\end{table}
+\fit{\input{tab_multiclass}}\end{table}
 
 \section{Searching for a Quantum Advantage: Controlled Negative Results}
 Because the trained circuit gave no benefit, we asked whether any quantum model could, using exact simulation of four to twelve qubits and three pre-planned tests. All grids below were chosen with knowledge of the evaluation families and are therefore optimistic for quantum and classical detectors alike.
@@ -88,18 +90,18 @@ Because the trained circuit gave no benefit, we asked whether any quantum model 
 
 \textbf{Zero-day detection.} Detectors were trained on benign flows only and scored against each unseen attack family (UNSW-NB15: \zdFamilies{} families, \zdSeeds{} seeds; Table~\ref{tab:qzd}). The quantum-kernel one-class SVM appeared to lead (AUC \zdQkAuc{}) until the classical grid was widened: a $k$-nearest-neighbour detector on the same eight inputs reached \zdKnnAuc{} and a Laplacian-kernel SVM \zdLapAuc{}. At 95\% detection the quantum kernel raised more false alarms (\zdQkFpr{}) than $k$-NN (\zdKnnFpr{}) or an isolation forest (\zdIfFpr{}). Removing entanglement drops its AUC to \zdNoEntAuc{}, so entanglement changes the kernel, but a local classical kernel recovers the same performance. A quantum-inspired matrix-product-state (Born machine) density model scored \zdMpsAuc{} in our untuned configuration and is not a fair test of that family. On a second dataset (CIC-IDS2017 sample) the best quantum kernel reached \zdCicQkAuc{} against \zdCicRbfAuc{} for a tuned RBF kernel.
 
-\begin{table}[t]\centering\caption{Leave-one-family-out zero-day detection, benign-only training. FPR@95: false-positive rate at 95\% true-positive rate (lower is better).}\label{tab:qzd}\small\resizebox{\columnwidth}{!}{\input{tab_qadv_zeroday}}\end{table}
+\begin{table}[t]\centering\caption{Leave-one-family-out zero-day detection, benign-only training. FPR@95: false-positive rate at 95\% true-positive rate (lower is better).}\label{tab:qzd}\small\fit{\input{tab_qadv_zeroday}}\end{table}
 
 \textbf{Few-shot.} With $k$ labelled examples of a new family plus abundant benign flows (\fsReps{} repetitions, hyperparameters fixed in advance), the quantum-kernel SVM is below the RBF SVM at small $k$ (AUC \fsQkOne{} vs.\ \fsRbfOne{} at $k=1$; \fsQkTwenty{} vs.\ \fsRbfTwenty{} at $k=20$; Table~\ref{tab:qfs}).
 
-\begin{table}[t]\centering\caption{Few-shot detection of an unseen family: AUC by number of labelled attack flows $k$.}\label{tab:qfs}\small\resizebox{\columnwidth}{!}{\input{tab_qadv_fewshot}}\end{table}
+\begin{table}[t]\centering\caption{Few-shot detection of an unseen family: AUC by number of labelled attack flows $k$.}\label{tab:qfs}\small\fit{\input{tab_qadv_fewshot}}\end{table}
 
 These results concern classical flow features and at most twelve simulated qubits. They do not rule out advantage on quantum-native data or at fault-tolerant scale; they show that apparent advantages on this data vanish against a tuned classical control, consistent with dequantization results~\cite{tang2019quantum}.
 
 \subsection{Measurement: post-quantum TLS handshake sizes}
 A concrete quantum-safe monitoring question is whether a passive sensor can tell post-quantum handshakes apart. We measured real TLS~1.3 handshakes (OpenSSL 3.5.0, loopback, tickets disabled, bytes counted by a TCP proxy; \hsReps{} repetitions per cell, maximum standard deviation \hsStdMax{} bytes) for classical, hybrid and ML-KEM key exchange and for ECDSA, RSA and ML-DSA certificates (Table~\ref{tab:hs}). The first client flight grows from \hsChClassical{} bytes (X25519) to \hsChHybrid{} bytes (X25519MLKEM768), a factor of \hsChRatio{}, and up to \hsChMax{} bytes for ML-KEM-1024, so a size threshold on the first client flight separates post-quantum from classical key exchange perfectly \emph{in this single-client setting}. Server flights grow from \hsSrvClassical{} bytes (ECDSA, X25519) to \hsSrvHybridMldsa{} bytes with an ML-DSA-65 certificate, about \hsSrvRatio{} times larger. This is a measurement of protocol sizes, not an intrusion-detection result: real clients differ in extensions and padding, and we have no labelled post-quantum attack traffic.
 
-\begin{table}[t]\centering\caption{Measured TLS~1.3 handshake bytes. Server$\to$client bytes by certificate type.}\label{tab:hs}\small\resizebox{\columnwidth}{!}{\input{tab_handshake}}\end{table}
+\begin{table}[t]\centering\caption{Measured TLS~1.3 handshake bytes. Server$\to$client bytes by certificate type.}\label{tab:hs}\small\fit{\input{tab_handshake}}\end{table}
 
 \section{Threats to Validity}
 \textbf{Random, not temporal, partition.} The official partitions are a random split of the same captures; the files carry no timestamps or host identifiers, so no grouped or temporal split was possible. Absolute numbers will overstate performance on new networks. \textbf{Single dataset and simulator only.} No hardware execution is reported, and the second dataset (CIC-IDS2017 sample) is used only for the zero-day replication; an earlier cross-dataset experiment is withdrawn because the aligned files lack generating code and verified field semantics. \textbf{Hyperparameters.} Models use fixed recipes without per-model tuning; the angle-embedding feature map was chosen in an earlier exploratory comparison on this corpus whose selection data we cannot rule out overlapped the test data, which if anything favours the quantum model. The hybrid and MLP recipes differ; the bypassed control isolates the circuit under an identical recipe. \textbf{Parameter count.} The trained circuit adds \paramsVqc{} parameters to \paramsMlp{}. \textbf{Prevalence shift} between training and test affects accuracy and false-positive rate. \textbf{Float determinism.} Results are bit-reproducible only for a fixed thread count (1 vs.\ 2 threads change the sum of predicted probabilities by \threadSumPDiff{} but, in a three-epoch probe, not accuracy: \threadAccOne\% vs.\ \threadAccTwo\%); we pin one thread.
