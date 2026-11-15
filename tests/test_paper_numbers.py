@@ -18,7 +18,7 @@ def _prose_lines():
 
 
 # Hyperparameters / environment constants are configuration, not results.
-ALLOWED = [r"learning rate 0\.\d+", r"\$p=0\.5\$", r"Python 3\.11", r"margin=0\.8in"]
+ALLOWED = [r"TLS~1\.3", r"OpenSSL 3\.5\.0", r"learning rate 0\.\d+", r"\$p=0\.5\$", r"Python 3\.11", r"margin=0\.8in"]
 
 
 def test_no_typed_decimal_results_in_manuscript():

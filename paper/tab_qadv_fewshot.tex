@@ -1,0 +1,11 @@
+\begin{tabular}{lrrrr}
+\toprule
+Model & $k=1$ & $k=5$ & $k=20$ & $k=100$ \\
+\midrule
+LogReg(8d) & 0.744 & 0.886 & 0.935 & 0.944 \\
+QuantumKernelSVM(8q) & 0.684 & 0.803 & 0.883 & 0.947 \\
+RBF-SVM(8d,gamma=0.3) & 0.749 & 0.903 & 0.955 & 0.978 \\
+RBF-SVM(8d,gamma=1) & 0.703 & 0.847 & 0.918 & 0.970 \\
+kNN(k=min(5,k)) & 0.550 & 0.747 & 0.867 & 0.952 \\
+\bottomrule
+\end{tabular}

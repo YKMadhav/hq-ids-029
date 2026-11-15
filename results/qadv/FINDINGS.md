@@ -96,3 +96,11 @@ The best quantum-kernel setting (AUC 0.870) is below a tuned RBF one-class SVM (
 |  1   |   2.33 |  2.02 |  2.64 |
 
 The geometric difference does not grow with qubit count (2.0-2.6 at 12 qubits vs 2.6-4.6 at 4-8), so there is no sign of a regime opening up as the circuit gets larger, within what exact simulation reaches.
+
+## Measured post-quantum TLS 1.3 handshake sizes (OpenSSL 3.5.0, loopback)
+`qadv/handshake_sizes.py`; raw rows in `results/qadv/handshake_sizes.csv`. A counting TCP proxy between `s_client` and `s_server` (tickets off), 3 repetitions per cell; byte counts are deterministic (standard deviation 0-1 byte). Requires an OpenSSL >= 3.5 build (set `OSSL` to its binary; the system 3.0.13 has no ML-KEM).
+
+- First client flight: 217 B (X25519) vs 1,393 B (X25519MLKEM768), 6.4x; 1,745 B for ML-KEM-1024.
+- Server flight with an ECDSA-P256 certificate: 781 B (X25519) vs 1,869 B (X25519MLKEM768); with ML-DSA-65: 10,231 B (13x the classical case).
+- A size threshold on the first client flight separates PQ from classical key exchange perfectly **for one client implementation**. Real clients vary in extensions and padding; this is a protocol measurement, not an intrusion-detection result.
+- The `first_s2c` column in the CSV is a socket read size (buffer artefact), not a message size; use `s2c` totals.

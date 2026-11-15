@@ -1,0 +1,14 @@
+\begin{tabular}{lrrrr}
+\toprule
+Detector (benign-only training) & UNSW AUC & UNSW FPR@95 & CIC AUC & CIC FPR@95 \\
+\midrule
+kNN, 8-d PCA & 0.881 & 0.34 & 0.847 & 0.41 \\
+Laplacian-kernel OCSVM, 8-d & 0.880 & 0.37 & 0.866 & 0.42 \\
+RBF OCSVM, 8-d & 0.866 & 0.47 & 0.891 & 0.42 \\
+Quantum-kernel OCSVM, 8 qubits & 0.874 & 0.47 & 0.842 & 0.47 \\
+Isolation forest, 39-d & 0.858 & 0.33 & 0.848 & 0.41 \\
+Autoencoder (39-16-4) & 0.731 & 0.70 & 0.816 & 0.42 \\
+MPS Born machine (quantum-inspired) & 0.701 & 0.72 & 0.706 & 0.58 \\
+Product-state kernel (no entanglement) & 0.572 & 0.80 & 0.586 & 0.81 \\
+\bottomrule
+\end{tabular}

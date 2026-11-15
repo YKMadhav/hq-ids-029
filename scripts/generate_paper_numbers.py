@@ -229,6 +229,60 @@ def main() -> None:
         rows.append([label, pm(v["accuracy"]["mean"], v["accuracy"]["std"]), pm(v["f1_macro"]["mean"], v["f1_macro"]["std"])])
     write("tab_multiclass.tex", booktabs(["Model", "Acc.\\ (\\%)", "Macro-F1 (\\%)"], rows, "lrr"))
 
+    # ------------------------------------------------- quantum-advantage search (qadv/)
+    qa = os.path.join(RES, "qadv")
+    g1 = pd.read_csv(os.path.join(qa, "item1_geometric.csv")); g12 = pd.read_csv(os.path.join(qa, "item1_scale12.csv"))
+    macro("gdLo", g1["g_C_to_Q_min"].min(), "{:.1f}"); macro("gdHi", g1["g_C_to_Q_min"].max(), "{:.1f}")
+    macro("gdTwelveLo", g12["g_C_to_Q_min"].min(), "{:.1f}"); macro("gdTwelveHi", g12["g_C_to_Q_min"].max(), "{:.1f}")
+    macro("gdRefLo", g1["g_classical_ref"].min(), "{:.1f}"); macro("gdRefHi", g1["g_classical_ref"].max(), "{:.1f}")
+    macro("gdSqrtN", g1["sqrtN"].iloc[0], "{:.1f}")
+    zu = pd.read_csv(os.path.join(qa, "item4_zeroday.csv")); zc = pd.read_csv(os.path.join(qa, "item4_zeroday_cic.csv"))
+    QK, NOENT = "OCSVM-QuantumKernel(8q,bw=1.0)", "OCSVM-ProductStateKernel(8q,no-entanglement,bw=1.0)"
+    mu = zu.groupby("detector")[["auc", "fpr_at_95tpr"]].mean(); mc_ = zc.groupby("detector")[["auc", "fpr_at_95tpr"]].mean()
+    macro("zdQkAuc", mu.loc[QK, "auc"], "{:.3f}"); macro("zdQkFpr", mu.loc[QK, "fpr_at_95tpr"], "{:.2f}")
+    macro("zdKnnAuc", mu.loc["kNN(k=10, 8d PCA)", "auc"], "{:.3f}"); macro("zdKnnFpr", mu.loc["kNN(k=10, 8d PCA)", "fpr_at_95tpr"], "{:.2f}")
+    macro("zdLapAuc", mu.loc["OCSVM-Laplacian(8d,gamma=10.0)", "auc"], "{:.3f}")
+    macro("zdIfFpr", mu.loc["IsolationForest", "fpr_at_95tpr"], "{:.2f}")
+    macro("zdNoEntAuc", mu.loc[NOENT, "auc"], "{:.2f}")
+    macro("zdMpsAuc", mu.loc["MPS-BornMachine(8d,chi=12)", "auc"], "{:.2f}")
+    qk_cic = max(mc_.loc[[d for d in mc_.index if d.startswith("OCSVM-QuantumKernel")], "auc"])
+    rbf_cic = max(mc_.loc[[d for d in mc_.index if d.startswith("OCSVM-RBF(8d")], "auc"])
+    macro("zdCicQkAuc", qk_cic, "{:.3f}"); macro("zdCicRbfAuc", rbf_cic, "{:.3f}")
+    macro("zdSeeds", zu["seed"].nunique(), "{:d}"); macro("zdFamilies", zu["family"].nunique(), "{:d}")
+    ZL = [("kNN(k=10, 8d PCA)", "kNN, 8-d PCA"), ("OCSVM-Laplacian(8d,gamma=10.0)", "Laplacian-kernel OCSVM, 8-d"),
+          ("OCSVM-RBF(8d,gamma=30.0)", "RBF OCSVM, 8-d"), (QK, "Quantum-kernel OCSVM, 8 qubits"),
+          ("IsolationForest", "Isolation forest, 39-d"), ("Autoencoder", "Autoencoder (39-16-4)"),
+          ("MPS-BornMachine(8d,chi=12)", "MPS Born machine (quantum-inspired)"), (NOENT, "Product-state kernel (no entanglement)")]
+    rows = [[lab, f"{mu.loc[d,'auc']:.3f}", f"{mu.loc[d,'fpr_at_95tpr']:.2f}", f"{mc_.loc[d,'auc']:.3f}" if d in mc_.index else "--",
+             f"{mc_.loc[d,'fpr_at_95tpr']:.2f}" if d in mc_.index else "--"] for d, lab in ZL]
+    write("tab_qadv_zeroday.tex", booktabs(["Detector (benign-only training)", "UNSW AUC", "UNSW FPR@95", "CIC AUC", "CIC FPR@95"], rows, "lrrrr"))
+    fs = pd.read_csv(os.path.join(qa, "item3_fewshot.csv")); pv = fs.pivot_table(index="model", columns="k", values="auc")
+    ks = list(pv.columns)
+    rows = [[m] + [f"{pv.loc[m,k]:.3f}" for k in ks] for m in pv.index]
+    write("tab_qadv_fewshot.tex", booktabs(["Model"] + [f"$k={k}$" for k in ks], rows, "l" + "r" * len(ks)))
+    macro("fsReps", fs["rep"].nunique(), "{:d}")
+    qk_fs, rbf_fs = pv.loc["QuantumKernelSVM(8q)"], pv.loc["RBF-SVM(8d,gamma=0.3)"]
+    macro("fsQkOne", qk_fs[1], "{:.2f}"); macro("fsRbfOne", rbf_fs[1], "{:.2f}")
+    macro("fsQkTwenty", qk_fs[20], "{:.2f}"); macro("fsRbfTwenty", rbf_fs[20], "{:.2f}")
+
+    # ------------------------------------------------- post-quantum TLS handshake sizes (measured)
+    hs = pd.read_csv(os.path.join(RES, "qadv", "handshake_sizes.csv")); hs = hs[hs["ok"]]
+    hm = hs.groupby(["cert", "group"])[["c2s", "s2c", "first_c2s"]].mean()
+    macro("hsReps", int(hs.groupby(["cert", "group"]).size().min()), "{:d}")
+    macro("hsChClassical", hm.loc[("ECDSA-P256", "X25519"), "first_c2s"], "{:.0f}")
+    macro("hsChHybrid", hm.loc[("ECDSA-P256", "X25519MLKEM768"), "first_c2s"], "{:.0f}")
+    macro("hsChMax", hm.loc[("ECDSA-P256", "MLKEM1024"), "first_c2s"], "{:.0f}")
+    macro("hsChRatio", hm.loc[("ECDSA-P256", "X25519MLKEM768"), "first_c2s"] / hm.loc[("ECDSA-P256", "X25519"), "first_c2s"], "{:.1f}")
+    macro("hsSrvClassical", hm.loc[("ECDSA-P256", "X25519"), "s2c"], "{:.0f}")
+    macro("hsSrvHybridEcdsa", hm.loc[("ECDSA-P256", "X25519MLKEM768"), "s2c"], "{:.0f}")
+    macro("hsSrvHybridMldsa", hm.loc[("ML-DSA-65", "X25519MLKEM768"), "s2c"], "{:.0f}")
+    macro("hsSrvRatio", hm.loc[("ML-DSA-65", "X25519MLKEM768"), "s2c"] / hm.loc[("ECDSA-P256", "X25519"), "s2c"], "{:.0f}")
+    macro("hsStdMax", hs.groupby(["cert", "group"])["c2s"].std().max(), "{:.0f}")
+    rows = []
+    for g in ["X25519", "secp256r1", "X25519MLKEM768", "SecP256r1MLKEM768", "MLKEM512", "MLKEM768", "MLKEM1024"]:
+        rows.append([g, f"{hm.loc[('ECDSA-P256', g), 'c2s']:.0f}"] + [f"{hm.loc[(c, g), 's2c']:.0f}" for c in ("ECDSA-P256", "RSA-2048", "ML-DSA-44", "ML-DSA-65")])
+    write("tab_handshake.tex", booktabs(["Key-exchange group", "Client$\\to$server", "ECDSA-P256", "RSA-2048", "ML-DSA-44", "ML-DSA-65"], rows, "lrrrrr"))
+
     body = "% AUTO-GENERATED by scripts/generate_paper_numbers.py -- do not edit.\n" + "".join(
         f"\\newcommand{{\\{k}}}{{{v}}}\n" for k, v in sorted(MACROS.items()))
     write("generated_numbers.tex", body)
