@@ -70,3 +70,29 @@ Assumed: 2^30 signatures, ~1,100 logical qubits, ~1.3e8 T gates for ONE search. 
 
 ## Conclusion
 On classical flow features, with exact simulation up to 8 qubits, no quantum advantage appears in kernel geometry, zero-day detection or few-shot learning; every apparent win disappeared against a tuned classical control. This is a result about this data and these models, not a proof for all quantum methods.
+
+
+## Replication and scaling checks
+**CIC-IDS2017 sample (56,661 flows, 6 families: Bot, BruteForce, DoS, Infiltration, PortScan, WebAttack; 6 seeds), same protocol as Item 4:**
+
+| detector                       |   auc |   fpr_at_95tpr |
+|:-------------------------------|------:|---------------:|
+| OCSVM-RBF(8d,gamma=10.0)       | 0.902 |          0.387 |
+| OCSVM-Laplacian(8d,gamma=3.0)  | 0.897 |          0.391 |
+| OCSVM-QuantumKernel(8q,bw=0.5) | 0.87  |          0.402 |
+| IsolationForest                | 0.848 |          0.413 |
+| kNN(k=10, 8d PCA)              | 0.847 |          0.413 |
+| OCSVM-QuantumKernel(8q,bw=1.0) | 0.842 |          0.474 |
+| Autoencoder                    | 0.816 |          0.417 |
+| MPS-BornMachine(8d,chi=12)     | 0.706 |          0.577 |
+
+The best quantum-kernel setting (AUC 0.870) is below a tuned RBF one-class SVM (0.902) on the same 8-d input, so the UNSW conclusion replicates on a second dataset. This file has no timestamps or day labels, so drift (Item 5) still cannot be tested.
+
+**Item 1 at 12 qubits (500 flows, 3 seeds); sqrt(N) = 22.4:**
+
+|   bw |   mean |   min |   max |
+|-----:|-------:|------:|------:|
+|  0.5 |   2.29 |  2.1  |  2.65 |
+|  1   |   2.33 |  2.02 |  2.64 |
+
+The geometric difference does not grow with qubit count (2.0-2.6 at 12 qubits vs 2.6-4.6 at 4-8), so there is no sign of a regime opening up as the circuit gets larger, within what exact simulation reaches.

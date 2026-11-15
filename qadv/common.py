@@ -19,3 +19,12 @@ def fpr_at_tpr(y, score, tpr=0.95):
     pos = np.sort(score[y == 1]); neg = score[y == 0]
     thr = np.quantile(pos, 1 - tpr)
     return float((neg >= thr).mean())
+
+
+def load_cic(path='data/cicids2017_raw.csv'):
+    d = pd.read_csv('/home/claude/hq-ids-029/' + path, low_memory=False)
+    d = d.replace([np.inf, -np.inf], np.nan).dropna().drop_duplicates().reset_index(drop=True)
+    num = [c for c in d.select_dtypes('number').columns if c != 'Label']
+    X = np.log1p(d[num].clip(lower=0).to_numpy(dtype=float))
+    cat = np.where(d['Label'] == 'BENIGN', 'Normal', d['Label'].astype(str))
+    return X, (cat != 'Normal').astype(int), cat, num

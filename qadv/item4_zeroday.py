@@ -1,7 +1,7 @@
 """Items 4 + 2: leave-one-family-out zero-day detection. Train on BENIGN ONLY, score unseen
 attack families. Metric: AUC and FPR at 95% TPR (SOC metric). Detectors trained once per seed."""
 import sys, json, numpy as np, pandas as pd, torch, torch.nn as nn
-from qadv.common import load_unsw, seed_everything, fpr_at_tpr
+from qadv.common import load_unsw, load_cic, seed_everything, fpr_at_tpr
 from qadv.item1_geometric import zz_states, fidelity_kernel
 from sklearn.ensemble import IsolationForest
 from sklearn.neighbors import NearestNeighbors
@@ -65,7 +65,7 @@ def run_seed(seed, X, y, cat):
     d = Xev - mu; scores['Mahalanobis'] = np.einsum('ij,jk,ik->i', d, P, d)
     scores['OCSVM-RBF(39d)'] = -OneClassSVM(gamma='scale', nu=0.05).fit(Xtr).decision_function(Xev)
     # autoencoder (matched small size)
-    ae = nn.Sequential(nn.Linear(39, 16), nn.ReLU(), nn.Linear(16, 4), nn.Tanh(), nn.Linear(4, 16), nn.ReLU(), nn.Linear(16, 39))
+    ae = nn.Sequential(nn.Linear(Xtr.shape[1], 16), nn.ReLU(), nn.Linear(16, 4), nn.Tanh(), nn.Linear(4, 16), nn.ReLU(), nn.Linear(16, Xtr.shape[1]))
     opt = torch.optim.Adam(ae.parameters(), 3e-3); T = torch.tensor(Xtr, dtype=torch.float32)
     for ep in range(150):
         perm = torch.randperm(len(T))
@@ -108,13 +108,15 @@ def run_seed(seed, X, y, cat):
     return rows
 
 def main():
-    X, y, cat, _ = load_unsw(); rows = []
+    ds = sys.argv[2] if len(sys.argv) > 2 else 'unsw'
+    X, y, cat, _ = (load_cic() if ds == 'cic' else load_unsw()); rows = []
+    OUT = 'results/qadv/item4_zeroday.csv' if ds == 'unsw' else f'results/qadv/item4_zeroday_{ds}.csv'
     for seed in range(int(sys.argv[1]) if len(sys.argv) > 1 else 3):
         rows += run_seed(seed, X, y, cat); print('seed', seed, 'done', flush=True)
-        pd.DataFrame(rows).to_csv('results/qadv/item4_zeroday.csv', index=False)
+        pd.DataFrame(rows).to_csv(OUT, index=False)
     df = pd.DataFrame(rows)
     print(df.groupby('detector')[['auc', 'fpr_at_95tpr']].mean().round(3).sort_values('auc', ascending=False))
-    pd.DataFrame(rows).to_csv('results/qadv/item4_zeroday.csv', index=False)
+    pd.DataFrame(rows).to_csv(OUT, index=False)
     print(df.pivot_table(index='family', columns='detector', values='auc').round(2).to_string())
 
 if __name__ == '__main__': main()
