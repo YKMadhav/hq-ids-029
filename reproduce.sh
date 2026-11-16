@@ -174,6 +174,15 @@ else
     fi
 
     echo ""
+
+if [ -d qadv ] && [ -f "data/UNSW_NB15_training-set.csv" ]; then
+    echo "[Step 15] Quantum-advantage search (qadv/): geometric difference, zero-day, few-shot ..."
+    PYTHONPATH=. "$PYTHON" qadv/item1_geometric.py > results/qadv/item1.log 2>&1 || echo "  item1 failed"
+    PYTHONPATH=. "$PYTHON" qadv/item4_zeroday.py 10 unsw > results/qadv/item4.log 2>&1 || echo "  item4 failed"
+    PYTHONPATH=. "$PYTHON" qadv/item3_fewshot.py 6 > results/qadv/item3.log 2>&1 || echo "  item3 failed"
+    # CIC / PQC-OAV / 12-qubit / MPS-tuning runs need extra data or time; see README for the commands.
+fi
+
     echo "[Step 14] Writing run manifest (versions, thread pinning, data hashes) ..."
     "$PYTHON" scripts/write_run_manifest.py
 

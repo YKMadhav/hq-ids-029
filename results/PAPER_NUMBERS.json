@@ -68,6 +68,8 @@
   "maeNoisyLo": "0.066",
   "maeShot": "0.015",
   "mitRecoveryPct": "53",
+  "mpsTunedBest": "0.71",
+  "mpsTunedConfigs": "16",
   "noiseAccDelta": "0.23",
   "noisePReadout": "0.03",
   "noiseSamples": "886",

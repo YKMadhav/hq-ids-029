@@ -113,3 +113,6 @@ The geometric difference does not grow with qubit count (2.0-2.6 at 12 qubits vs
 - 9 of 11 scenarios are separated almost perfectly (AUC >= 0.99) by some detector; hybrid-PKI (best AUC 0.64) and high-loss (0.70) stay near chance for every detector.
 - Caveat: synthetic, scenario-structured data; this says little about real traffic. Normal sessions come from 10 fixed configurations, which makes one-class detection easy.
 - Result: no quantum advantage here either.
+
+## Item 2 follow-up: tuning the quantum-inspired MPS Born machine (`qadv/item2_mps_tuning.py`)
+16 configurations (input dimension 4/8, 8/16 bins, bond dimension 6/16, 250/600 steps), 3 seeds, UNSW zero-day protocol. Best: AUC 0.714 (8-d, 16 bins, chi 16, 600 steps) vs 0.881 for kNN on the same 8-d input; 4-d inputs are worse (0.52-0.59). Tuning did not close the gap. Discretising each feature into bins before the tensor-network model likely discards the information distance-based methods use; a continuous-variable tensor-network model is untested.

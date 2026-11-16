@@ -249,6 +249,9 @@ def main() -> None:
     rbf_cic = max(mc_.loc[[d for d in mc_.index if d.startswith("OCSVM-RBF(8d")], "auc"])
     macro("zdCicQkAuc", qk_cic, "{:.3f}"); macro("zdCicRbfAuc", rbf_cic, "{:.3f}")
     macro("zdSeeds", zu["seed"].nunique(), "{:d}"); macro("zdFamilies", zu["family"].nunique(), "{:d}")
+    mt = pd.read_csv(os.path.join(qa, "item2_mps_tuning.csv")).groupby("model")["auc"].mean()
+    macro("mpsTunedBest", mt[[m for m in mt.index if m.startswith("MPS")]].max(), "{:.2f}")
+    macro("mpsTunedConfigs", len([m for m in mt.index if m.startswith("MPS")]), "{:d}")
     ZL = [("kNN(k=10, 8d PCA)", "kNN, 8-d PCA"), ("OCSVM-Laplacian(8d,gamma=10.0)", "Laplacian-kernel OCSVM, 8-d"),
           ("OCSVM-RBF(8d,gamma=30.0)", "RBF OCSVM, 8-d"), (QK, "Quantum-kernel OCSVM, 8 qubits"),
           ("IsolationForest", "Isolation forest, 39-d"), ("Autoencoder", "Autoencoder (39-16-4)"),
