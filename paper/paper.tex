@@ -96,6 +96,8 @@ Because the trained circuit gave no benefit, we asked whether any quantum model 
 
 \begin{table}[t]\centering\caption{Few-shot detection of an unseen family: AUC by number of labelled attack flows $k$.}\label{tab:qfs}\small\fit{\input{tab_qadv_fewshot}}\end{table}
 
+\textbf{Post-quantum TLS scenarios.} On the CIC-PQC\_OAV handshake benchmark (a synthetic testbed; exact duplicates removed, missing fields set to zero) we held out each of \pqcFamilies{} anomaly scenarios in turn and trained on normal sessions only (\pqcSeeds{} seeds). The best quantum-kernel setting reached AUC \pqcQkBest{} (worst setting \pqcQkWorst{}) against \pqcClassBest{} for the best classical detector, and an entanglement-free kernel reached \pqcNoEnt{}. \pqcEasyShare{} scenarios are separated almost perfectly by several detectors, whereas the hybrid-PKI and high-loss scenarios stay near chance for every detector (best AUC \pqcHardPki{} and \pqcHardLoss{}), so the benchmark is easy except for scenarios that look normal in these features. Because the data are synthetic and scenario-structured, these results say little about real traffic.
+
 These results concern classical flow features and at most twelve simulated qubits. They do not rule out advantage on quantum-native data or at fault-tolerant scale; they show that apparent advantages on this data vanish against a tuned classical control, consistent with dequantization results~\cite{tang2019quantum}.
 
 \subsection{Measurement: post-quantum TLS handshake sizes}

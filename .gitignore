@@ -76,3 +76,4 @@ data/cicids2017_raw.csv
 *.ckpt
 
 
+data/pqc_oav/

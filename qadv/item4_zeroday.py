@@ -1,7 +1,7 @@
 """Items 4 + 2: leave-one-family-out zero-day detection. Train on BENIGN ONLY, score unseen
 attack families. Metric: AUC and FPR at 95% TPR (SOC metric). Detectors trained once per seed."""
 import sys, json, numpy as np, pandas as pd, torch, torch.nn as nn
-from qadv.common import load_unsw, load_cic, seed_everything, fpr_at_tpr
+from qadv.common import load_unsw, load_cic, load_pqc, seed_everything, fpr_at_tpr
 from qadv.item1_geometric import zz_states, fidelity_kernel
 from sklearn.ensemble import IsolationForest
 from sklearn.neighbors import NearestNeighbors
@@ -109,7 +109,7 @@ def run_seed(seed, X, y, cat):
 
 def main():
     ds = sys.argv[2] if len(sys.argv) > 2 else 'unsw'
-    X, y, cat, _ = (load_cic() if ds == 'cic' else load_unsw()); rows = []
+    X, y, cat, _ = (load_cic() if ds == 'cic' else load_pqc() if ds == 'pqc' else load_unsw()); rows = []
     OUT = 'results/qadv/item4_zeroday.csv' if ds == 'unsw' else f'results/qadv/item4_zeroday_{ds}.csv'
     for seed in range(int(sys.argv[1]) if len(sys.argv) > 1 else 3):
         rows += run_seed(seed, X, y, cat); print('seed', seed, 'done', flush=True)

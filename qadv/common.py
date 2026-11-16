@@ -28,3 +28,19 @@ def load_cic(path='data/cicids2017_raw.csv'):
     X = np.log1p(d[num].clip(lower=0).to_numpy(dtype=float))
     cat = np.where(d['Label'] == 'BENIGN', 'Normal', d['Label'].astype(str))
     return X, (cat != 'Normal').astype(int), cat, num
+
+
+def load_pqc(dir_='data/pqc_oav'):
+    """CIC-PQC_OAV v1 handshake features. 'family' = testbed scenario; normal scenarios -> 'Normal'.
+    Exact duplicate feature vectors removed."""
+    base = '/home/claude/hq-ids-029/' + dir_
+    f = pd.read_csv(base + '/ml_features_and_labels.csv'); m = pd.read_csv(base + '/scenario_manifest.csv')
+    m['ID'] = m['ID'].str.replace('.pcap', '', regex=False)
+    d = f.merge(m[['ID', 'scenario_id', 'anomaly_label']], on='ID', how='left')
+    assert d['scenario_id'].notna().all()
+    feat = [c for c in f.columns if c not in ('label', 'split', 'taxonomy', 'ID')]
+    Xf = d[feat].astype(float).fillna(0.0)  # missing handshake fields (e.g. no cert parsed) -> 0
+    d = d.loc[~Xf.round(6).duplicated()].reset_index(drop=True); Xf = Xf.loc[Xf.index.isin(Xf.round(6).drop_duplicates().index)].reset_index(drop=True)
+    X = np.log1p(Xf.clip(lower=0).to_numpy())
+    cat = np.where(d['anomaly_label'] == 'Normal', 'Normal', d['scenario_id'].astype(str))
+    return X, (cat != 'Normal').astype(int), cat, feat

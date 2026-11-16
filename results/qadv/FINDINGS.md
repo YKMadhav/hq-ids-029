@@ -104,3 +104,12 @@ The geometric difference does not grow with qubit count (2.0-2.6 at 12 qubits vs
 - Server flight with an ECDSA-P256 certificate: 781 B (X25519) vs 1,869 B (X25519MLKEM768); with ML-DSA-65: 10,231 B (13x the classical case).
 - A size threshold on the first client flight separates PQ from classical key exchange perfectly **for one client implementation**. Real clients vary in extensions and padding; this is a protocol measurement, not an intrusion-detection result.
 - The `first_s2c` column in the CSV is a socket read size (buffer artefact), not a message size; use `s2c` totals.
+
+## CIC-PQC_OAV v1 (user-supplied, synthetic testbed): leave-one-scenario-out, normal-only training
+`ml_features_and_labels.csv` + `scenario_manifest.csv` (join on ID after stripping `.pcap`); 40,010 sessions, 38,494 after exact-duplicate removal; 11 anomaly scenarios; 6 seeds; missing handshake fields set to 0 (missingness stays visible as a value). `raw_sessions.jsonl` was not available and is not needed. Same detectors and protocol as Item 4; the data are not committed (licence not stated; place them in `data/pqc_oav/`).
+
+- Best classical detector: AUC 0.934 (Isolation Forest, 8-d PCA). Best quantum-kernel setting: 0.907; the setting that was best on UNSW (bandwidth 1.0) is the worst here, 0.810.
+- Entanglement-free product-state kernel: 0.923, so entanglement is not needed on this data.
+- 9 of 11 scenarios are separated almost perfectly (AUC >= 0.99) by some detector; hybrid-PKI (best AUC 0.64) and high-loss (0.70) stay near chance for every detector.
+- Caveat: synthetic, scenario-structured data; this says little about real traffic. Normal sessions come from 10 fixed configurations, which makes one-class detection easy.
+- Result: no quantum advantage here either.
