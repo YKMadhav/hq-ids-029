@@ -281,6 +281,9 @@ def main() -> None:
     macro("hsSrvHybridMldsa", hm.loc[("ML-DSA-65", "X25519MLKEM768"), "s2c"], "{:.0f}")
     macro("hsSrvRatio", hm.loc[("ML-DSA-65", "X25519MLKEM768"), "s2c"] / hm.loc[("ECDSA-P256", "X25519"), "s2c"], "{:.0f}")
     macro("hsStdMax", hs.groupby(["cert", "group"])["c2s"].std().max(), "{:.0f}")
+    import json as _json
+    rt = _json.load(open(os.path.join(RES, "qadv", "real_trace_check.json")))
+    macro("hsGoCh", rt["first_client_payload"], "{:d}")
     rows = []
     for g in ["X25519", "secp256r1", "X25519MLKEM768", "SecP256r1MLKEM768", "MLKEM512", "MLKEM768", "MLKEM1024"]:
         rows.append([g, f"{hm.loc[('ECDSA-P256', g), 'c2s']:.0f}"] + [f"{hm.loc[(c, g), 's2c']:.0f}" for c in ("ECDSA-P256", "RSA-2048", "ML-DSA-44", "ML-DSA-65")])

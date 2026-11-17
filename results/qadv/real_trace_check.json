@@ -1,0 +1,6 @@
+{
+ "source": "salrashid123/ml-kem-tls-keyexchange trace.cap (Go client, single handshake)",
+ "first_client_payload": 1471,
+ "client_to_server_bytes": 1652,
+ "server_to_client_bytes": 2855
+}

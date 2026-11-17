@@ -21,3 +21,15 @@
 ## Catalogues
 - Continuous survey of intrusion-detection datasets: https://arxiv.org/html/2408.02521v1
 - Würzburg NIDS dataset list: https://www.informatik.uni-wuerzburg.de/datascience/research/datasets/nids-ds/
+
+## Update 2026-11-17: what can be fetched without downloading everything
+Checked from the sandbox: S3 (cse-cic-ids2018), Zenodo, Kaggle and tumi8.github.io are **refused by the egress proxy**; only GitHub works.
+
+**CSE-CIC-IDS2018 without uploading 6 GB.** The bucket is public. On your machine:
+1. List files: `aws s3 ls --no-sign-request --region us-east-2 "s3://cse-cic-ids2018/Processed Traffic Data for ML Algorithms/"`
+2. Download only the files you need (the Tuesday-20-02 file is about 4 GB; skip it): `aws s3 sync --no-sign-request --region us-east-2 "s3://cse-cic-ids2018/Processed Traffic Data for ML Algorithms/" ./cic-ids2018-csvs/ --exclude "Thuesday-20-02-2018*"` (file names as listed in step 1).
+3. Shrink to a small time-ordered sample (streams in chunks, ~20 MB output): `python scripts/make_cic2018_sample.py cic-ids2018-csvs/ cic2018_sample.csv 3000`
+4. Upload `cic2018_sample.csv` here; then `PYTHONPATH=. python qadv/item5_drift.py data/cic2018_sample.csv`.
+
+**Real post-quantum captures.** Verified: `salrashid123/ml-kem-tls-keyexchange` (GitHub, Apache-2.0) has one real X25519MLKEM768 handshake (`trace.cap`, 14 packets; retrieved and analysed, `qadv/check_real_trace.py`). `tumi8/pqs-tls-measurements` (GitHub) holds code and patches; its data are on Zenodo DOI 10.5281/zenodo.10054882 (blocked here; measurement data, not attack-labelled). The Android PQ-TLS pcaps (Zenodo 7950522, 4.5 GB) and the Kaggle mirror were not verified by me.
+Key limitation: none of these real sources is labelled with attacks. Real captures give benign PQC traffic; an anomaly benchmark on them needs injected or lab-generated anomalies, so they can complement CIC-PQC_OAV but not replace its labels.
