@@ -11,12 +11,12 @@ for f in sorted(glob.glob(os.path.join(src, '*.csv'))):
     day = os.path.basename(f).split('_')[0]; keep_b, keep_a = [], []
     for ch in pd.read_csv(f, chunksize=200_000, low_memory=False):
         ch = ch[ch['Label'] != 'Label']
-        ch['Timestamp'] = pd.to_datetime(ch['Timestamp'], errors='coerce'); ch = ch.dropna(subset=['Timestamp'])
+        ch['Timestamp'] = pd.to_datetime(ch['Timestamp'], errors='coerce', dayfirst=True); ch = ch.dropna(subset=['Timestamp'])
         num = [c for c in ch.columns if c not in ID_COLS | {'Timestamp', 'Label'}]
         ch[num] = ch[num].apply(pd.to_numeric, errors='coerce'); ch = ch.replace([np.inf, -np.inf], np.nan).dropna()
         isb = ch['Label'] == 'Benign'
-        for part, store, frac in ((ch[isb], keep_b, 0.003), (ch[~isb], keep_a, 0.05)):
-            if len(part): store.append(part.sample(frac=min(1, frac * 4), random_state=0)[['Timestamp', 'Label'] + num])
+        for part, store in ((ch[isb], keep_b), (ch[~isb], keep_a)):  # cap candidates per chunk, keeps memory flat
+            if len(part): store.append(part.sample(n=min(len(part), 4000), random_state=0)[['Timestamp', 'Label'] + num])
     b = pd.concat(keep_b) if keep_b else pd.DataFrame(); a = pd.concat(keep_a) if keep_a else pd.DataFrame()
     nb, na = (N // 2, N // 2) if len(a) else (N, 0)
     pick = [x.sample(min(len(x), n), random_state=0) for x, n in ((b, nb), (a, na)) if len(x)]
