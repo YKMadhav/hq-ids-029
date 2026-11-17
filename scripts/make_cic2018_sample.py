@@ -8,6 +8,7 @@ src, out = sys.argv[1], sys.argv[2]; N = int(sys.argv[3]) if len(sys.argv) > 3 e
 ID_COLS = {'Flow ID', 'Src IP', 'Src Port', 'Dst IP', 'Dst Port'}
 rng = np.random.RandomState(0); parts = []
 for f in sorted(glob.glob(os.path.join(src, '*.csv'))):
+    if os.path.abspath(f) == os.path.abspath(out): continue  # never read our own output
     day = os.path.basename(f).split('_')[0]; keep_b, keep_a = [], []
     for ch in pd.read_csv(f, chunksize=200_000, low_memory=False):
         ch = ch[ch['Label'] != 'Label']
