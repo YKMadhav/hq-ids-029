@@ -106,3 +106,28 @@ because the official test set is about one-third duplicate attack vectors.
 - Withdrawn: cross-dataset and RFF claims (aligned CSVs have no generator); no temporal split possible (no timestamps).
 - Open items: author names in `paper/paper.tex`; compile with the real IEEEtran class; human read-through.
 - Earlier tables in this file reflect the 5k-sample runs and are historical.
+
+---
+
+## Grouped split and testbed-artifact ablation (added 2026-11-27)
+
+`scripts/run_grouped_artifact_ablation.py` -> `results/grouped_artifact_results.csv`
+(de-duplicated protocol, 1 pinned thread; the random/full arm reproduces the headline
+table: RF 0.9318, XGBoost 0.9325, HybridQNN 0.9269).
+
+- Dropping 8 assumed testbed-artifact fields (`sttl,dttl,swin,dwin,stcpb,dtcpb,
+  ct_state_ttl,is_sm_ips_ports`; the list is a study assumption) costs every model about
+  0.4-0.6 accuracy points under random splits. Artifacts are not the main driver.
+- Leave-one-attack-family-out (single seed, one family per fold): DoS, Reconnaissance,
+  Generic are detected at recall ~0.99-1.0 by all models, Exploits 0.84-0.99, and **Fuzzers
+  only 0.26-0.41** for all models, including the VQC. No model generalises to unseen Fuzzers.
+  The VQC is not better than classical models on any held-out family.
+- A temporal split is still impossible with this CSV (no timestamps).
+
+## Aligned cross-dataset data (added 2026-11-27)
+
+All fields of `data/*_aligned_5k.csv` are now reproducible from raw sources
+(`scripts/verify_aligned_data.py`, `data/aligned_data_manifest.json`). Field semantics
+still differ between Argus and CICFlowMeter (`rate`, `swin/dwin`, `sinpkt/dinpkt`), so
+`field_semantics_verified` stays `false` and the cross-dataset results remain exploratory.
+See `data/ALIGNED_DATA_PROVENANCE.md`.
