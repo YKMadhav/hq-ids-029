@@ -1,0 +1,78 @@
+{
+  "sha256": {
+    "unsw_aligned_5k.csv": "f65f99ed4c9bca86573bd585c6787a289119be600c10c2c0936e5fba1de1cd77",
+    "cic_aligned_5k.csv": "f079aea282b057ebb67b1eb1297ce7df418ccadba7ffa0083323976fbe00b510"
+  },
+  "sources": {
+    "unsw": {
+      "file": "data/real_flows.csv",
+      "sha256": "c10fea678690a4d1fa20d68a9507c98c568074aed3c64cf01890688226faf308",
+      "mapping": "12 columns copied as-is; sinpkt,dinpkt divided by 1000 (ms->s)"
+    },
+    "cic": {
+      "file": "1fe5e561-cicids2017_raw.csv",
+      "sha256": "03ba3626a0f9bb73b90c56772893e68b0577285130891cd7d811542c17b032dd",
+      "mapping": {
+        "dur": "Flow Duration / 1e6",
+        "spkts": "Total Fwd Packets",
+        "dpkts": "Total Backward Packets",
+        "sbytes": "Total Length of Fwd Packets",
+        "dbytes": "Total Length of Bwd Packets",
+        "rate": "(spkts+dpkts)/max(dur,0.0001)",
+        "smean": "Fwd Packet Length Mean",
+        "dmean": "Bwd Packet Length Mean",
+        "sinpkt": "Fwd IAT Mean / 1e6",
+        "dinpkt": "Bwd IAT Mean / 1e6",
+        "swin": "clip(Init_Win_bytes_forward*255/65535, 0, 255)",
+        "dwin": "clip(Init_Win_bytes_backward*255/65535, 0, 255)",
+        "label": "Label != BENIGN"
+      }
+    }
+  },
+  "unsw_verification": {
+    "dur": true,
+    "spkts": true,
+    "dpkts": true,
+    "sbytes": true,
+    "dbytes": true,
+    "rate": true,
+    "smean": true,
+    "dmean": true,
+    "sinpkt": true,
+    "dinpkt": true,
+    "swin": true,
+    "dwin": true,
+    "label": true,
+    "rate_is_(pkts-1)/dur": true,
+    "swin_distinct_values": [
+      0.0,
+      172.0,
+      255.0
+    ]
+  },
+  "cic_verification": {
+    "rows": 5000,
+    "no_raw_match": 0,
+    "label_ambiguous_in_raw": 581,
+    "label_unique_match": 4419,
+    "label_agrees_with_raw": 4419,
+    "fields_reproduced_of_rows": {
+      "smean": 5000,
+      "dmean": 5000,
+      "sinpkt": 5000,
+      "dinpkt": 5000,
+      "swin": 5000,
+      "dwin": 5000
+    },
+    "rate_formula_reproduced_rows": 5000
+  },
+  "cic_label_sequence_identical_to_unsw_aligned": true,
+  "extraction_code": "scripts/verify_aligned_data.py documents and verifies the mapping; the original sampling code that produced the 5k CIC subset was not retained.",
+  "semantic_findings": [
+    "UNSW rate = (spkts+dpkts-1)/dur (Argus); CIC rate here = (spkts+dpkts)/max(dur,100us). Definitions differ.",
+    "UNSW swin/dwin are quantised TCP window values (observed {0,172,255}); CIC swin/dwin are Init_Win_bytes rescaled by 255/65535 and clipped, i.e. continuous. Not the same quantity.",
+    "UNSW sinpkt/dinpkt are interarrival means in ms (converted to s); CIC uses Fwd/Bwd IAT Mean, which are not Argus source/destination interpacket arrival times.",
+    "CIC label sequence equals the UNSW aligned label sequence row-for-row (3403 attack/1597 benign): the CIC subset was drawn to mirror the UNSW class order. Features still match raw rows with agreeing labels, so this is matched sampling, not label copying, but class prior is NOT natural."
+  ],
+  "field_semantics_verified": false
+}

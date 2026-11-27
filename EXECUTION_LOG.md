@@ -210,3 +210,4 @@ This document provides a real-time, chronological audit trail of all architectur
 - `[2026-11-14 10:09:30] [VERIFICATION]` Official held-out evaluation: 40 runs on 73791 unseen official-test flows.
 - `[2026-11-14 10:32:02] [VERIFICATION]` Official held-out evaluation: 20 runs on 73791 unseen official-test flows.
 - `[2026-11-14 10:38:49] [VERIFICATION]` Official held-out evaluation: 25 runs on 73791 unseen official-test flows.
+- `[2026-11-27 18:14:07] [GROUPED/ARTIFACT ABLATION]` Wrote 80 rows to results/grouped_artifact_results.csv (random vs leave-one-family-out; full vs no_artifacts features).
