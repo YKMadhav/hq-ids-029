@@ -116,3 +116,27 @@ The geometric difference does not grow with qubit count (2.0-2.6 at 12 qubits vs
 
 ## Item 2 follow-up: tuning the quantum-inspired MPS Born machine (`qadv/item2_mps_tuning.py`)
 16 configurations (input dimension 4/8, 8/16 bins, bond dimension 6/16, 250/600 steps), 3 seeds, UNSW zero-day protocol. Best: AUC 0.714 (8-d, 16 bins, chi 16, 600 steps) vs 0.881 for kNN on the same 8-d input; 4-d inputs are worse (0.52-0.59). Tuning did not close the gap. Discretising each feature into bins before the tensor-network model likely discards the information distance-based methods use; a continuous-variable tensor-network model is untested.
+
+## Direction 3 - QUBO feature selection: QAOA vs classical solvers (`qadv/qubo_featsel.py`, pre-registered in `qadv/QUBO_PREREGISTRATION.md`)
+mRMR-style QUBO (relevance from mutual information, redundancy from |Spearman|, cardinality penalty), random feature subsets of
+the de-duplicated UNSW sample, n = 10/14/18 binary variables, 8 instances per size, exact brute-force ground truth.
+QAOA p=1,2,3 by exact statevector simulation (5 COBYLA restarts, 1000 shots) vs greedy, simulated annealing, tabu and random
+sampling, the classical solvers given at least QAOA's wall-clock.
+
+| n | method | found optimum (of 8) | mean P(opt) | approx. ratio | mean sample energy gap |
+|--:|:--|--:|--:|--:|--:|
+| 10 | QAOA p=2 / p=3 | 1.00 | 0.005 / 0.004 | 1.000 | 1.8 / 1.7 |
+| 10 | Tabu / SA | 1.00 / 1.00 | 0.855 / 0.232 | 1.000 | 0.015 / 0.175 |
+| 14 | QAOA p=2 | 0.75 | 0.001 | 0.999 | 3.6 |
+| 14 | Tabu / SA | 1.00 / 1.00 | 0.754 / 0.184 | 1.000 | 0.020 / 0.222 |
+| 18 | QAOA p=1 / 2 / 3 | 0.00 / 0.00 / 0.125 | 0.000 | 0.982 / 0.989 / 0.988 | 9.6 / 6.1 / 5.5 |
+| 18 | Tabu / SA / Random | 1.00 / 1.00 / 1.00 | 0.761 / 0.057 / 0.000 | 1.000 | 0.013 / 0.481 / 22.6 |
+
+Paired (QAOA minus SA) approximation ratio: QAOA wins 0 of 8 instances at every size and depth; the deficit grows with n
+(p=2: -0.0000 at n=10, -0.0008 at 14, -0.0107 at 18; the n=18 bootstrap CI excludes 0). Subsets chosen by any solver give
+the same XGBoost accuracy within 0.5 points (n=18: 0.918-0.922), so the QUBO optimum is not even the bottleneck.
+Pre-registered success criterion NOT met. Cautions: (1) n <= 18 is the simulator ceiling, where plain random sampling already
+finds the optimum (2^18 states), so this regime cannot reveal a quantum advantage either way; (2) QAOA wall-clock is simulator
+time, which scales as 2^n and says nothing about hardware; (3) energies are looked up from a precomputed table for both sides.
+What would be needed to test a real advantage: instances with n >> 30 where classical heuristics have a documented gap, which
+exact simulation cannot reach, and a hardware or tensor-network-QAOA run.

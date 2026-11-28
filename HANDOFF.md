@@ -83,6 +83,7 @@ F. Noise as a feature: test whether hardware noise (shot noise, readout error) a
    run few-shot (k<=20) on real IBM hardware only after a simulated noisy result looks different from classical.
 G. If nothing wins: write the rigorous negative-result/benchmark paper (already supported by data): 4-qubit VQC IDS is
    no better than a bypass, a frozen random circuit, or a one-threshold stump after leakage removal.
+Direction C status (2026-11-28): DONE at n<=18, no benefit; see results/qadv/FINDINGS.md (QUBO section). Owner has no non-packet data, so A is blocked; remaining sensible options are B (parameter-matched small models), D (temporal/Fuzzers evaluation), or G (negative-result paper).
 Immediate concrete steps for the next agent: (1) merge/review PR #1; (2) decide A vs B vs C with the owner (ask which data
 or resources exist); (3) pick one, write the task + classical controls + success criterion BEFORE running; (4) pin threads,
 dedup, 5+ seeds, bootstrap CIs, tune classical controls as hard as the quantum model; (5) log in EXECUTION_LOG.md and
