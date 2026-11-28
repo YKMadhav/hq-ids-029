@@ -84,6 +84,7 @@ F. Noise as a feature: test whether hardware noise (shot noise, readout error) a
 G. If nothing wins: write the rigorous negative-result/benchmark paper (already supported by data): 4-qubit VQC IDS is
    no better than a bypass, a frozen random circuit, or a one-threshold stump after leakage removal.
 Direction C status (2026-11-28): DONE at n<=18, no benefit; see results/qadv/FINDINGS.md (QUBO section). Owner has no non-packet data, so A is blocked; remaining sensible options are B (parameter-matched small models), D (temporal/Fuzzers evaluation), or G (negative-result paper).
+Direction D status (2026-11-28): Fuzzers diagnostic DONE (see FINDINGS); day-wise temporal split BLOCKED: needs the owner to upload CIC-IDS2017 per-day CSVs (Monday..Friday) - no network here and the available 56k file has no day/timestamp. Then adapt qadv/item5_drift.py (written for CIC-2018 columns day,Timestamp,Label).
 Immediate concrete steps for the next agent: (1) merge/review PR #1; (2) decide A vs B vs C with the owner (ask which data
 or resources exist); (3) pick one, write the task + classical controls + success criterion BEFORE running; (4) pin threads,
 dedup, 5+ seeds, bootstrap CIs, tune classical controls as hard as the quantum model; (5) log in EXECUTION_LOG.md and

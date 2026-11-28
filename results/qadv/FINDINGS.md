@@ -140,3 +140,16 @@ finds the optimum (2^18 states), so this regime cannot reveal a quantum advantag
 time, which scales as 2^n and says nothing about hardware; (3) energies are looked up from a precomputed table for both sides.
 What would be needed to test a real advantage: instances with n >> 30 where classical heuristics have a documented gap, which
 exact simulation cannot reach, and a hardware or tensor-network-QAOA run.
+
+## Fuzzers diagnostic (`qadv/fuzzers_diagnostic.py`, UNSW 5k de-duplicated, XGBoost, 5 seeds; 531 Fuzzers, 1577 Normal)
+- Fuzzers are NOT inherently hard: labelled Fuzzers-vs-Normal CV AUC = 0.947.
+- Unseen Fuzzers (trained on Normal + all other attack families): AUC 0.893, but recall is only 0.31 at the 0.5 threshold.
+  At a fixed 10% benign FPR, recall is 0.57. So much of the earlier "26-41% recall" is a fixed-threshold/calibration failure of
+  models trained on other families, not an absence of signal. Adding labelled Fuzzers helps slowly: recall@10%FPR 0.57 (k=0),
+  0.62 (5), 0.64 (20), 0.65 (50), 0.74 (265 = half of all Fuzzers); recall@0.5 0.31 -> 0.78 only with 265.
+- Fuzzers look like Exploits on the testbed fields (median sttl 254 and ct_state_ttl 1 for both; Normal 31 and 0), so the
+  family is flagged largely through the same TTL artifact the stump uses; versus Exploits the main differences are synack/tcprtt.
+  Conclusion: report threshold-free metrics (AUC, recall at fixed FPR) for held-out families; accuracy at 0.5 overstates failure.
+- Temporal split: NOT done. The only CIC-IDS2017 file available (56,661 flows) has no timestamp or day column and the sandbox
+  cannot download the original (network blocked). Faking day labels from attack families would confound attack type with day.
+  Needs CIC-IDS2017 `MachineLearningCVE` day files (Mon-Fri CSVs) or `TrafficLabelling` CSVs with Timestamp, uploaded by the owner.
